@@ -67,8 +67,8 @@ export function TestRunCasesSummary({
     queryKey: ["testRunSummary", ...effectiveTestRunIds],
     queryFn: async () => {
       if (!isMultiConfig) {
-        // Single test run - use existing endpoint
-        const response = await fetch(`/api/test-runs/${testRunId}/summary`);
+        // Single test run - use existing endpoint with case details for color bar
+        const response = await fetch(`/api/test-runs/${testRunId}/summary?includeCaseDetails=true`);
         if (!response.ok) {
           throw new Error("Failed to fetch test run summary");
         }
@@ -78,7 +78,7 @@ export function TestRunCasesSummary({
       // Multi-config - fetch all and aggregate
       const summaries = await Promise.all(
         effectiveTestRunIds.map(async (id) => {
-          const response = await fetch(`/api/test-runs/${id}/summary`);
+          const response = await fetch(`/api/test-runs/${id}/summary?includeCaseDetails=true`);
           if (!response.ok) {
             throw new Error(`Failed to fetch test run summary for ${id}`);
           }

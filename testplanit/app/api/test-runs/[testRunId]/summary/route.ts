@@ -85,6 +85,10 @@ export async function GET(
     return NextResponse.json({ error: "Invalid test run ID" }, { status: 400 });
   }
 
+  // Check if case details should be included (for detail views with color bars)
+  const searchParams = req.nextUrl.searchParams;
+  const includeCaseDetails = searchParams.get("includeCaseDetails") === "true";
+
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -166,7 +170,8 @@ export async function GET(
       // Handle regular test runs with optimized queries
       const summary = await getRegularRunSummary(
         testRunId,
-        testRun.forecastManual
+        testRun.forecastManual,
+        includeCaseDetails
       );
       return NextResponse.json({
         ...summary,
@@ -190,7 +195,8 @@ export async function GET(
 
 async function getRegularRunSummary(
   testRunId: number,
-  forecastManual: number | null
+  forecastManual: number | null,
+  includeCaseDetails: boolean = false
 ): Promise<
   Omit<TestRunSummaryData, "testRunType" | "issues" | "commentsCount">
 > {
@@ -250,9 +256,7 @@ async function getRegularRunSummary(
       AND trr.id IS NULL
   `;
 
-  // Skip case details for list view - they're expensive and not needed
-  // Case details are only fetched when explicitly requested via query param
-  const includeCaseDetails = false; // TODO: Add query param support if needed
+  // Case details are only fetched when explicitly requested (e.g., for detail views with color bars)
   let caseDetails: Array<{
     id: number;
     repositoryCaseId: number;
