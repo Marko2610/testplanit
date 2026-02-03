@@ -44,7 +44,7 @@ const RenderField: React.FC<RenderFieldProps> = ({
   canEditRestricted = true,
   projectId,
 }) => {
-  const defaultOption = field.caseField.fieldOptions.find(
+  const defaultOption = field.caseField.fieldOptions?.find(
     (option: any) => option.fieldOption.isDefault
   );
 
@@ -83,23 +83,30 @@ const RenderField: React.FC<RenderFieldProps> = ({
         );
       case "Multi-Select": {
         // Ensure value is an array for Multi-Select
-        const valueArray = Array.isArray(value) ? value : (value != null ? [value] : []);
+        const valueArray = Array.isArray(value)
+          ? value
+          : value != null
+            ? [value]
+            : [];
 
         return (
           <MultiSelect
-            value={field.caseField.fieldOptions
-              .filter(
-                (option: any) => valueArray.includes(option.fieldOption.id)
+            value={(field.caseField.fieldOptions ?? [])
+              .filter((option: any) =>
+                valueArray.includes(option.fieldOption.id)
               )
               .map((option: any) => ({
                 value: option.fieldOption.id,
                 label: (
                   <div className="flex items-center">
-                    <DynamicIcon
-                      className="h-4 w-4 mr-1"
-                      name={option.fieldOption.icon.name}
-                      color={option.fieldOption.iconColor.value}
-                    />
+                    {option.fieldOption.icon &&
+                      option.fieldOption.iconColor && (
+                        <DynamicIcon
+                          className="h-4 w-4 mr-1"
+                          name={option.fieldOption.icon.name}
+                          color={option.fieldOption.iconColor.value}
+                        />
+                      )}
                     {option.fieldOption.name}
                   </div>
                 ),
@@ -110,7 +117,7 @@ const RenderField: React.FC<RenderFieldProps> = ({
                 : [];
               onChange(selectedValues);
             }}
-            options={field.caseField.fieldOptions
+            options={(field.caseField.fieldOptions ?? [])
               .sort(
                 (a: any, b: any) => a.fieldOption.order - b.fieldOption.order
               )
@@ -118,11 +125,14 @@ const RenderField: React.FC<RenderFieldProps> = ({
                 value: option.fieldOption.id,
                 label: (
                   <div className="flex items-center">
-                    <DynamicIcon
-                      className="h-4 w-4 mr-1"
-                      name={option.fieldOption.icon.name}
-                      color={option.fieldOption.iconColor.value}
-                    />
+                    {option.fieldOption.icon &&
+                      option.fieldOption.iconColor && (
+                        <DynamicIcon
+                          className="h-4 w-4 mr-1"
+                          name={option.fieldOption.icon.name}
+                          color={option.fieldOption.iconColor.value}
+                        />
+                      )}
                     {option.fieldOption.name}
                   </div>
                 ),
@@ -144,14 +154,14 @@ const RenderField: React.FC<RenderFieldProps> = ({
               onValueChange={(val) => {
                 onChange(Number(val)); // Convert value to number
               }}
-              value={value ? value.toString() : initialValue.toString()}
+              value={value ? value.toString() : initialValue?.toString() || ""}
               disabled={isDisabled}
             >
               <SelectTrigger className="w-fit">
                 <SelectValue placeholder="Select an option" />
               </SelectTrigger>
               <SelectContent>
-                {field.caseField.fieldOptions
+                {(field.caseField.fieldOptions ?? [])
                   .sort(
                     (a: any, b: any) =>
                       a.fieldOption.order - b.fieldOption.order
@@ -162,11 +172,14 @@ const RenderField: React.FC<RenderFieldProps> = ({
                       value={option.fieldOption.id.toString()}
                     >
                       <div className="flex items-center">
-                        <DynamicIcon
-                          className="h-4 w-4 mr-1"
-                          name={option.fieldOption.icon.name}
-                          color={option.fieldOption.iconColor.value}
-                        />
+                        {option.fieldOption.icon &&
+                          option.fieldOption.iconColor && (
+                            <DynamicIcon
+                              className="h-4 w-4 mr-1"
+                              name={option.fieldOption.icon.name}
+                              color={option.fieldOption.iconColor.value}
+                            />
+                          )}
                         {option.fieldOption.name}
                       </div>
                     </SelectItem>
@@ -323,8 +336,14 @@ const RenderField: React.FC<RenderFieldProps> = ({
       control={control}
       name={field.caseField.id.toString()}
       render={({ field: { onChange, value } }) => (
-        <FormItem className="min-w-[300px] mx-1">
-          <FormLabel className="flex items-center">
+        <FormItem
+          className="min-w-[300px] mx-1"
+          data-testid={`field-${field.caseField.systemName}`}
+        >
+          <FormLabel
+            className="flex items-center"
+            data-testid={`field-${field.caseField.systemName}-label`}
+          >
             {field.caseField.displayName}
             {field.caseField.isRequired && (
               <sup>
@@ -345,7 +364,11 @@ const RenderField: React.FC<RenderFieldProps> = ({
               />
             )}
           </FormLabel>
-          <FormControl>{renderFieldControl(onChange, value)}</FormControl>
+          <FormControl
+            data-testid={`field-${field.caseField.systemName}-input`}
+          >
+            {renderFieldControl(onChange, value)}
+          </FormControl>
           <FormMessage />
         </FormItem>
       )}

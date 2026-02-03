@@ -599,10 +599,12 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
             break;
           case "Link":
           case "Text String":
-            defaultValues[fieldIdStr] = "";
+            defaultValues[fieldIdStr] = caseField.caseField.defaultValue || "";
             break;
           case "Text Long":
-            defaultValues[fieldIdStr] = JSON.stringify(emptyEditorContent);
+            defaultValues[fieldIdStr] =
+              caseField.caseField.defaultValue ||
+              JSON.stringify(emptyEditorContent);
             break;
         }
       });
@@ -716,10 +718,12 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
             break;
           case "Link":
           case "Text String":
-            defaultValues[fieldIdStr] = "";
+            defaultValues[fieldIdStr] = caseField.caseField.defaultValue || "";
             break;
           case "Text Long":
-            defaultValues[fieldIdStr] = JSON.stringify(emptyEditorContent);
+            defaultValues[fieldIdStr] =
+              caseField.caseField.defaultValue ||
+              JSON.stringify(emptyEditorContent);
             break;
         }
       });
@@ -1115,7 +1119,7 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
           </span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] lg:max-w-[1400px]">
+      <DialogContent className="sm:max-w-[600px] lg:max-w-[1400px]" data-testid="add-case-dialog">
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {isSubmitting && (

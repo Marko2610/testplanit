@@ -390,6 +390,44 @@ export class ApiHelper {
   }
 
   /**
+   * Create a test case with field values via API
+   */
+  async createTestCaseWithFieldValues(
+    projectId: number,
+    folderId: number,
+    name: string,
+    fieldValues: Record<string, any>
+  ): Promise<number> {
+    // First create the test case
+    const caseId = await this.createTestCase(projectId, folderId, name);
+
+    // Then create field values for each field
+    for (const [fieldIdStr, value] of Object.entries(fieldValues)) {
+      const fieldId = parseInt(fieldIdStr, 10);
+
+      const valueResponse = await this.request.post(
+        `${this.baseURL}/api/model/caseFieldValues/create`,
+        {
+          data: {
+            data: {
+              repositoryCase: { connect: { id: caseId } },
+              caseField: { connect: { id: fieldId } },
+              project: { connect: { id: projectId } },
+              value: typeof value === "string" ? value : JSON.stringify(value),
+            },
+          },
+        }
+      );
+
+      if (!valueResponse.ok()) {
+        console.warn(`Failed to create field value for field ${fieldId} on case ${caseId}`);
+      }
+    }
+
+    return caseId;
+  }
+
+  /**
    * Helper: Get folder info
    */
   private async getFolderInfo(
@@ -2630,6 +2668,7 @@ export class ApiHelper {
     name: string,
     options?: {
       typeId?: number;
+      isStarted?: boolean;
       isCompleted?: boolean;
       completedAt?: Date;
       parentId?: number;
@@ -2642,6 +2681,7 @@ export class ApiHelper {
       projectId: projectId,
       milestoneTypesId: options?.typeId ?? 1, // Default to type 1 (Version)
       createdBy: userId,
+      isStarted: options?.isStarted ?? false,
       isCompleted: options?.isCompleted ?? false,
       isDeleted: false,
     };
@@ -2914,7 +2954,7 @@ export class ApiHelper {
       password: options.password,
       emailVerifToken: crypto.randomUUID(),
       access: options.access || "USER",
-      roleId: options.roleId || 1,
+      ...(options.roleId ? { roleId: options.roleId } : {}),
     };
 
     const response = await this.request.post(
@@ -3043,5 +3083,119 @@ export class ApiHelper {
 
     const result = await response.json();
     return result.data.id;
+  }
+
+  /**
+   * Update user preferences
+   */
+  async updateUserPreferences(options: {
+    userId: string;
+    hasCompletedWelcomeTour?: boolean;
+    theme?: string;
+    locale?: string;
+    itemsPerPage?: string;
+  }): Promise<void> {
+    const response = await this.request.patch(
+      `${this.baseURL}/api/model/userPreferences/update`,
+      {
+        data: {
+          where: { userId: options.userId },
+          data: {
+            hasCompletedWelcomeTour: options.hasCompletedWelcomeTour,
+            theme: options.theme,
+            locale: options.locale,
+            itemsPerPage: options.itemsPerPage,
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to update user preferences: ${error}`);
+    }
+  }
+
+  /**
+   * Give a user access to a project
+   */
+  async giveUserProjectAccess(options: {
+    userId: string;
+    projectId: number;
+    accessType?: "DEFAULT" | "NO_ACCESS" | "GLOBAL_ROLE" | "SPECIFIC_ROLE";
+  }): Promise<void> {
+    const response = await this.request.post(
+      `${this.baseURL}/api/model/userProjectPermission/create`,
+      {
+        data: {
+          data: {
+            user: { connect: { id: options.userId } },
+            project: { connect: { id: options.projectId } },
+            accessType: options.accessType || "DEFAULT",
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to give user project access: ${error}`);
+    }
+  }
+
+  /**
+   * Create a role
+   */
+  async createRole(name: string): Promise<number> {
+    const response = await this.request.post(
+      `${this.baseURL}/api/model/roles/create`,
+      {
+        data: {
+          data: {
+            name,
+            isDefault: false,
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to create role: ${error}`);
+    }
+
+    const result = await response.json();
+    return result.data.id;
+  }
+
+  /**
+   * Set a role permission for a specific application area
+   */
+  async setRolePermission(options: {
+    roleId: number;
+    area: string;
+    canAddEdit?: boolean;
+    canDelete?: boolean;
+    canClose?: boolean;
+  }): Promise<void> {
+    const response = await this.request.post(
+      `${this.baseURL}/api/model/rolePermission/create`,
+      {
+        data: {
+          data: {
+            roleId: options.roleId,
+            area: options.area,
+            canAddEdit: options.canAddEdit ?? false,
+            canDelete: options.canDelete ?? false,
+            canClose: options.canClose ?? false,
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to set role permission: ${error}`);
+    }
   }
 }

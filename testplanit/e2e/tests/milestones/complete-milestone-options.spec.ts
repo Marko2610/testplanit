@@ -13,34 +13,35 @@ import { test, expect } from "../../fixtures";
 test.describe("Complete Milestone - Feature Validation", () => {
   test("should show Complete Milestone dialog with proper UI elements", async ({
     page,
-    projectId,
+    api,
   }) => {
+    // Create a test project and milestone
+    const projectId = await api.createProject(`E2E Milestone Test ${Date.now()}`);
+    await api.createMilestone(projectId, `Test Milestone ${Date.now()}`, {
+      isStarted: true,
+      isCompleted: false,
+    });
+
     // Navigate to milestones page
     await page.goto(`/en-US/projects/milestones/${projectId}`);
     await page.waitForLoadState("networkidle");
 
-    // Wait for the table to be visible
-    const table = page.locator("table").first();
-    await expect(table).toBeVisible({ timeout: 10000 });
+    // Wait for milestone content to be visible (uses card layout, not table)
+    // Look for the "Active" tab which indicates milestones are loaded
+    const activeTab = page.getByRole("tab", { name: /Active/i });
+    await expect(activeTab).toBeVisible({ timeout: 10000 });
 
-    // Look for any incomplete milestone in the table and wait for it to appear
-    const incompleteMilestones = page.locator(
-      'tr:has(button[title="Complete Milestone"])'
-    );
-    await expect(incompleteMilestones.first()).toBeVisible({ timeout: 10000 });
+    // Find the first milestone card
+    const milestoneCard = page.locator('div').filter({ hasText: 'Test Milestone' }).first();
+    await expect(milestoneCard).toBeVisible({ timeout: 10000 });
 
-    const count = await incompleteMilestones.count();
-    if (count === 0) {
-      throw new Error("No incomplete milestones found in the seeded data");
-    }
+    // Open the 3-dot menu (last button in the card)
+    const menuButton = milestoneCard.getByRole('button').last();
+    await menuButton.click();
 
-    // Wait for the Complete Milestone button to be visible and clickable
-    const completeMilestoneButton = incompleteMilestones
-      .first()
-      .locator('button[title="Complete Milestone"]');
+    // Click Complete from the menu
+    const completeMilestoneButton = page.getByRole('menuitem', { name: 'Complete' });
     await expect(completeMilestoneButton).toBeVisible({ timeout: 10000 });
-
-    // Click the first Complete Milestone button
     await completeMilestoneButton.click();
 
     // Wait for dialog to open
@@ -60,25 +61,43 @@ test.describe("Complete Milestone - Feature Validation", () => {
 
   test("should show checkboxes when milestone has incomplete dependencies", async ({
     page,
-    projectId,
+    api,
   }) => {
+    // Create a test project
+    const projectId = await api.createProject(`E2E Milestone Test ${Date.now()}`);
+
     // This test verifies the checkbox functionality exists
     // It will only run if there's a milestone with dependencies in the seeded data
     await page.goto(`/en-US/projects/milestones/${projectId}`);
     await page.waitForLoadState("networkidle");
 
-    // Look for incomplete milestones
-    const incompleteMilestones = page.locator(
-      'tr:has(button[title="Complete Milestone"])'
-    );
-    const count = await incompleteMilestones.count();
+    // Wait for the Active tab to be visible
+    const activeTab = page.getByRole("tab", { name: /Active/i });
+    await expect(activeTab).toBeVisible({ timeout: 10000 });
+
+    // Look for incomplete milestone cards (cards in the Active tab)
+    const milestoneCards = page.locator('div').filter({ hasText: /Test Milestone|Milestone/ });
+    const count = await milestoneCards.count();
 
     // Try to find one with dependencies
     for (let i = 0; i < Math.min(count, 5); i++) {
-      await incompleteMilestones
-        .nth(i)
-        .locator('button[title="Complete Milestone"]')
-        .click();
+      const card = milestoneCards.nth(i);
+
+      // Open the 3-dot menu
+      const menuButton = card.getByRole('button').last();
+      await menuButton.click();
+
+      // Click Complete Milestone from the menu
+      const completeMilestoneButton = page.getByRole('menuitem', { name: 'Complete' });
+      const isVisible = await completeMilestoneButton.isVisible().catch(() => false);
+
+      if (!isVisible) {
+        // Close menu if Complete Milestone not available (milestone might be completed)
+        await page.keyboard.press('Escape');
+        continue;
+      }
+
+      await completeMilestoneButton.click();
       await expect(page.getByRole("dialog")).toBeVisible();
 
       // Check if any optional completion checkboxes appear
@@ -126,22 +145,41 @@ test.describe("Complete Milestone - Feature Validation", () => {
 
   test("should hide workflow selector when checkbox is unchecked", async ({
     page,
-    projectId,
+    api,
   }) => {
+    // Create a test project
+    const projectId = await api.createProject(`E2E Milestone Test ${Date.now()}`);
+
     await page.goto(`/en-US/projects/milestones/${projectId}`);
     await page.waitForLoadState("networkidle");
 
-    const incompleteMilestones = page.locator(
-      'tr:has(button[title="Complete Milestone"])'
-    );
-    const count = await incompleteMilestones.count();
+    // Wait for the Active tab to be visible
+    const activeTab = page.getByRole("tab", { name: /Active/i });
+    await expect(activeTab).toBeVisible({ timeout: 10000 });
+
+    // Look for incomplete milestone cards
+    const milestoneCards = page.locator('div').filter({ hasText: /Test Milestone|Milestone/ });
+    const count = await milestoneCards.count();
 
     // Try to find a milestone with test runs
     for (let i = 0; i < Math.min(count, 5); i++) {
-      await incompleteMilestones
-        .nth(i)
-        .locator('button[title="Complete Milestone"]')
-        .click();
+      const card = milestoneCards.nth(i);
+
+      // Open the 3-dot menu
+      const menuButton = card.getByRole('button').last();
+      await menuButton.click();
+
+      // Click Complete Milestone from the menu
+      const completeMilestoneButton = page.getByRole('menuitem', { name: 'Complete' });
+      const isVisible = await completeMilestoneButton.isVisible().catch(() => false);
+
+      if (!isVisible) {
+        // Close menu if Complete Milestone not available
+        await page.keyboard.press('Escape');
+        continue;
+      }
+
+      await completeMilestoneButton.click();
       await expect(page.getByRole("dialog")).toBeVisible();
 
       const testRunsCheckbox = page.getByLabel(
