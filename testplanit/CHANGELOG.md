@@ -1,3 +1,10 @@
+## [0.11.17](https://github.com/TestPlanIt/testplanit/compare/v0.11.16...v0.11.17) (2026-02-06)
+
+
+### Bug Fixes
+
+* add Node types to TypeScript configuration and clean up test file imports ([101f528](https://github.com/TestPlanIt/testplanit/commit/101f5289f9ce5c9c7b9ba04d0a1754fa3b3bbf5e))
+
 ## [0.11.16](https://github.com/TestPlanIt/testplanit/compare/v0.11.15...v0.11.16) (2026-02-05)
 
 
