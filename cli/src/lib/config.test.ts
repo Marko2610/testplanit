@@ -4,19 +4,25 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 vi.mock("conf", () => {
   const store: Record<string, any> = {};
   return {
-    default: vi.fn().mockImplementation(() => ({
-      get: vi.fn((key: string) => store[key]),
-      set: vi.fn((key: string, value: any) => {
+    default: class MockConf {
+      get(key: string) {
+        return store[key];
+      }
+      set(key: string, value: any) {
         store[key] = value;
-      }),
-      clear: vi.fn(() => {
+      }
+      clear() {
         for (const key in store) {
           delete store[key];
         }
-      }),
-      path: "/mock/config/path/testplanit-cli/config.json",
-      store,
-    })),
+      }
+      get path() {
+        return "/mock/config/path/testplanit-cli/config.json";
+      }
+      get store() {
+        return store;
+      }
+    },
   };
 });
 

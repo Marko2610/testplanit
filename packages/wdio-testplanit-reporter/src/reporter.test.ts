@@ -25,23 +25,76 @@ vi.mock('@wdio/reporter', () => {
 // Mock the API client
 vi.mock('@testplanit/api', () => {
   return {
-    TestPlanItClient: vi.fn().mockImplementation(() => ({
-      getStatuses: vi.fn().mockResolvedValue([
-        { id: 1, name: 'Passed', systemName: 'passed', isSuccess: true, isFailure: false },
-        { id: 2, name: 'Failed', systemName: 'failed', isSuccess: false, isFailure: true },
-        { id: 3, name: 'Skipped', systemName: 'skipped', isSuccess: false, isFailure: false },
-      ]),
-      getStatusId: vi.fn().mockImplementation(async (_projectId: number, status: string) => {
+    TestPlanItClient: class MockTestPlanItClient {
+      async getStatuses() {
+        return [
+          { id: 1, name: 'Passed', systemName: 'passed', isSuccess: true, isFailure: false },
+          { id: 2, name: 'Failed', systemName: 'failed', isSuccess: false, isFailure: true },
+          { id: 3, name: 'Skipped', systemName: 'skipped', isSuccess: false, isFailure: false },
+        ];
+      }
+      async getStatusId(_projectId: number, status: string) {
         const map: Record<string, number> = { passed: 1, failed: 2, skipped: 3 };
         return map[status];
-      }),
-      createTestRun: vi.fn().mockResolvedValue({ id: 123, name: 'Test Run' }),
-      getTestRun: vi.fn().mockResolvedValue({ id: 123, name: 'Test Run' }),
-      completeTestRun: vi.fn().mockResolvedValue({ id: 123, isCompleted: true }),
-      findOrAddTestCaseToRun: vi.fn().mockResolvedValue({ id: 456 }),
-      createTestResult: vi.fn().mockResolvedValue({ id: 789 }),
-      uploadAttachment: vi.fn().mockResolvedValue({ id: 1, path: '/attachments/1' }),
-    })),
+      }
+      async createTestRun() {
+        return { id: 123, name: 'Test Run' };
+      }
+      async getTestRun() {
+        return { id: 123, name: 'Test Run' };
+      }
+      async completeTestRun() {
+        return { id: 123, isCompleted: true };
+      }
+      async findOrAddTestCaseToRun() {
+        return { id: 456 };
+      }
+      async createTestResult() {
+        return { id: 789 };
+      }
+      async uploadAttachment() {
+        return { id: 1, path: '/attachments/1' };
+      }
+      async createJUnitTestSuite() {
+        return { id: 1, name: 'Test Suite' };
+      }
+      async createJUnitTestResult() {
+        return { id: 789 };
+      }
+      async uploadJUnitAttachment() {
+        return { id: 1, path: '/attachments/1' };
+      }
+      async findTestRunByName() {
+        return { id: 123, name: 'Test Run' };
+      }
+      async findConfigurationByName() {
+        return { id: 1, name: 'Configuration' };
+      }
+      async findMilestoneByName() {
+        return { id: 1, name: 'Milestone' };
+      }
+      async findWorkflowStateByName() {
+        return { id: 1, name: 'State' };
+      }
+      async findFolderByName() {
+        return { id: 1, name: 'Folder' };
+      }
+      async createFolder() {
+        return { id: 1, name: 'Folder' };
+      }
+      async findTemplateByName() {
+        return { id: 1, name: 'Template' };
+      }
+      async resolveTagIds() {
+        return [1, 2, 3];
+      }
+      async findOrCreateFolderPath() {
+        return { id: 1, name: 'Folder' };
+      }
+      async findOrCreateTestCase() {
+        return { testCase: { id: 456, name: 'Test Case' }, action: 'found' };
+      }
+    },
     TestPlanItError: class TestPlanItError extends Error {
       constructor(message: string) {
         super(message);
@@ -53,8 +106,10 @@ vi.mock('@testplanit/api', () => {
 
 // Mock fs module
 vi.mock('fs', () => ({
-  existsSync: vi.fn().mockReturnValue(true),
+  existsSync: vi.fn().mockReturnValue(false), // No shared state file exists by default
   readFileSync: vi.fn().mockReturnValue(Buffer.from('fake-image-data')),
+  writeFileSync: vi.fn(),
+  unlinkSync: vi.fn(),
 }));
 
 // Import after mocks are set up
