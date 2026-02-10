@@ -323,8 +323,36 @@ async function handler(
 
     // Clone the response to add headers (NextResponse is immutable)
     const responseBody = await response.clone().text();
+
+    // Remap certain HTTP status codes to prevent nginx ingress from intercepting
+    // API error responses. The ingress controller's `custom-http-errors` setting
+    // (403,404,500,502,503,504) replaces JSON response bodies with HTML error pages,
+    // which breaks API clients that expect JSON. We remap Prisma/ZenStack error
+    // responses to status codes that won't be intercepted while preserving the
+    // JSON error body for proper client-side error handling.
+    let responseStatus = response.status;
+    if (!response.ok && responseBody) {
+      try {
+        const parsed = JSON.parse(responseBody);
+        if (parsed.error) {
+          // Prisma P2025 (connected record not found) maps to 404 in ZenStack,
+          // but 422 (Unprocessable Entity) is more appropriate and avoids interception
+          if (response.status === 404) {
+            responseStatus = 422;
+          }
+          // ZenStack returns 403 for constraint violations (access policy),
+          // remap to 422 to preserve the JSON error details
+          if (response.status === 403) {
+            responseStatus = 422;
+          }
+        }
+      } catch {
+        // Response body is not JSON (e.g., actual 404 page), leave status as-is
+      }
+    }
+
     const newResponse = new NextResponse(responseBody, {
-      status: response.status,
+      status: responseStatus,
       statusText: response.statusText,
       headers: response.headers,
     });
