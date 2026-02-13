@@ -121,9 +121,6 @@ importers:
       docs:
         specifier: 0.3.2-canary.0
         version: 0.3.2-canary.0
-      forge-app:
-        specifier: ^1.1.1
-        version: 1.1.1(@types/node@25.2.3)
       lucide-react:
         specifier: ^0.561.0
         version: 0.561.0(react@19.2.4)
@@ -11174,10 +11171,6 @@ packages:
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
-
-  forge-app@1.1.1:
-    resolution: {integrity: sha512-8kSxab1OM+A2YmZMarRJlo+x5C82hoLmX7tQlFCLmA+2LUukTwrHi0+uQ1NQPBHQct+mft0dJMHBUDA/iNua4Q==}
-    hasBin: true
 
   form-data-encoder@2.1.4:
     resolution: {integrity: sha512-yDYSgNMraqvnxiEXO4hi88+YZxaHC6QKzb5N84iRCTDeRO7ZALpir/lVmf/uXUhnwUr2O4HU8s/n6x+yNjQkHw==}
@@ -38334,13 +38327,6 @@ snapshots:
     dependencies:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
-
-  forge-app@1.1.1(@types/node@25.2.3):
-    dependencies:
-      colors: 1.4.0
-      inquirer: 8.2.7(@types/node@25.2.3)
-    transitivePeerDependencies:
-      - '@types/node'
 
   form-data-encoder@2.1.4: {}
 
