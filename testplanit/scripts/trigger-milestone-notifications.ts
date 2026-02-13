@@ -1,5 +1,6 @@
 import { getForecastQueue } from "../lib/queues";
 import { JOB_MILESTONE_DUE_NOTIFICATIONS } from "../workers/forecastWorker";
+import { isMultiTenantMode, getAllTenantIds } from "../lib/multiTenantPrisma";
 
 async function triggerMilestoneNotifications() {
   const forecastQueue = getForecastQueue();
@@ -9,9 +10,12 @@ async function triggerMilestoneNotifications() {
   }
 
   try {
+    const tenantIds = isMultiTenantMode() ? getAllTenantIds() : [undefined];
     console.log("Queueing milestone due notifications job...");
-    const job = await forecastQueue.add(JOB_MILESTONE_DUE_NOTIFICATIONS, {});
-    console.log(`✓ Successfully queued milestone notifications job: ${job.id}`);
+    for (const tenantId of tenantIds) {
+      const job = await forecastQueue.add(JOB_MILESTONE_DUE_NOTIFICATIONS, { tenantId });
+      console.log(`✓ Successfully queued milestone notifications job: ${job.id}${tenantId ? ` for tenant ${tenantId}` : ""}`);
+    }
     console.log(`  Job will be processed by the forecast worker`);
     console.log(`  Monitor progress with: pnpm pm2:logs`);
     process.exit(0);

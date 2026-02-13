@@ -1,5 +1,6 @@
 import { getForecastQueue } from "../lib/queues";
 import { JOB_UPDATE_ALL_CASES } from "../workers/forecastWorker";
+import { isMultiTenantMode, getAllTenantIds } from "../lib/multiTenantPrisma";
 
 async function triggerForecastRecalculation() {
   const forecastQueue = getForecastQueue();
@@ -9,9 +10,12 @@ async function triggerForecastRecalculation() {
   }
 
   try {
+    const tenantIds = isMultiTenantMode() ? getAllTenantIds() : [undefined];
     console.log("Queueing forecast recalculation job...");
-    const job = await forecastQueue.add(JOB_UPDATE_ALL_CASES, {});
-    console.log(`✓ Successfully queued forecast recalculation job: ${job.id}`);
+    for (const tenantId of tenantIds) {
+      const job = await forecastQueue.add(JOB_UPDATE_ALL_CASES, { tenantId });
+      console.log(`✓ Successfully queued forecast recalculation job: ${job.id}${tenantId ? ` for tenant ${tenantId}` : ""}`);
+    }
     console.log(`  Job will be processed by the forecast worker`);
     console.log(`  Monitor progress with: pnpm pm2:logs`);
     process.exit(0);
