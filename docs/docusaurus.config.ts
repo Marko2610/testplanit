@@ -1,6 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
-
 import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
@@ -180,34 +177,12 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
     },
     // Algolia DocSearch Configuration
+    // These are public search-only credentials, safe to commit
     algolia: {
-      // The application ID provided by Algolia
-      appId: process.env.ALGOLIA_APP_ID || 'YOUR_APP_ID', // Fallback is for placeholder only
-
-      // Public API key: it is safe to commit it
-      apiKey: process.env.ALGOLIA_API_KEY || 'YOUR_SEARCH_API_KEY', // Fallback is for placeholder only
-
-      indexName: process.env.ALGOLIA_INDEX_NAME || 'YOUR_INDEX_NAME', // Fallback is for placeholder only
-
-      // Optional: see DocSearch docs
+      appId: 'TIRP24VNLH',
+      apiKey: '44756cc71f4fee513570b5124c24198d',
+      indexName: 'testplanit',
       contextualSearch: true,
-
-      // Optional: Specify domains where the navigation should occur through window.location instead navigating within the SPA
-      // externalUrlRegex: 'external\\.com|domain\\.com',
-
-      // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl.
-      // replaceSearchResultPathname: {
-      //   from: '/docs/', // or as RegExp: /\/docs\//
-      //   to: '/',
-      // },
-
-      // Optional: Algolia search parameters
-      // searchParameters: {},
-
-      // Optional: path for search page that enabled by default (`false` to disable)
-      // searchPagePath: 'search',
-
-      //... other Algolia params
     },
   } satisfies Preset.ThemeConfig,
 };
