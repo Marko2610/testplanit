@@ -60,7 +60,6 @@ import { useForm, Controller, FormProvider } from "react-hook-form";
 import FieldValueRenderer from "./[caseId]/FieldValueRenderer";
 import {
   convertHtmlToTipTapJSON,
-  convertTextToTipTapJSON,
   ensureTipTapJSON,
   serializeTipTapJSON,
 } from "~/utils/tiptapConversion";
@@ -84,7 +83,7 @@ import { IssueStatusDisplay } from "@/components/IssueStatusDisplay";
 import { ApplicationArea } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { emptyEditorContent } from "~/app/constants";
-import { tiptapToHtml } from "~/utils/tiptapToHtml";
+import { generateHTMLFallback } from "~/utils/tiptapToHtml";
 
 interface ExternalIssue {
   id: string;
@@ -1462,7 +1461,7 @@ export function GenerateTestCasesWizard({
                     // Convert string to TipTap JSON format if it's a string
                     if (typeof fieldValue === "string") {
                       processedValue = JSON.stringify(
-                        convertTextToTipTapJSON(fieldValue)
+                        ensureTipTapJSON(fieldValue)
                       );
                     } else {
                       processedValue = JSON.stringify(fieldValue);
@@ -1552,7 +1551,7 @@ export function GenerateTestCasesWizard({
                     case "Text Long":
                       if (typeof fieldValue === "string") {
                         processedValue = JSON.stringify(
-                          convertTextToTipTapJSON(fieldValue)
+                          ensureTipTapJSON(fieldValue)
                         );
                       } else {
                         processedValue = JSON.stringify(fieldValue);
@@ -1626,13 +1625,13 @@ export function GenerateTestCasesWizard({
                 // Convert step text to TipTap JSON format
                 const stepContent =
                   typeof step.step === "string"
-                    ? convertTextToTipTapJSON(step.step)
+                    ? ensureTipTapJSON(step.step)
                     : step.step || emptyEditorContent;
 
                 // Convert expected result to TipTap JSON format
                 const expectedResultContent =
                   typeof step.expectedResult === "string"
-                    ? convertTextToTipTapJSON(step.expectedResult)
+                    ? ensureTipTapJSON(step.expectedResult)
                     : step.expectedResult || emptyEditorContent;
 
                 await createStep.mutateAsync({
@@ -3471,12 +3470,12 @@ function IssueDescriptionText({ description }: { description: string }) {
   const renderDescription = (value: string, treatAsHtml: boolean) => {
     const json = treatAsHtml
       ? convertHtmlToTipTapJSON(value)
-      : convertTextToTipTapJSON(value);
-    const htmlOutput = tiptapToHtml(json);
+      : ensureTipTapJSON(value);
+    const htmlOutput = generateHTMLFallback(json);
 
     return (
       <div
-        className="prose prose-sm max-w-none"
+        className="prose prose-sm dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: htmlOutput }}
       />
     );
