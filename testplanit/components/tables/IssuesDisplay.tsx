@@ -115,7 +115,6 @@ export const IssuesDisplay: React.FC<IssueDisplayProps> = ({
         method: "POST",
       }).catch((err) => {
         // Silently fail - this is a background optimization
-        console.debug("Background sync trigger failed:", err);
       });
     }
   };

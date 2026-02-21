@@ -868,7 +868,6 @@ const useI18nNavigationAdapter = (): NavigationAdapter => {
 
   return {
     push: (path: string) => {
-      console.log("[Tour:NavAdapter] push called:", path, "from:", pathname);
       router.push(path);
     },
     getCurrentPath: () => pathname || "/",
@@ -887,19 +886,16 @@ function NextStepController() {
   useEffect(() => {
     // Expose the context functions globally
     (window as any).startOnboardingTour = (tourName: string = "mainTour") => {
-      console.log("[Tour:Controller] startOnboardingTour called:", tourName);
       startNextStep(tourName);
     };
 
     // Also expose admin tour function for consistency
     (window as any).startAdminTour = (tourName: string = "adminTour") => {
-      console.log("[Tour:Controller] startAdminTour called:", tourName);
       startNextStep(tourName);
     };
 
     // Expose setCurrentStep for cross-page tour restoration
     (window as any).__setTourStep = (step: number) => {
-      console.log("[Tour:Controller] __setTourStep called:", step);
       setCurrentStep(step, 0);
     };
 
@@ -925,38 +921,12 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
   const activeTourRef = useRef<string | null>(null);
   const prevPathnameRef = useRef<string>(pathname);
 
-  // Debug: listen for popstate events (NextStep closes tour on popstate)
-  useEffect(() => {
-    const handler = (e: PopStateEvent) => {
-      console.log(
-        "[Tour:PopState] popstate event fired!",
-        "state:",
-        e.state,
-        "location:",
-        window.location.href,
-        "activeTour:",
-        activeTourRef.current
-      );
-      console.trace("[Tour:PopState] stack trace");
-    };
-    window.addEventListener("popstate", handler);
-    return () => window.removeEventListener("popstate", handler);
-  }, []);
-
-  // Track pathname changes for debugging
-  // Don't clear activeTourRef here — NextStep's MutationObserver handles
-  // cross-page step transitions natively. Clearing would cause the restoration
-  // effect to re-start the tour, causing a disappear/reappear flash.
+  // Track pathname changes — don't clear activeTourRef here.
+  // NextStep's MutationObserver handles cross-page step transitions natively.
+  // Clearing would cause the restoration effect to re-start the tour,
+  // causing a disappear/reappear flash.
   useEffect(() => {
     if (prevPathnameRef.current !== pathname) {
-      console.log(
-        "[Tour:Pathname] changed:",
-        prevPathnameRef.current,
-        "→",
-        pathname,
-        "| activeTour:",
-        (window as any).__activeTour
-      );
       prevPathnameRef.current = pathname;
     }
   }, [pathname]);
@@ -1025,7 +995,6 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
 
   const handleTourComplete = useCallback(
     async (tourName: string | null) => {
-      console.log("[Tour:Complete] tourName:", tourName);
       (window as any).__activeTour = null;
       localStorage.setItem("hasSeenOnboardingTour", "true");
 
@@ -1066,7 +1035,6 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
 
   const handleTourSkip = useCallback(
     async (step: number, tourName: string | null) => {
-      console.log("[Tour:Skip] step:", step, "tourName:", tourName);
       (window as any).__activeTour = null;
       localStorage.setItem("hasSeenOnboardingTour", "true");
 
@@ -1107,22 +1075,12 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
 
   const handleStepChange = useCallback(
     (step: number, tourName: string | null) => {
-      console.log(
-        "[Tour:StepChange] step:",
-        step,
-        "tour:",
-        tourName,
-        "pathname:",
-        pathname
-      );
-
       // Demo tour: click the first shared step group to show its steps
       if (tourName === "demoProjectTour" && step === 10) {
         const firstGroup = document.querySelector(
           "[data-testid^='shared-step-group-']"
         ) as HTMLElement;
         if (firstGroup) {
-          console.log("[Tour:StepChange] clicking first shared step group");
           firstGroup.click();
         }
       }
@@ -1133,9 +1091,6 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
           "[data-testid^='folder-node-']"
         ) as HTMLElement;
         if (firstFolder) {
-          console.log(
-            "[Tour:StepChange] clicking first folder to populate cases table"
-          );
           firstFolder.click();
         }
       }
@@ -1149,7 +1104,6 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
         // Remove manual flag after first step change
         newSearchParams.delete("manual");
         const newUrl = pathname + `?${newSearchParams.toString()}`;
-        console.log("[Tour:StepChange] router.replace →", newUrl);
         router.replace(newUrl);
       }
     },
@@ -1177,13 +1131,6 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
     (window as any).__tourOverrideInstalled = true;
 
     (window as any).startOnboardingTour = (tourName: string = "mainTour") => {
-      console.log(
-        "[Tour:StartOverride] called:",
-        tourName,
-        "pathname:",
-        pathnameRef.current
-      );
-
       // Set active tour reference + global flag
       activeTourRef.current = tourName;
       (window as any).__activeTour = tourName;
@@ -1200,7 +1147,6 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
           newSearchParams.set("step", "0");
           newSearchParams.set("manual", "true");
           const newUrl = currentPathname + `?${newSearchParams.toString()}`;
-          console.log("[Tour:StartOverride] setting URL params →", newUrl);
           routerRef.current.replace(newUrl);
         }, 100);
       }
@@ -1213,19 +1159,6 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
   }, []);
 
   useEffect(() => {
-    console.log(
-      "[Tour:Effect] fired | pathname:",
-      pathname,
-      "| tourParam:",
-      tourParam,
-      "| stepParam:",
-      stepParam,
-      "| manualParam:",
-      manualParam,
-      "| activeTourRef:",
-      activeTourRef.current
-    );
-
     // Check if user has seen the tour before
     const hasSeenTour = localStorage.getItem("hasSeenOnboardingTour");
 
@@ -1238,15 +1171,6 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
       !manualParam &&
       !(window as any).__activeTour
     ) {
-      console.log(
-        "[Tour:Restore] will restore tour:",
-        tourParam,
-        "step:",
-        stepParam,
-        "activeTourRef was:",
-        activeTourRef.current
-      );
-
       // Set active tour reference for restoration
       activeTourRef.current = tourParam;
       (window as any).__activeTour = tourParam;
@@ -1255,16 +1179,8 @@ export function NextStepOnboarding({ children }: NextStepOnboardingProps) {
       setTimeout(() => {
         // Access the original startOnboardingTour without URL parameter override
         const originalStartTour = (window as any)._originalStartOnboardingTour;
-        console.log(
-          "[Tour:Restore] timeout fired, originalStartTour exists:",
-          !!originalStartTour
-        );
         if (originalStartTour) {
           const targetStep = parseInt(stepParam || "0", 10);
-          console.log(
-            "[Tour:Restore] starting tour at targetStep:",
-            targetStep
-          );
 
           // Hide the tour UI while we jump to the correct step to prevent
           // a flash of step 0 content before the target step renders

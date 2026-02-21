@@ -343,7 +343,6 @@ export default function Cases({
       currentSearchParams.set("view", "folders");
 
       const newUrl = `${pathname}?${currentSearchParams.toString()}`;
-      console.log("[Cases:AutoSelect] replacing URL →", newUrl, "| tour param:", currentSearchParams.get("tour"));
       router.replace(newUrl);
 
       // Dispatch a custom event to notify the tree component
@@ -360,10 +359,7 @@ export default function Cases({
         // Use global flag instead of URL params since navigation can strip them
         const activeTour = (window as any).__activeTour;
         if (!activeTour) {
-          console.log("[Cases:AutoSelect] dispatching popstate (no tour active)");
           window.dispatchEvent(new PopStateEvent("popstate", { state: null }));
-        } else {
-          console.log("[Cases:AutoSelect] SKIPPING popstate (tour active:", activeTour, ")");
         }
       }, 100);
     }

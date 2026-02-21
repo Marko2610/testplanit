@@ -694,9 +694,6 @@ export function SessionResultsList({
 
   const handleSaveEdit = useCallback(
     async (values: FieldFormValues) => {
-      console.log("=== handleSaveEdit CALLED ===");
-      console.log("selectedFiles:", selectedFiles);
-      console.log("selectedFiles.length:", selectedFiles.length);
       if (!resultToEdit || !session?.user?.id) return;
 
       setIsSubmitting(true);
@@ -816,11 +813,6 @@ export function SessionResultsList({
         }
 
         // Then handle file uploads if any
-        console.log(
-          "[DEBUG] selectedFiles at upload time:",
-          selectedFiles.length,
-          selectedFiles.map((f) => f.name)
-        );
         if (selectedFiles.length > 0) {
           const prependString = session.user.id;
           const sanitizedFolder =
@@ -837,12 +829,6 @@ export function SessionResultsList({
                   f.lastModified === file.lastModified
               )
           );
-          console.log(
-            "[DEBUG] uniqueFiles after deduplication:",
-            uniqueFiles.length,
-            uniqueFiles.map((f) => f.name)
-          );
-
           const uploadAttachmentsPromises = uniqueFiles.map(async (file) => {
             try {
               const fileUrl = await fetchSignedUrl(
@@ -1641,7 +1627,6 @@ export function SessionResultsList({
           <Form {...form}>
             <form
               onSubmit={(e) => {
-                console.log("=== FORM onSubmit CALLED ===");
                 e.preventDefault();
                 const formData = form.getValues() as FieldFormValues;
 

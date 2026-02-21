@@ -913,7 +913,6 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
         params.set("node", folderId.toString());
         params.set("view", "folders");
         const newUrl = `${pathName}?${params.toString()}`;
-        console.log("[Repo:updateURL] replacing →", newUrl);
         router.replace(newUrl, {
           scroll: false,
         });

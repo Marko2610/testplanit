@@ -310,18 +310,15 @@ export function ShareContent({ shareKey, shareData, session }: ShareContentProps
           body: JSON.stringify({}),
         })
           .then(() => {
-            console.log("Redirecting to:", reportsUrl);
             window.location.href = reportsUrl;
           })
           .catch((error) => {
             console.error("Error counting view:", error);
             // Redirect anyway even if view counting fails
-            console.log("Redirecting to:", reportsUrl);
             window.location.href = reportsUrl;
           });
       } else {
         // Already counted, just redirect
-        console.log("Redirecting to:", reportsUrl);
         window.location.href = reportsUrl;
       }
       return;

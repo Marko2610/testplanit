@@ -1353,50 +1353,9 @@ function ReportBuilderContent({
           // Only update chart data when running a new report (not pagination)
           // Chart should always show the full dataset, not update on pagination
           if (updateUrl) {
-            console.log('Updating chart with new data:', {
-              dataLength: newAllResults.length,
-              firstRow: newAllResults[0],
-              updateUrl
-            });
-
-            // Debug: Compare ALL rows between allResults and results to find mismatches
-            const metricsToCheck = selectedMetrics.map(m => m.label || m.value);
-            console.log('Checking for data mismatches in metrics:', metricsToCheck);
-
-            newAllResults.forEach((allRow: any) => {
-              const dateKey = allRow.date?.executedAt || allRow.date?.createdAt;
-              if (!dateKey) return;
-
-              // Find matching row in results (paginated data)
-              const resultRow = (data.results || []).find((r: any) =>
-                (r.date?.executedAt === dateKey) || (r.date?.createdAt === dateKey)
-              );
-
-              if (resultRow) {
-                // Compare metric values
-                for (const metric of metricsToCheck) {
-                  if (allRow[metric] !== resultRow[metric]) {
-                    console.error(`VALUE MISMATCH for ${dateKey}:`, {
-                      metric,
-                      chartValue: allRow[metric],
-                      tableValue: resultRow[metric],
-                      chartRow: allRow,
-                      tableRow: resultRow
-                    });
-                  }
-                }
-              }
-            });
-
             setAllResults(newAllResults);
             chartDataRef.current = newAllResults;
             setChartDataVersion((prev) => prev + 1);
-          } else {
-            console.log('Skipping chart update (pagination/sort):', {
-              chartDataLength: chartDataRef.current?.length,
-              newResultsLength: (data.results || []).length,
-              updateUrl
-            });
           }
 
           setTotalCount(
