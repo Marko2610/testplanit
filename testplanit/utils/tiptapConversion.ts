@@ -237,7 +237,7 @@ export const ensureTipTapJSON = (value: any): JSONContent => {
       }
     }
 
-    if (/<\/?[a-z][\s\S]*>/i.test(trimmed)) {
+    if (/<\/?[a-z][^>]*>/i.test(trimmed)) {
       return convertHtmlToTipTapJSON(trimmed);
     }
 
