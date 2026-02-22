@@ -1,3 +1,10 @@
+## [0.12.4](https://github.com/TestPlanIt/testplanit/compare/v0.12.3...v0.12.4) (2026-02-21)
+
+
+### Bug Fixes
+
+* remove debug console.log statements from production code ([dae2346](https://github.com/TestPlanIt/testplanit/commit/dae2346d2191c68ed25b6597735f005762d4cdb2))
+
 ## [0.12.3](https://github.com/TestPlanIt/testplanit/compare/v0.12.2...v0.12.3) (2026-02-21)
 
 ## [0.12.2](https://github.com/TestPlanIt/testplanit/compare/v0.12.1...v0.12.2) (2026-02-20)
