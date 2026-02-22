@@ -1,3 +1,10 @@
+## [0.13.1](https://github.com/TestPlanIt/testplanit/compare/v0.13.0...v0.13.1) (2026-02-22)
+
+
+### Bug Fixes
+
+* prevent double-firing of auto-select effect in Cases component ([3d59c0c](https://github.com/TestPlanIt/testplanit/commit/3d59c0c89330bece32efdf425ed4c6d0e040958a))
+
 # [0.13.0](https://github.com/TestPlanIt/testplanit/compare/v0.12.4...v0.13.0) (2026-02-22)
 
 
