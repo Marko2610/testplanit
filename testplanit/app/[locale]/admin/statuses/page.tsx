@@ -32,9 +32,8 @@ function Status() {
 
   // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
   const updateStatusRef = useRef(updateStatus);
-  useEffect(() => {
-    updateStatusRef.current = updateStatus;
-  });
+  // eslint-disable-next-line react-hooks/refs
+  updateStatusRef.current = updateStatus;
 
   const { data } = useFindManyStatus(
     {
@@ -120,6 +119,7 @@ function Status() {
     []
   );
 
+  /* eslint-disable react-hooks/refs */
   const columns = useMemo(
     () =>
       getColumns(
@@ -137,6 +137,7 @@ function Status() {
       tCommon,
     ]
   );
+  /* eslint-enable react-hooks/refs */
 
   const [columnVisibility, setColumnVisibility] = useState<
     Record<string, boolean>

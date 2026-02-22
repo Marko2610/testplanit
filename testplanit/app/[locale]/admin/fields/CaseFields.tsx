@@ -33,9 +33,8 @@ export default function CaseFields() {
 
   // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
   const updateCaseFieldRef = useRef(updateCaseField);
-  useEffect(() => {
-    updateCaseFieldRef.current = updateCaseField;
-  });
+  // eslint-disable-next-line react-hooks/refs
+  updateCaseFieldRef.current = updateCaseField;
 
   const handleSortChange = (column: string) => {
     const direction =
@@ -89,6 +88,7 @@ export default function CaseFields() {
   );
 
   const columns: CustomColumnDef<ExtendedCaseFields>[] = useMemo(
+    // eslint-disable-next-line react-hooks/refs
     () => getColumns(t, tCommon, handleToggle),
     [handleToggle, t, tCommon]
   );

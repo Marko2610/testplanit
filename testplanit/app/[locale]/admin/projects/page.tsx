@@ -124,9 +124,8 @@ function ProjectAdmin() {
 
   // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
   const updateProjectsRef = useRef(updateProjects);
-  useEffect(() => {
-    updateProjectsRef.current = updateProjects;
-  });
+  // eslint-disable-next-line react-hooks/refs
+  updateProjectsRef.current = updateProjects;
 
   const {
     register,
@@ -398,6 +397,7 @@ function ProjectAdmin() {
 
   const columns: CustomColumnDef<ExtendedProjects>[] = useMemo(
     () =>
+      // eslint-disable-next-line react-hooks/refs
       getColumns(userPreferences, handleToggleCompleted, handleOpenEditModal, tCommon),
     [userPreferences, handleToggleCompleted, handleOpenEditModal, tCommon]
   );

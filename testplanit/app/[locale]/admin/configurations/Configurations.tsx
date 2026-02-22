@@ -110,9 +110,8 @@ function Configurations(): React.ReactElement | null {
 
   // Stabilize mutation ref — ZenStack's mutate changes identity every render
   const updateConfigurationRef = useRef(updateConfiguration);
-  useEffect(() => {
-    updateConfigurationRef.current = updateConfiguration;
-  });
+  // eslint-disable-next-line react-hooks/refs
+  updateConfigurationRef.current = updateConfiguration;
 
   const handleToggle = useCallback(
     (id: number, isEnabled: boolean) => {
@@ -125,6 +124,7 @@ function Configurations(): React.ReactElement | null {
   );
 
   const columns = useMemo(
+    // eslint-disable-next-line react-hooks/refs
     () => getColumns(tCommon, handleToggle),
     [tCommon, handleToggle]
   );

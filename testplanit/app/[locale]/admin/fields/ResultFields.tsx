@@ -33,9 +33,8 @@ export default function ResultFields() {
 
   // Stabilize mutation ref — ZenStack's mutateAsync changes identity every render
   const updateResultFieldRef = useRef(updateResultField);
-  useEffect(() => {
-    updateResultFieldRef.current = updateResultField;
-  });
+  // eslint-disable-next-line react-hooks/refs
+  updateResultFieldRef.current = updateResultField;
 
   const handleSortChange = (column: string) => {
     const direction =
@@ -89,6 +88,7 @@ export default function ResultFields() {
   );
 
   const columns: CustomColumnDef<ExtendedResultFields>[] = useMemo(
+    // eslint-disable-next-line react-hooks/refs
     () => getColumns(t, tCommon, handleToggle),
     [handleToggle, t, tCommon]
   );
