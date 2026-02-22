@@ -1359,7 +1359,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
                         )}
                       </div>
                       <Cases
-                        folderId={selectedFolderId ?? 0}
+                        folderId={selectedFolderId}
                         viewType={selectedItem}
                         filterId={selectedFilter}
                         isSelectionMode={isSelectionMode}

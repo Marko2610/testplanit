@@ -639,7 +639,8 @@
     },
     "table": {
       "columns": {
-        "columns": "Colonnes"
+        "columns": "Colonnes",
+        "required": "(requis)"
       },
       "filter": "Liste des filtres...",
       "selectNone": "Sélectionnez « Aucun »",

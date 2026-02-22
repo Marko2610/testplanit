@@ -105,6 +105,9 @@ export default function Cases({
 }: CasesProps) {
   const t = useTranslations();
 
+  // Guard to prevent auto-select effect from double-firing (React Strict Mode)
+  const hasAutoSelectedRef = useRef(false);
+
   // Performance logging - use refs to avoid re-renders
   const performanceLog = useRef({
     componentStart: Date.now(),
@@ -326,6 +329,13 @@ export default function Cases({
   // Add state for the export modal
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
+  // Reset auto-select guard when switching away from folders view
+  useEffect(() => {
+    if (viewType !== "folders") {
+      hasAutoSelectedRef.current = false;
+    }
+  }, [viewType]);
+
   // Auto-select first folder when view is folders and no folder is selected
   useEffect(() => {
     if (
@@ -333,8 +343,10 @@ export default function Cases({
       !folderId &&
       projectFolders &&
       projectFolders.length > 0 &&
-      !isFoldersLoading
+      !isFoldersLoading &&
+      !hasAutoSelectedRef.current
     ) {
+      hasAutoSelectedRef.current = true;
       const firstFolder = projectFolders[0];
 
       // Navigate to the first folder by updating the URL

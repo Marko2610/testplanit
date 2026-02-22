@@ -122,7 +122,10 @@ export function ColumnSelection<TData>({
       )
       .join(",");
 
-    const query = new URLSearchParams(searchParams.toString());
+    // Use window.location.search instead of searchParams.toString() to get
+    // the actual current URL. searchParams can lag behind pushState updates
+    // (especially in dev mode), causing stale params to overwrite correct values.
+    const query = new URLSearchParams(window.location.search);
     const currentColumns = query.get("columns");
     const newColumns = visibleColumns === "" ? "none" : visibleColumns;
 
@@ -138,7 +141,7 @@ export function ColumnSelection<TData>({
     columnVisibility,
     onVisibilityChange,
     router,
-    searchParams,
+    columnVisibilityQuery,
     metadataSource,
     getInitialVisibility,
     pathname,
@@ -195,9 +198,10 @@ export function ColumnSelection<TData>({
         id: itemId,
         label,
         enableHiding,
+        isRequired: enableHiding === false,
       };
     })
-    .filter((item) => item.enableHiding !== false && item.id && item.label)
+    .filter((item) => item.id && item.label)
     .sort((a, b) => a.label.localeCompare(b.label));
 
   const midpoint = Math.ceil(displayColumns.length / 2);
@@ -230,7 +234,7 @@ export function ColumnSelection<TData>({
               <div className="flex flex-col space-y-1 flex-1">
                 {leftColumns.map((column) => {
                   const columnId = column.id;
-                  const isChecked = columnVisibility[columnId] ?? false;
+                  const isChecked = column.isRequired || (columnVisibility[columnId] ?? false);
                   return (
                     <div
                       key={columnId}
@@ -239,6 +243,7 @@ export function ColumnSelection<TData>({
                       <Checkbox
                         id={columnId}
                         checked={isChecked}
+                        disabled={column.isRequired}
                         onCheckedChange={(checked) => {
                           if (typeof checked === "boolean") {
                             handleCheckboxChange(columnId, checked);
@@ -247,9 +252,9 @@ export function ColumnSelection<TData>({
                       />
                       <label
                         htmlFor={columnId}
-                        className="text-sm truncate cursor-pointer flex-1 max-w-[150px] overflow-hidden text-ellipsis"
+                        className={`text-sm truncate cursor-pointer flex-1 max-w-[150px] overflow-hidden text-ellipsis${column.isRequired ? " text-muted-foreground" : ""}`}
                       >
-                        {column.label}
+                        {column.label} {column.isRequired && t("table.columns.required")}
                       </label>
                     </div>
                   );
@@ -258,7 +263,7 @@ export function ColumnSelection<TData>({
               <div className="flex flex-col space-y-1 flex-1">
                 {rightColumns.map((column) => {
                   const columnId = column.id;
-                  const isChecked = columnVisibility[columnId] ?? false;
+                  const isChecked = column.isRequired || (columnVisibility[columnId] ?? false);
                   return (
                     <div
                       key={columnId}
@@ -267,6 +272,7 @@ export function ColumnSelection<TData>({
                       <Checkbox
                         id={columnId}
                         checked={isChecked}
+                        disabled={column.isRequired}
                         onCheckedChange={(checked) => {
                           if (typeof checked === "boolean") {
                             handleCheckboxChange(columnId, checked);
@@ -275,9 +281,9 @@ export function ColumnSelection<TData>({
                       />
                       <label
                         htmlFor={columnId}
-                        className="text-sm truncate cursor-pointer flex-1 max-w-[150px] overflow-hidden text-ellipsis"
+                        className={`text-sm truncate cursor-pointer flex-1 max-w-[150px] overflow-hidden text-ellipsis${column.isRequired ? " text-muted-foreground" : ""}`}
                       >
-                        {column.label}
+                        {column.label} {column.isRequired && t("table.columns.required")}
                       </label>
                     </div>
                   );
