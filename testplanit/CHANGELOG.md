@@ -1,3 +1,22 @@
+# [0.13.0](https://github.com/TestPlanIt/testplanit/compare/v0.12.4...v0.13.0) (2026-02-22)
+
+
+### Bug Fixes
+
+* fix search unit tests since adding pagination info to the search header as well as footer ([82a2676](https://github.com/TestPlanIt/testplanit/commit/82a267620b05141cf87a0e30444f19d8d382fa95))
+* implement tenant-aware Elasticsearch sync for multi-tenant support ([5bc207c](https://github.com/TestPlanIt/testplanit/commit/5bc207cdaef94cf4e6e786fc4423b20eb02ae019))
+* stabilize DataTable column refs to prevent dialog/modal remounts ([5f57bb5](https://github.com/TestPlanIt/testplanit/commit/5f57bb51fabff02163d1eeb0c2bb6d93824cf5da))
+* stabilize DataTable column refs to prevent dialog/modal remounts ([77cf664](https://github.com/TestPlanIt/testplanit/commit/77cf664201dea66b09e0b2c6d87ae347c3cbbe75))
+* stabilize mutation refs in admin components to prevent remounts ([dcb3ec5](https://github.com/TestPlanIt/testplanit/commit/dcb3ec5d96fcb6e4ca7d2cb7c3ac42b81a7f4ee4))
+* stabilize mutation refs in admin components to prevent remounts ([c2573fb](https://github.com/TestPlanIt/testplanit/commit/c2573fbff7501ffece022c6846bf363308383b05))
+* top toast was being covered by bottom toasts preventing text from displaying ([e7fb54d](https://github.com/TestPlanIt/testplanit/commit/e7fb54d85bf30f59c62480affc114d7549a647e2))
+* update default color value in FieldIconPicker to undefined ([5b48a54](https://github.com/TestPlanIt/testplanit/commit/5b48a5475a2454cd94a8c56508b0d2cbec01912b))
+
+
+### Features
+
+* enhance sorting functionality in API tokens and projects ([c41b38b](https://github.com/TestPlanIt/testplanit/commit/c41b38b14a186f8b9da3e9dd7437581309381473))
+
 ## [0.12.4](https://github.com/TestPlanIt/testplanit/compare/v0.12.3...v0.12.4) (2026-02-21)
 
 
