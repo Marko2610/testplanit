@@ -61,8 +61,8 @@ jobs:
 
       - name: Run package tests
         run: |
-          pnpm --filter "@testplanit/api" test --run
-          pnpm --filter "@testplanit/wdio-reporter" test --run
+          pnpm --filter "@testplanit/api" test -- --run
+          pnpm --filter "@testplanit/wdio-reporter" test -- --run
 
       - name: Build packages
         run: |
