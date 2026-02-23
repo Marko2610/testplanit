@@ -311,7 +311,6 @@ describe('shared utilities', () => {
 
       // Speed up busy-wait by making Date.now() jump forward each call
       let time = 1000;
-      const originalDateNow = Date.now;
       vi.spyOn(Date, 'now').mockImplementation(() => {
         time += 100000; // Jump far ahead each call to exit busy-wait instantly
         return time;
