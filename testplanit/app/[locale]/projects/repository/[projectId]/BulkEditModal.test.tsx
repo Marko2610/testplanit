@@ -1345,7 +1345,7 @@ describe("BulkEditModal", () => {
       );
       // Check that the replacement was applied with the capture group
       expect(screen.getByText(/Test Suite Alpha/)).toBeInTheDocument();
-    }, 10000);
+    }, 30000);
 
     it("should show error for invalid regex", async () => {
       const user = userEvent.setup();

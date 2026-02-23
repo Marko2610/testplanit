@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import {
   useFindManyTemplates,
   useFindManyRepositoryFolders,
+  useFindManyProjectLlmIntegration,
 } from "~/lib/hooks";
 
 // Mock dependencies
@@ -21,6 +22,7 @@ vi.mock("next-intl", () => ({
 vi.mock("~/lib/hooks", () => ({
   useFindManyTemplates: vi.fn(),
   useFindManyRepositoryFolders: vi.fn(),
+  useFindManyProjectLlmIntegration: vi.fn(),
 }));
 
 vi.mock("@/components/ui/use-toast", () => ({
@@ -31,7 +33,7 @@ vi.mock("@/components/ui/use-toast", () => ({
 
 vi.mock("papaparse", () => ({
   default: {
-    parse: vi.fn((text, options) => {
+    parse: vi.fn((_text, options) => {
       // Mock CSV parsing
       const mockData = [
         { Name: "Test Case 1", Description: "Description 1", Priority: "High" },
@@ -305,6 +307,9 @@ describe("ImportCasesWizard", () => {
     (useFindManyRepositoryFolders as any).mockReturnValue({
       data: mockFolders,
     });
+    (useFindManyProjectLlmIntegration as any).mockReturnValue({
+      data: [],
+    });
   });
 
   it("renders the import wizard dialog", () => {
@@ -383,7 +388,7 @@ describe("ImportCasesWizard", () => {
       fireEvent.click(
         screen.getByLabelText("Create folder structure at top level")
       );
-      expect(screen.queryByText("Select Folder")).not.toBeInTheDocument();
+      expect(screen.queryByText("Select Folder")).toBeNull();
     });
 
     it("allows delimiter selection", async () => {
@@ -397,13 +402,25 @@ describe("ImportCasesWizard", () => {
     });
 
     it("has checkbox for headers", async () => {
+      const user = userEvent.setup();
       render(<ImportCasesWizard />);
 
       fireEvent.click(screen.getByText("Import Test Cases"));
 
-      const checkbox = screen.getByLabelText("First row contains column names");
-      expect(checkbox).toBeInTheDocument();
-      expect(checkbox).toBeChecked();
+      // Upload a CSV file first — the headers checkbox only appears for CSV files
+      const file = new File(["test,content"], "test.csv", {
+        type: "text/csv",
+      });
+      const fileInput = screen.getByTestId("file-upload");
+      await user.upload(fileInput, file);
+
+      await waitFor(() => {
+        const checkbox = screen.getByLabelText(
+          "First row contains column names"
+        );
+        expect(checkbox).toBeInTheDocument();
+        expect(checkbox).toBeChecked();
+      });
     });
 
     it("only accepts CSV files", async () => {
@@ -421,9 +438,7 @@ describe("ImportCasesWizard", () => {
       await user.upload(fileInput, nonCsvFile);
 
       // Should not show selected file info for non-CSV files
-      expect(
-        screen.queryByTestId("selected-file-info")
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId("selected-file-info")).toBeNull();
 
       // Upload a CSV file
       const csvFile = new File(["test,content"], "test.csv", {
@@ -472,7 +487,7 @@ describe("ImportCasesWizard", () => {
       fireEvent.click(screen.getByText("Import Test Cases"));
 
       const nextButton = screen.getByText("Next");
-      expect(nextButton).not.toBeDisabled();
+      expect((nextButton as HTMLButtonElement).disabled).toBe(false);
 
       // Click next button without filling required fields
       fireEvent.click(nextButton);
@@ -506,7 +521,7 @@ describe("ImportCasesWizard", () => {
 
       await waitFor(() => {
         const nextButton = screen.getByTestId("next-button");
-        expect(nextButton).not.toBeDisabled();
+        expect((nextButton as HTMLButtonElement).disabled).toBe(false);
       });
     });
   });
@@ -534,7 +549,8 @@ describe("ImportCasesWizard", () => {
 
       // Should have Next button enabled
       await waitFor(() => {
-        expect(screen.getByTestId("next-button")).not.toBeDisabled();
+        const nextButton = screen.getByTestId("next-button");
+        expect((nextButton as HTMLButtonElement).disabled).toBe(false);
       });
     });
 
