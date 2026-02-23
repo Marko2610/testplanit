@@ -684,7 +684,7 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(date-fns@4.1.0)
       dompurify:
-        specifier: ^3.3.1
+        specifier: ^3.2.4
         version: 3.3.1
       embla-carousel-react:
         specifier: ^8.6.0
@@ -705,7 +705,7 @@ importers:
         specifier: ^20.7.0
         version: 20.7.0
       hono:
-        specifier: ^4.12.2
+        specifier: '>=4.11.10'
         version: 4.12.2
       html-to-adf-converter:
         specifier: ^1.0.2
@@ -729,7 +729,7 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       lodash:
-        specifier: ^4.17.23
+        specifier: '>=4.17.23'
         version: 4.17.23
       lowlight:
         specifier: ^3.3.0
@@ -1063,7 +1063,7 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0
       esbuild:
-        specifier: ^0.27.3
+        specifier: '>=0.25.0'
         version: 0.27.3
       eslint:
         specifier: ^9.39.3
