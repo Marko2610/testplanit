@@ -53,6 +53,9 @@ import { generateHTMLFallback } from "~/utils/tiptapToHtml";
 
 interface ImportCasesWizardProps {
   onImportComplete?: () => void;
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
+  initialFile?: File | null;
 }
 
 type ImportLocation = "single_folder" | "root_folder" | "top_level";
@@ -104,6 +107,9 @@ type Page1ValidationErrors = {
 
 export function ImportCasesWizard({
   onImportComplete,
+  externalOpen,
+  onExternalOpenChange,
+  initialFile,
 }: ImportCasesWizardProps) {
   const t = useTranslations("repository.cases");
   const tGlobal = useTranslations();
@@ -112,7 +118,13 @@ export function ImportCasesWizard({
   const params = useParams();
   const projectId = parseInt(params.projectId as string);
 
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled
+    ? (v: boolean) => onExternalOpenChange?.(v)
+    : setInternalOpen;
+
   const [currentPage, setCurrentPage] = useState(1);
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
@@ -144,6 +156,13 @@ export function ImportCasesWizard({
   const [validationErrors, setValidationErrors] =
     useState<Page1ValidationErrors>({});
 
+  // Seed selectedFile from initialFile when dialog opens externally
+  useEffect(() => {
+    if (open && initialFile) {
+      setSelectedFile(initialFile);
+    }
+  }, [open, initialFile]);
+
   // Fetch data
   const { data: templates } = useFindManyTemplates({
     where: {
@@ -169,10 +188,19 @@ export function ImportCasesWizard({
     },
   });
 
+  const defaultTemplate = templates?.find((template) => template.isDefault);
+
   const { data: folders } = useFindManyRepositoryFolders({
     where: { projectId, isDeleted: false },
     orderBy: { order: "asc" },
   });
+
+  // Auto-select default template when dialog opens
+  useEffect(() => {
+    if (open && defaultTemplate && !selectedTemplateId) {
+      setSelectedTemplateId(defaultTemplate.id.toString());
+    }
+  }, [open, defaultTemplate, selectedTemplateId]);
 
   // Get template fields for mapping
   const selectedTemplate = templates?.find(
@@ -707,17 +735,10 @@ export function ImportCasesWizard({
               previews={false}
               accept=".csv"
               allowedTypes={[".csv", "text/csv"]}
+              multiple={false}
+              initialFiles={initialFile ? [initialFile] : undefined}
             />
           </div>
-          {selectedFile && (
-            <p
-              className="mt-2 text-sm text-muted-foreground"
-              data-testid="selected-file-info"
-            >
-              {tGlobal("sharedSteps.importWizard.page1.selectedFile")}:{" "}
-              {selectedFile.name}
-            </p>
-          )}
         </div>
       </div>
 
@@ -872,6 +893,11 @@ export function ImportCasesWizard({
             {templates?.map((template) => (
               <SelectItem key={template.id} value={template.id.toString()}>
                 {template.templateName}
+                {template.isDefault && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {tCommon("fields.default")}
+                  </span>
+                )}
               </SelectItem>
             ))}
           </SelectContent>
