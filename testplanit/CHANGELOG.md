@@ -1,3 +1,11 @@
+## [0.13.2](https://github.com/TestPlanIt/testplanit/compare/v0.13.1...v0.13.2) (2026-02-23)
+
+
+### Bug Fixes
+
+* fix the failing unit tests due to UploadAttachments changes ([eff0fdc](https://github.com/TestPlanIt/testplanit/commit/eff0fdc27c47688be4e9cdad2305db17ba501680))
+* move ref to useEffect ([7b525f8](https://github.com/TestPlanIt/testplanit/commit/7b525f8bb86fdf4cd58aef595983b82713f191d3))
+
 ## [0.13.1](https://github.com/TestPlanIt/testplanit/compare/v0.13.0...v0.13.1) (2026-02-22)
 
 
