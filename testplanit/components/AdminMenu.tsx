@@ -27,6 +27,7 @@ import {
   Activity,
   KeyRound,
   Share2,
+  MessageSquareCode,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
@@ -171,6 +172,12 @@ const menuOptions: MenuOption[] = [
     icon: Sparkles,
     translationKey: "llm",
     path: "llm",
+    section: "toolsAndIntegrations",
+  },
+  {
+    icon: MessageSquareCode,
+    translationKey: "prompts",
+    path: "prompts",
     section: "toolsAndIntegrations",
   },
 
