@@ -1,8 +1,11 @@
 # @testplanit/wdio-reporter
 
-WebdriverIO reporter for [TestPlanIt](https://github.com/testplanit/testplanit) - report test results directly to your TestPlanIt instance.
+WebdriverIO reporter and service for [TestPlanIt](https://github.com/testplanit/testplanit) - report test results directly to your TestPlanIt instance.
 
-This reporter pushes your WebdriverIO test results to TestPlanIt in real-time.
+This package includes:
+
+- **Reporter** - Tracks test execution in worker processes and reports results to TestPlanIt
+- **Service** - Manages the test run lifecycle in the main process, ensuring all workers report to a single test run
 
 ## Installation
 
@@ -14,7 +17,7 @@ pnpm add @testplanit/wdio-reporter
 yarn add @testplanit/wdio-reporter
 ```
 
-## Setup
+## Quick Start
 
 ### 1. Generate an API Token
 
@@ -23,36 +26,60 @@ yarn add @testplanit/wdio-reporter
 3. Click **Generate New Token**
 4. Copy the token (it starts with `tpi_`)
 
-### 2. Configure the Reporter
+### 2. Configure the Reporter and Service
 
-Add the reporter to your `wdio.conf.js` or `wdio.conf.ts`:
+Add both the service and reporter to your `wdio.conf.js` or `wdio.conf.ts`:
 
 ```javascript
 // wdio.conf.js
+import { TestPlanItService } from '@testplanit/wdio-reporter';
+
 export const config = {
+  services: [
+    [TestPlanItService, {
+      domain: 'https://testplanit.example.com',
+      apiToken: process.env.TESTPLANIT_API_TOKEN,
+      projectId: 1,
+      runName: 'E2E Tests - {date} {time}',
+      captureScreenshots: true,
+    }]
+  ],
   reporters: [
     ['@testplanit/wdio-reporter', {
       domain: 'https://testplanit.example.com',
       apiToken: process.env.TESTPLANIT_API_TOKEN,
       projectId: 1,
-      runName: 'WebdriverIO Tests - {date} {time}',
     }]
   ],
   // ... rest of config
 }
 ```
 
+> **Note:** The service is recommended when running with `maxInstances > 1`. It creates a single test run before workers start, eliminating race conditions. Without the service, the reporter can still manage test runs on its own using file-based coordination (`oneReport: true`).
+
+## Service vs Reporter
+
+| Aspect | Service | Reporter |
+| -------- | --------- | --------- |
+| **Process** | Main WDIO process | Each worker process |
+| **Timing** | Runs once before/after all workers | Runs in each worker |
+| **Test run creation** | Creates in `onPrepare` | Fallback: creates if no service |
+| **Result reporting** | - | Reports each test result |
+| **Screenshot capture** | Optional (`captureScreenshots`) | - |
+| **Screenshot upload** | - | Uploads in `onRunnerEnd` |
+| **Run completion** | Completes in `onComplete` | Skips if service-managed |
+
 ## Linking Test Cases
 
-Embed TestPlanIt case IDs in your test titles using the `C` prefix (configurable):
+Embed TestPlanIt case IDs in your test titles using brackets (configurable via `caseIdPattern`):
 
 ```javascript
 describe('Authentication', () => {
-  it('C12345 should login with valid credentials', async () => {
+  it('[12345] should login with valid credentials', async () => {
     // This test will be linked to case ID 12345
   });
 
-  it('C12346 C12347 should show error for invalid password', async () => {
+  it('[12346] [12347] should show error for invalid password', async () => {
     // This test will be linked to multiple cases: 12346 and 12347
   });
 
@@ -62,46 +89,123 @@ describe('Authentication', () => {
 });
 ```
 
-## Configuration Options
+### Custom Case ID Patterns
+
+The `caseIdPattern` option accepts a regex with a capturing group for the numeric ID:
+
+```javascript
+// Default: brackets - "[12345] should work"
+caseIdPattern: /\[(\d+)\]/g
+
+// C-prefix: "C12345 should work"
+caseIdPattern: /C(\d+)/g
+
+// TC- prefix: "TC-12345 should work"
+caseIdPattern: /TC-(\d+)/g
+
+// JIRA-style: "TEST-12345 should work"
+caseIdPattern: /TEST-(\d+)/g
+```
+
+## Reporter Options
 
 | Option | Type | Required | Default | Description |
 |--------|------|----------|---------|-------------|
-| `domain` | string | Yes | - | Base URL of your TestPlanIt instance |
-| `apiToken` | string | Yes | - | API token for authentication |
-| `projectId` | number | Yes | - | Project ID to report results to |
-| `testRunId` | number | No | - | Existing test run ID to append results to |
-| `runName` | string | No | `'WebdriverIO Test Run - {date} {time}'` | Name for new test runs. Supports placeholders: `{date}`, `{time}`, `{browser}`, `{platform}` |
-| `configId` | number | No | - | Configuration ID for the test run |
-| `milestoneId` | number | No | - | Milestone ID for the test run |
-| `stateId` | number | No | - | Workflow state ID for the test run |
-| `caseIdPrefix` | string | No | `'C'` | Prefix for case IDs in test titles |
-| `autoCreateTestCases` | boolean | No | `false` | Auto-create test cases if not found |
-| `repositoryId` | number | No* | - | Repository ID for auto-created cases (*required if autoCreateTestCases is true) |
-| `parentFolderId` | number | No* | - | Folder ID for auto-created cases (*required if autoCreateTestCases is true) |
-| `templateId` | number | No* | - | Template ID for auto-created cases (*required if autoCreateTestCases is true) |
-| `uploadScreenshots` | boolean | No | `true` | Upload intercepted screenshots (requires `afterTest` hook) |
-| `includeStackTrace` | boolean | No | `true` | Include stack traces in results |
-| `completeRunOnFinish` | boolean | No | `true` | Mark test run as completed when done |
-| `oneReport` | boolean | No | `true` | Consolidate all results into one run |
-| `timeout` | number | No | `30000` | API request timeout in ms |
-| `maxRetries` | number | No | `3` | Number of retries for failed requests |
-| `verbose` | boolean | No | `false` | Enable verbose logging |
+| `domain` | `string` | Yes | - | Base URL of your TestPlanIt instance |
+| `apiToken` | `string` | Yes | - | API token for authentication |
+| `projectId` | `number` | Yes | - | Project ID to report results to |
+| `testRunId` | `number \| string` | No | - | Existing test run ID or name to append results to |
+| `runName` | `string` | No | `'{suite} - {date} {time}'` | Name for new test runs. Supports placeholders: `{date}`, `{time}`, `{browser}`, `{platform}`, `{spec}`, `{suite}` |
+| `testRunType` | `string` | No | Auto-detected | Test framework type: `'REGULAR'`, `'MOCHA'`, `'CUCUMBER'`, etc. Auto-detected from WDIO config |
+| `configId` | `number \| string` | No | - | Configuration ID or name for the test run |
+| `milestoneId` | `number \| string` | No | - | Milestone ID or name for the test run |
+| `stateId` | `number \| string` | No | - | Workflow state ID or name for the test run |
+| `tagIds` | `(number \| string)[]` | No | - | Tags to apply (IDs or names). Non-existent tags are created automatically |
+| `caseIdPattern` | `RegExp \| string` | No | `/\[(\d+)\]/g` | Regex to extract case IDs from test titles. Must include a capturing group |
+| `autoCreateTestCases` | `boolean` | No | `false` | Auto-create test cases matched by suite name + test title |
+| `createFolderHierarchy` | `boolean` | No | `false` | Create nested folders based on suite structure. Requires `autoCreateTestCases` and `parentFolderId` |
+| `parentFolderId` | `number \| string` | No | - | Parent folder for auto-created cases (ID or name) |
+| `templateId` | `number \| string` | No | - | Template for auto-created cases (ID or name) |
+| `uploadScreenshots` | `boolean` | No | `true` | Upload intercepted screenshots |
+| `includeStackTrace` | `boolean` | No | `true` | Include stack traces in results |
+| `completeRunOnFinish` | `boolean` | No | `true` | Mark test run as completed when done |
+| `oneReport` | `boolean` | No | `true` | Combine parallel workers from the same spec file into a single test run. Does not persist across spec file batches — use the service for that |
+| `timeout` | `number` | No | `30000` | API request timeout in ms |
+| `maxRetries` | `number` | No | `3` | Number of retries for failed requests |
+| `verbose` | `boolean` | No | `false` | Enable verbose logging |
+
+> **Tip:** Options like `configId`, `milestoneId`, `stateId`, `parentFolderId`, and `templateId` accept either numeric IDs or string names. When a string is provided, the system looks up the resource by exact name match.
+
+## Service Options
+
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `domain` | `string` | Yes | - | Base URL of your TestPlanIt instance |
+| `apiToken` | `string` | Yes | - | API token for authentication |
+| `projectId` | `number` | Yes | - | Project ID to report results to |
+| `runName` | `string` | No | `'Automated Tests - {date} {time}'` | Name for the test run. Supports `{date}`, `{time}`, `{platform}` |
+| `testRunType` | `string` | No | `'MOCHA'` | Test framework type |
+| `configId` | `number \| string` | No | - | Configuration ID or name |
+| `milestoneId` | `number \| string` | No | - | Milestone ID or name |
+| `stateId` | `number \| string` | No | - | Workflow state ID or name |
+| `tagIds` | `(number \| string)[]` | No | - | Tags to apply (IDs or names) |
+| `captureScreenshots` | `boolean` | No | `false` | Auto-capture screenshots on test failure via `afterTest` hook |
+| `completeRunOnFinish` | `boolean` | No | `true` | Mark test run as completed when all workers finish |
+| `timeout` | `number` | No | `30000` | API request timeout in ms |
+| `maxRetries` | `number` | No | `3` | Number of retries for failed requests |
+| `verbose` | `boolean` | No | `false` | Enable verbose logging |
+
+> **Note:** The service's `runName` does not support `{browser}`, `{spec}`, or `{suite}` placeholders since it runs before any workers start.
 
 ## Examples
 
-### Create a New Test Run
+### Recommended: Service + Reporter (Multi-Worker)
 
 ```javascript
-reporters: [
-  ['@testplanit/wdio-reporter', {
-    domain: 'https://testplanit.example.com',
-    apiToken: process.env.TESTPLANIT_API_TOKEN,
-    projectId: 1,
-    runName: 'E2E Tests - {browser} - {date}',
-    configId: 1,
-    milestoneId: 2,
-  }]
-]
+import { TestPlanItService } from '@testplanit/wdio-reporter';
+
+export const config = {
+  maxInstances: 5,
+  services: [
+    [TestPlanItService, {
+      domain: 'https://testplanit.example.com',
+      apiToken: process.env.TESTPLANIT_API_TOKEN,
+      projectId: 1,
+      runName: 'E2E Tests - {date} {time}',
+      captureScreenshots: true,
+      milestoneId: 'Sprint 42',
+      tagIds: ['regression', 'automated'],
+    }]
+  ],
+  reporters: [
+    ['@testplanit/wdio-reporter', {
+      domain: 'https://testplanit.example.com',
+      apiToken: process.env.TESTPLANIT_API_TOKEN,
+      projectId: 1,
+      autoCreateTestCases: true,
+      createFolderHierarchy: true,
+      parentFolderId: 'Automated Tests',
+      templateId: 1,
+    }]
+  ],
+}
+```
+
+### Reporter Only (Single Worker)
+
+```javascript
+export const config = {
+  reporters: [
+    ['@testplanit/wdio-reporter', {
+      domain: 'https://testplanit.example.com',
+      apiToken: process.env.TESTPLANIT_API_TOKEN,
+      projectId: 1,
+      runName: 'E2E Tests - {browser} - {date}',
+      configId: 1,
+      milestoneId: 2,
+    }]
+  ],
+}
 ```
 
 ### Append to Existing Test Run
@@ -117,7 +221,7 @@ reporters: [
 ]
 ```
 
-### Auto-Create Test Cases
+You can also reference a test run by name:
 
 ```javascript
 reporters: [
@@ -125,61 +229,90 @@ reporters: [
     domain: 'https://testplanit.example.com',
     apiToken: process.env.TESTPLANIT_API_TOKEN,
     projectId: 1,
-    runName: 'Automated Tests',
-    autoCreateTestCases: true,
-    repositoryId: 1,
-    parentFolderId: 10,
-    templateId: 1,
+    testRunId: 'Nightly Regression', // Looked up by name
   }]
 ]
 ```
 
-### Custom Case ID Prefix
+### Auto-Create Test Cases with Folder Hierarchy
 
 ```javascript
-// Use TC- prefix: "TC-12345 should work"
 reporters: [
   ['@testplanit/wdio-reporter', {
     domain: 'https://testplanit.example.com',
     apiToken: process.env.TESTPLANIT_API_TOKEN,
     projectId: 1,
-    caseIdPrefix: 'TC-',
+    autoCreateTestCases: true,
+    createFolderHierarchy: true,
+    parentFolderId: 'Automated Tests',
+    templateId: 'Default Template',
   }]
 ]
+```
+
+With `createFolderHierarchy`, nested `describe` blocks create matching folders:
+
+```javascript
+describe('Authentication', () => {         // Creates folder: Automated Tests > Authentication
+  describe('Login', () => {                // Creates folder: Automated Tests > Authentication > Login
+    it('should accept valid credentials');  // Test case placed in Login folder
+  });
+});
 ```
 
 ### Environment-Based Configuration
 
 ```javascript
-reporters: [
-  ['@testplanit/wdio-reporter', {
-    domain: process.env.TESTPLANIT_URL,
-    apiToken: process.env.TESTPLANIT_API_TOKEN,
-    projectId: process.env.CI_PROJECT_ID === 'frontend' ? 1 : 2,
-    runName: `CI Build ${process.env.CI_BUILD_NUMBER} - ${process.env.CI_BRANCH}`,
-    milestoneId: process.env.CI_MILESTONE_ID,
-  }]
-]
+import { TestPlanItService } from '@testplanit/wdio-reporter';
+
+export const config = {
+  services: [
+    [TestPlanItService, {
+      domain: process.env.TESTPLANIT_URL,
+      apiToken: process.env.TESTPLANIT_API_TOKEN,
+      projectId: Number(process.env.TESTPLANIT_PROJECT_ID),
+      runName: `CI Build ${process.env.CI_BUILD_NUMBER} - ${process.env.CI_BRANCH}`,
+      milestoneId: process.env.CI_MILESTONE_ID,
+    }]
+  ],
+  reporters: [
+    ['@testplanit/wdio-reporter', {
+      domain: process.env.TESTPLANIT_URL,
+      apiToken: process.env.TESTPLANIT_API_TOKEN,
+      projectId: Number(process.env.TESTPLANIT_PROJECT_ID),
+      autoCreateTestCases: true,
+      parentFolderId: 10,
+      templateId: 1,
+    }]
+  ],
+}
 ```
 
 ## Output
 
-When tests complete, the reporter outputs a summary:
+When tests complete, the service outputs a summary:
 
 ```console
-[TestPlanIt] Results Summary:
-  Test Run ID: 456
-  Passed: 15
-  Failed: 2
-  Skipped: 3
-  URL: https://testplanit.example.com/projects/1/test-runs/456
+[TestPlanIt Service] Test run created: "E2E Tests - 2025-01-15 10:30:00" (ID: 456)
+
+[TestPlanIt Service] ══════════════════════════════════════════
+[TestPlanIt Service]   Test Run ID: 456
+[TestPlanIt Service]   Status: Completed
+[TestPlanIt Service]   View: https://testplanit.example.com/projects/runs/1/456
+[TestPlanIt Service] ══════════════════════════════════════════
 ```
 
 ## Verbose Mode
 
-Enable verbose logging for debugging:
+Enable verbose logging for debugging on both the service and reporter:
 
 ```javascript
+services: [
+  [TestPlanItService, {
+    // ... other options
+    verbose: true,
+  }]
+],
 reporters: [
   ['@testplanit/wdio-reporter', {
     // ... other options
@@ -190,34 +323,55 @@ reporters: [
 
 This will log:
 
-- Reporter initialization
-- Test run creation
+- Reporter/service initialization
+- Test run and suite creation
+- ID resolution (name lookups)
 - Status mappings
 - Each test result submission
-- Screenshot uploads
-- API errors
+- Screenshot captures and uploads
+- API errors and retries
 
 ## Error Handling
 
-The reporter handles errors gracefully:
-
-- Failed API requests are retried (configurable)
-- Individual test result failures don't stop other results
-- Errors are logged but don't fail the test suite
+- **Service errors** in `onPrepare` will throw and stop the test suite
+- **Service errors** in `onComplete` are logged but don't throw (to avoid hiding test results)
+- **Reporter errors** are logged but don't fail the test suite
+- Failed API requests are retried (configurable via `maxRetries`)
+- Individual test result failures don't stop other results from being reported
 
 ## TypeScript Support
 
 Full TypeScript support is included:
 
 ```typescript
-import type { TestPlanItReporterOptions } from '@testplanit/wdio-reporter';
+import { TestPlanItService } from '@testplanit/wdio-reporter';
+import type { TestPlanItReporterOptions, TestPlanItServiceOptions } from '@testplanit/wdio-reporter';
+
+const serviceOptions: TestPlanItServiceOptions = {
+  domain: 'https://testplanit.example.com',
+  apiToken: process.env.TESTPLANIT_API_TOKEN!,
+  projectId: 1,
+  captureScreenshots: true,
+};
 
 const reporterOptions: TestPlanItReporterOptions = {
   domain: 'https://testplanit.example.com',
   apiToken: process.env.TESTPLANIT_API_TOKEN!,
   projectId: 1,
+  autoCreateTestCases: true,
+  parentFolderId: 10,
+  templateId: 1,
 };
 ```
+
+## Compatibility
+
+| WebdriverIO Version | Supported |
+| -------------------- | ----------- |
+| 9.x | Yes |
+| 8.x | Yes |
+
+Requires Node.js 18 or later.
 
 ## Related Packages
 
