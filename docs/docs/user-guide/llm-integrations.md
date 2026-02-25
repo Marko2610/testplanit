@@ -156,7 +156,7 @@ After creating an LLM integration:
 
 1. Go to **Project Settings** → **AI Models**
 2. Select the integration from available options
-3. Optionally assign a **[Prompt Configuration](./prompt-configurations)** to customize how AI prompts behave for this project
+3. Optionally assign a **[Prompt Configuration](../prompt-configurations)** to customize how AI prompts behave for this project
 4. Save settings
 
 ## Security Considerations
