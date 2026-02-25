@@ -1,3 +1,10 @@
+## [0.14.1](https://github.com/TestPlanIt/testplanit/compare/v0.14.0...v0.14.1) (2026-02-25)
+
+### Bug Fixes
+
+* **docs:** clarify role of Project Administrators in prompt configuration settings ([d0e15aa](https://github.com/TestPlanIt/testplanit/commit/d0e15aa9ffb396e3fb6af64a4e288be918ad2129))
+* **docs:** correct link to Prompt Configuration in LLM integrations documentation ([fb17000](https://github.com/TestPlanIt/testplanit/commit/fb170008461750f5b733607c89b782c554b580bd))
+
 ## [0.14.0](https://github.com/TestPlanIt/testplanit/compare/v0.13.4...v0.14.0) (2026-02-25)
 
 ### Features
