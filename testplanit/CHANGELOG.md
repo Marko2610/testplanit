@@ -1,3 +1,22 @@
+## [0.14.0](https://github.com/TestPlanIt/testplanit/compare/v0.13.4...v0.14.0) (2026-02-25)
+
+### Features
+
+* **AdminMenu:** restructure menu options into sections and enhance functionality ([5897547](https://github.com/TestPlanIt/testplanit/commit/5897547ee8bafe838bf77f05bfcbc1e29185dbb2))
+* **ProjectMenu:** enhance menu structure and add new settings options ([d515c98](https://github.com/TestPlanIt/testplanit/commit/d515c9815a2ee82cb38b532532ed039aa0e230cf))
+* **prompt-config:** add unit tests ([4710b8a](https://github.com/TestPlanIt/testplanit/commit/4710b8a37c120502fa9de6db0334d3c6fb69f649))
+* **prompt-config:** introduce PromptConfig and PromptConfigPrompt models ([caf4c9b](https://github.com/TestPlanIt/testplanit/commit/caf4c9b5351966f2d78b6c5b2f02bd750b4021cd))
+* **prompts:** enhance project display in prompt configurations ([55b5df0](https://github.com/TestPlanIt/testplanit/commit/55b5df0ecd35b24373eba047aa9a210546679e38))
+* **release:** remove v0.13.0 release notes and update v0.14.0 blog title ([089007f](https://github.com/TestPlanIt/testplanit/commit/089007f0a7d89693f6ed97336dbd3842e7b19788))
+* **translations:** add prompt configuration translations for Spanish and French ([ceb2df8](https://github.com/TestPlanIt/testplanit/commit/ceb2df8aab14995f4c45d9ef6212d17b20543d1d))
+* **user-guide:** update LLM integrations and add prompt configurations section ([17c6ce6](https://github.com/TestPlanIt/testplanit/commit/17c6ce6db5b661dcb7ef4e6b4d014f5496fffbe5))
+* **wdio-reporter:** add launcher service for single test run across all spec files ([d1588ba](https://github.com/TestPlanIt/testplanit/commit/d1588ba85bcad5d7ca65dd329258f422f18d055b))
+
+### Bug Fixes
+
+* **ci:** add js-yaml v3 override for read-yaml-file used by changesets ([4e7d15e](https://github.com/TestPlanIt/testplanit/commit/4e7d15ee3347fa3fc2a4bc9e75e091bf37628ac6))
+* **ci:** pass --run flag through to vitest in packages-release workflow ([5cbf992](https://github.com/TestPlanIt/testplanit/commit/5cbf992a113f1aa9a2921da02f437cc570c7ebcc))
+
 ## [0.13.4](https://github.com/TestPlanIt/testplanit/compare/v0.13.3...v0.13.4) (2026-02-23)
 
 ## [0.13.3](https://github.com/TestPlanIt/testplanit/compare/v0.13.2...v0.13.3) (2026-02-23)
