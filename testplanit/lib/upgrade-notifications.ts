@@ -177,10 +177,10 @@ export const upgradeNotifications: Record<string, UpgradeNotification> = {
       <h4>Per-Project Customization</h4>
       <ul>
         <li>Create prompt configurations tailored to specific teams or domains</li>
-        <li>Assign configurations per project in <strong>Settings → AI Models</strong></li>
+        <li>Project Administrators assign configurations per project in <strong>Settings → AI Models</strong></li>
         <li>Three-level resolution: project-specific → system default → built-in fallback</li>
       </ul>
-      <p>System Administrators get started at <strong>Admin → Prompt Configs</strong> (Tools & Integrations section). See the <a href="https://docs.testplanit.io/user-guide/llm-integrations#prompt-configurations" target="_blank">documentation</a> for details.</p>
+      <p>System Administrators get started at <strong>Admin → Prompt Configs</strong> (Tools & Integrations section). See the <a href="https://docs.testplanit.com/user-guide/llm-integrations#prompt-configurations" target="_blank">documentation</a> for details.</p>
     `,
   },
 };
