@@ -33,7 +33,8 @@ resolver.define('getTestInfo', async ({ context, payload }) => {
     }
 
     const apiKey = await getApiKey();
-    const apiUrl = `${instanceUrl}/api/integrations/jira/test-info?issueKey=${issueKey}&issueId=${issueId}`;
+    const cleanUrl = instanceUrl.replace(/\/+$/, '');
+    const apiUrl = `${cleanUrl}/api/integrations/jira/test-info?issueKey=${issueKey}&issueId=${issueId}`;
 
     const headers = {
       'Accept': 'application/json',
@@ -125,7 +126,8 @@ resolver.define('testConnection', async ({ payload }) => {
       return { success: false, message: 'Instance URL is required' };
     }
 
-    const testUrl = `${instanceUrl}/version.json`;
+    const cleanUrl = instanceUrl.replace(/\/+$/, '');
+    const testUrl = `${cleanUrl}/version.json`;
 
     const response = await api.fetch(testUrl, {
       method: 'GET',
