@@ -4,6 +4,15 @@
 
 * export templates ([adf0655](https://github.com/TestPlanIt/testplanit/commit/adf0655ab24e588a59d238c01e6ec588a843d004))
 * export templates ([#84](https://github.com/TestPlanIt/testplanit/issues/84)) ([641bc8b](https://github.com/TestPlanIt/testplanit/commit/641bc8b5f2b2dbdec3d2be3e5c81a44012030e08))
+* trigger release ([11d1ca7](https://github.com/TestPlanIt/testplanit/commit/11d1ca7401824d582add416a0652d75f59e9c574))
+* trigger v0.15.0 release ([92b19b1](https://github.com/TestPlanIt/testplanit/commit/92b19b132cf91da81c56308e336a9200ce48dc2d))
+
+## [0.15.0](https://github.com/TestPlanIt/testplanit/compare/v0.14.3...v0.15.0) (2026-03-08)
+
+### Features
+
+* export templates ([adf0655](https://github.com/TestPlanIt/testplanit/commit/adf0655ab24e588a59d238c01e6ec588a843d004))
+* export templates ([#84](https://github.com/TestPlanIt/testplanit/issues/84)) ([641bc8b](https://github.com/TestPlanIt/testplanit/commit/641bc8b5f2b2dbdec3d2be3e5c81a44012030e08))
 
 ## [0.14.3](https://github.com/TestPlanIt/testplanit/compare/v0.14.2...v0.14.3) (2026-03-06)
 
