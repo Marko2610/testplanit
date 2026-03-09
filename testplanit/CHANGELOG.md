@@ -1,3 +1,9 @@
+## [0.15.2](https://github.com/TestPlanIt/testplanit/compare/v0.15.1...v0.15.2) (2026-03-09)
+
+### Bug Fixes
+
+* enhance error handling and logging in seed process ([a8e5b53](https://github.com/TestPlanIt/testplanit/commit/a8e5b53650cd38cee0d7070e71a0018beac56906))
+
 ## [0.15.0](https://github.com/TestPlanIt/testplanit/compare/v0.14.3...v0.15.0) (2026-03-08)
 
 ### Features
