@@ -1,3 +1,9 @@
+## [0.15.4](https://github.com/TestPlanIt/testplanit/compare/v0.15.3...v0.15.4) (2026-03-11)
+
+### Bug Fixes
+
+* update hono and other dependencies for improved compatibility ([6c92666](https://github.com/TestPlanIt/testplanit/commit/6c926661e499f67773e8681257f02990abfd31e8))
+
 ## [0.15.3](https://github.com/TestPlanIt/testplanit/compare/v0.15.2...v0.15.3) (2026-03-11)
 
 ### Enhancements
