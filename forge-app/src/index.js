@@ -149,9 +149,8 @@ resolver.define('testConnection', async ({ payload }) => {
 
     const versionData = await versionResponse.json();
 
-    // Validate the API key using the existing test-info endpoint with a dummy issue key.
-    // A 401 means bad key; 200 or 400 (missing params) means the key is valid.
-    const testUrl = `${cleanUrl}/api/integrations/jira/test-info?issueKey=TEST-0`;
+    // Validate the API key using the test-connection endpoint
+    const testUrl = `${cleanUrl}/api/integrations/jira/test-connection`;
     const testResponse = await api.fetch(testUrl, {
       method: 'GET',
       headers: {
@@ -168,7 +167,13 @@ resolver.define('testConnection', async ({ payload }) => {
       };
     }
 
-    // Any other response (200, 400, etc.) means the key was accepted
+    if (!testResponse.ok) {
+      return {
+        success: false,
+        message: `Connection test returned status ${testResponse.status}. Please ensure your TestPlanIt instance is v0.15.4 or later.`
+      };
+    }
+
     return {
       success: true,
       message: `Successfully connected to TestPlanIt ${versionData.version || 'instance'} — API key is valid.`

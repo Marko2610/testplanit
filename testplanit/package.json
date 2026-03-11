@@ -184,7 +184,7 @@
     "framer-motion": "^12.35.0",
     "handlebars": "^4.7.8",
     "happy-dom": "^20.8.3",
-    "hono": "^4.12.5",
+    "hono": "^4.12.7",
     "html-to-adf-converter": "^1.0.2",
     "humanize-duration": "^3.33.2",
     "iframe-resizer": "^5.5.9",
