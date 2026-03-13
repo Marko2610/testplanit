@@ -1004,7 +1004,7 @@ var startWorker = async () => {
   if (valkey_default) {
     worker = new import_bullmq2.Worker(EMAIL_QUEUE_NAME, processor, {
       connection: valkey_default,
-      concurrency: 3
+      concurrency: parseInt(process.env.EMAIL_CONCURRENCY || "3", 10)
     });
     worker.on("completed", (job) => {
       console.log(`Email job ${job.id} completed successfully.`);

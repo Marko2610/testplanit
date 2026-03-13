@@ -218,7 +218,7 @@ const startWorker = async () => {
   if (valkeyConnection) {
     worker = new Worker(NOTIFICATION_QUEUE_NAME, processor, {
       connection: valkeyConnection as any,
-      concurrency: 5,
+      concurrency: parseInt(process.env.NOTIFICATION_CONCURRENCY || '5', 10),
     });
 
     worker.on("completed", (job) => {

@@ -115,7 +115,7 @@ const startWorker = async () => {
   if (valkeyConnection) {
     worker = new Worker(AUDIT_LOG_QUEUE_NAME, processor, {
       connection: valkeyConnection as any,
-      concurrency: 10, // Higher concurrency since audit logs are independent
+      concurrency: parseInt(process.env.AUDIT_LOG_CONCURRENCY || '10', 10), // Higher concurrency since audit logs are independent
     });
 
     worker.on("completed", (job) => {

@@ -366,7 +366,7 @@ var startWorker = async () => {
   if (valkey_default) {
     worker = new import_bullmq2.Worker(AUDIT_LOG_QUEUE_NAME, processor, {
       connection: valkey_default,
-      concurrency: 10
+      concurrency: parseInt(process.env.AUDIT_LOG_CONCURRENCY || "10", 10)
       // Higher concurrency since audit logs are independent
     });
     worker.on("completed", (job) => {

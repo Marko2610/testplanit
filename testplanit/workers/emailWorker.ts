@@ -420,7 +420,7 @@ const startWorker = async () => {
   if (valkeyConnection) {
     worker = new Worker(EMAIL_QUEUE_NAME, processor, {
       connection: valkeyConnection as any,
-      concurrency: 3,
+      concurrency: parseInt(process.env.EMAIL_CONCURRENCY || '3', 10),
     });
 
     worker.on("completed", (job) => {

@@ -4187,7 +4187,7 @@ var startWorker = async () => {
   if (valkey_default) {
     worker = new import_bullmq2.Worker(SYNC_QUEUE_NAME, processor, {
       connection: valkey_default,
-      concurrency: 1,
+      concurrency: parseInt(process.env.SYNC_CONCURRENCY || "2", 10),
       lockDuration: 216e5,
       maxStalledCount: 3,
       stalledInterval: 3e5

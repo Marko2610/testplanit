@@ -16,7 +16,10 @@ The application uses the following background processes:
 4. **Sync Worker** - Synchronizes issues with external integrations
 5. **Testmo Import Worker** - Processes large Testmo JSON imports
 6. **Elasticsearch Reindex Worker** - Reindexes entities for search functionality
-7. **Scheduler** - Sets up recurring jobs (cron jobs)
+7. **Auto Tag Worker** - Runs AI-powered automatic tagging on test cases and other entities
+8. **Audit Log Worker** - Persists audit log entries for user and system actions
+9. **Budget Alert Worker** - Checks and sends alerts for AI model budget thresholds
+10. **Scheduler** - Sets up recurring jobs (cron jobs)
 
 ## Workers
 
@@ -69,6 +72,26 @@ The application uses the following background processes:
 - Selective reindex by entity type (repository-cases, test-runs, sessions, etc.)
 - Project-specific reindexing
 - Batch processing with configurable batch sizes
+
+### Auto Tag Worker
+
+- Runs AI-powered automatic tagging on test cases and other entities
+- Processes tagging jobs triggered by content changes
+- Default concurrency: 3 (one per entity type)
+- Location: `workers/autoTagWorker.ts`
+
+### Audit Log Worker
+
+- Persists audit log entries for user and system actions
+- High throughput, independent operations
+- Default concurrency: 10 (lightweight, independent writes)
+- Location: `workers/auditLogWorker.ts`
+
+### Budget Alert Worker
+
+- Checks AI model budget thresholds and sends alerts
+- Default concurrency: 2
+- Location: `workers/budgetAlertWorker.ts`
 
 ### Scheduler
 
@@ -251,6 +274,10 @@ SYNC_CONCURRENCY=2
 # Can handle moderate concurrency (3-10) for email sending
 EMAIL_CONCURRENCY=3
 
+# Auto Tag Worker (default: 3)
+# One per entity type; increase cautiously as AI calls are expensive
+AUTO_TAG_CONCURRENCY=3
+
 # Notification Worker (lightweight operations, default: 5)
 # Can handle higher concurrency (5-20) for lightweight tasks
 NOTIFICATION_CONCURRENCY=5
@@ -258,6 +285,17 @@ NOTIFICATION_CONCURRENCY=5
 # Forecast Worker (CPU-intensive but parallelizable, default: 5)
 # Set based on available CPU cores, typically 1-2x CPU count
 FORECAST_CONCURRENCY=5
+
+# Budget Alert Worker (default: 2)
+BUDGET_ALERT_CONCURRENCY=2
+
+# Elasticsearch Reindex Worker (I/O-intensive, default: 2)
+# Balanced for Elasticsearch performance; increase for faster reindexing
+ELASTICSEARCH_REINDEX_CONCURRENCY=2
+
+# Audit Log Worker (lightweight independent writes, default: 10)
+# Can safely be set higher on powerful machines
+AUDIT_LOG_CONCURRENCY=10
 ```
 
 ### Setting Concurrency Values

@@ -1706,7 +1706,7 @@
     },
     "templateNotAssignedWarning": "Este caso de prueba utiliza la plantilla \"{templateName}\", que actualmente no está asignada al proyecto \"{projectName}\". Es posible que deba asignar esta plantilla al proyecto o modificar el caso de prueba para usar una plantilla diferente.",
     "orphanedStepsWarning": "Este caso de prueba tiene pasos, pero la plantilla actual \"{templateName}\" no incluye el campo \"Pasos\". Los pasos no se pueden editar hasta que el caso de prueba tenga una plantilla con dicho campo.",
-    "orphanedFieldsWarning": "This test case has {count, plural, =1 {# field value} other {# field values}} that {count, plural, =1 {is} other {are}} not included in the current template \"{templateName}\". {count, plural, =1 {This field is} other {These fields are}} shown below but may not be editable until added to the template.",
+    "orphanedFieldsWarning": "Este caso de prueba tiene {count, plural, =1 {# valor de campo} other {# valores de campo}} que {count, plural, =1 {es} other {son}} no incluidos en la plantilla actual \"{templateName}\". {count, plural, =1 {Este campo es} other {Estos campos son}} mostrados a continuación, pero es posible que no se puedan editar hasta que se agreguen a la plantilla.",
     "title": "Repositorio de Casos de Prueba",
     "folders": "Carpetas",
     "addFolder": "Añadir carpeta",

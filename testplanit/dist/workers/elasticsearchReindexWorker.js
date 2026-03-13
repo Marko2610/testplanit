@@ -2316,7 +2316,7 @@ var startWorker = async () => {
   if (valkey_default) {
     worker = new import_bullmq.Worker(ELASTICSEARCH_REINDEX_QUEUE_NAME, processor, {
       connection: valkey_default,
-      concurrency: 2,
+      concurrency: parseInt(process.env.ELASTICSEARCH_REINDEX_CONCURRENCY || "2", 10),
       lockDuration: 36e5,
       maxStalledCount: 3,
       stalledInterval: 3e5

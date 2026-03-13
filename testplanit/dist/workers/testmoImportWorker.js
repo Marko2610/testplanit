@@ -11867,7 +11867,7 @@ async function startWorker() {
   }
   const worker = new import_bullmq2.Worker(TESTMO_IMPORT_QUEUE_NAME, processor, {
     connection: valkey_default,
-    concurrency: 1
+    concurrency: parseInt(process.env.TESTMO_IMPORT_CONCURRENCY || "1", 10)
   });
   worker.on("completed", (job) => {
     console.log(

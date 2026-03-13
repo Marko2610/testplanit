@@ -50,7 +50,7 @@ const startWorker = async () => {
   if (valkeyConnection) {
     worker = new Worker(BUDGET_ALERT_QUEUE_NAME, processor, {
       connection: valkeyConnection as any,
-      concurrency: 5,
+      concurrency: parseInt(process.env.BUDGET_ALERT_CONCURRENCY || '2', 10),
     });
 
     worker.on("completed", (job) => {

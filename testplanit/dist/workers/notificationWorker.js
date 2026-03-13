@@ -476,7 +476,7 @@ var startWorker = async () => {
   if (valkey_default) {
     worker = new import_bullmq2.Worker(NOTIFICATION_QUEUE_NAME, processor, {
       connection: valkey_default,
-      concurrency: 5
+      concurrency: parseInt(process.env.NOTIFICATION_CONCURRENCY || "5", 10)
     });
     worker.on("completed", (job) => {
       console.log(`Job ${job.id} completed successfully.`);

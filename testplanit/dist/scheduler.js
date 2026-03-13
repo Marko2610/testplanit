@@ -939,7 +939,7 @@ var startWorker = async () => {
   if (valkey_default) {
     worker = new import_bullmq2.Worker(NOTIFICATION_QUEUE_NAME, processor, {
       connection: valkey_default,
-      concurrency: 5
+      concurrency: parseInt(process.env.NOTIFICATION_CONCURRENCY || "5", 10)
     });
     worker.on("completed", (job) => {
       console.log(`Job ${job.id} completed successfully.`);
@@ -1453,7 +1453,7 @@ async function startWorker2() {
   if (valkey_default) {
     const worker2 = new import_bullmq3.Worker(FORECAST_QUEUE_NAME, processor2, {
       connection: valkey_default,
-      concurrency: 5,
+      concurrency: parseInt(process.env.FORECAST_CONCURRENCY || "5", 10),
       limiter: {
         max: 100,
         duration: 1e3

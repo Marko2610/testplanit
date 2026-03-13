@@ -7524,7 +7524,7 @@ async function startWorker() {
 
   const worker = new Worker(TESTMO_IMPORT_QUEUE_NAME, processor, {
     connection: valkeyConnection as any,
-    concurrency: 1,
+    concurrency: parseInt(process.env.TESTMO_IMPORT_CONCURRENCY || '1', 10),
   });
 
   worker.on("completed", (job) => {

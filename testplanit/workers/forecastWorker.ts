@@ -418,7 +418,7 @@ async function startWorker() {
   if (valkeyConnection) {
     const worker = new Worker(FORECAST_QUEUE_NAME, processor, {
       connection: valkeyConnection as any,
-      concurrency: 5,
+      concurrency: parseInt(process.env.FORECAST_CONCURRENCY || '5', 10),
       limiter: {
         max: 100,
         duration: 1000,

@@ -298,7 +298,7 @@ const startWorker = async () => {
       processor,
       {
         connection: valkeyConnection as any,
-        concurrency: 3, // Process up to 3 jobs in parallel (one per entity type)
+        concurrency: parseInt(process.env.AUTO_TAG_CONCURRENCY || '3', 10), // Process up to 3 jobs in parallel (one per entity type)
       },
     );
 
