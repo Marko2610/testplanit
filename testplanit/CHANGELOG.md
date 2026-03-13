@@ -1,3 +1,10 @@
+## [0.16.6](https://github.com/TestPlanIt/testplanit/compare/v0.16.5...v0.16.6) (2026-03-13)
+
+### Bug Fixes
+
+* **dependencies:** bump undici override to >=7.24.0 for security patches ([cabe2ba](https://github.com/TestPlanIt/testplanit/commit/cabe2baae042e5d9236c3984aceaf3af87cb1332))
+* **workers:** enhance multi-tenant support in syncWorker and autoTagWorker ([641b894](https://github.com/TestPlanIt/testplanit/commit/641b89402a9bd29f56b61d3cb9e3e23d794d81e7))
+
 ## [0.16.5](https://github.com/TestPlanIt/testplanit/compare/v0.16.4...v0.16.5) (2026-03-13)
 
 ### Bug Fixes
