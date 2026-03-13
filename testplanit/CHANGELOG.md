@@ -1,3 +1,9 @@
+## [0.16.4](https://github.com/TestPlanIt/testplanit/compare/v0.16.3...v0.16.4) (2026-03-13)
+
+### Bug Fixes
+
+* **docker:** increase memory limits and optimize service configurations ([358c5c1](https://github.com/TestPlanIt/testplanit/commit/358c5c1b84bc864d3dbfc6754388ca1a940f2a87))
+
 ## [0.16.2](https://github.com/TestPlanIt/testplanit/compare/v0.16.1...v0.16.2) (2026-03-13)
 
 ### Bug Fixes
