@@ -214,7 +214,7 @@ export class SyncService {
     let syncedCount = 0;
 
     try {
-      // Get full user object for enhance
+      // Get user for auth validation
       const user = await prisma.user.findUnique({
         where: { id: userId },
         include: {
@@ -230,12 +230,11 @@ export class SyncService {
         throw new Error("User not found");
       }
 
-      // Get user context for database operations (lazy-load enhance to reduce memory)
-      const enhance = await getEnhance();
-      const userDb = enhance(prisma, { user }, { kinds: ["delegate"] });
+      // Use raw Prisma client (no ZenStack enhance) — workers don't need access control
+      // and enhance() causes ~3GB memory overhead
 
       // Get the integration
-      const integration = await userDb.integration.findUnique({
+      const integration = await prisma.integration.findUnique({
         where: { id: integrationId },
         include: {
           userIntegrationAuths: {
@@ -288,7 +287,7 @@ export class SyncService {
       }
 
       // Get total count of issues to sync
-      const totalIssues = await userDb.issue.count({
+      const totalIssues = await prisma.issue.count({
         where: {
           integrationId,
           ...(projectId && { projectId: parseInt(projectId) }),
@@ -301,7 +300,7 @@ export class SyncService {
 
       while (processedCount < totalIssues) {
         // Fetch a batch of issues
-        const localIssues = await userDb.issue.findMany({
+        const localIssues = await prisma.issue.findMany({
           where: {
             integrationId,
             ...(projectId && { projectId: parseInt(projectId) }),
@@ -349,7 +348,7 @@ export class SyncService {
             await issueCache.set(integrationId, issueData.id, issueData);
 
             // Update local database
-            await this.updateExistingIssue(userDb, integrationId, issueData);
+            await this.updateExistingIssue(prisma, integrationId, issueData);
             syncedCount++;
 
           } catch (error: any) {
@@ -410,7 +409,7 @@ export class SyncService {
   ): Promise<{ success: boolean; error?: string }> {
     const prisma = serviceOptions.prismaClient || defaultPrisma;
     try {
-      // Get full user object for enhance
+      // Get user for auth validation
       const user = await prisma.user.findUnique({
         where: { id: userId },
         include: {
@@ -426,12 +425,11 @@ export class SyncService {
         throw new Error("User not found");
       }
 
-      // Get user context for database operations (lazy-load enhance to reduce memory)
-      const enhance = await getEnhance();
-      const userDb = enhance(prisma, { user }, { kinds: ["delegate"] });
+      // Use raw Prisma client (no ZenStack enhance) — workers don't need access control
+      // and enhance() causes ~3GB memory overhead
 
       // Get the integration
-      const integration = await userDb.integration.findUnique({
+      const integration = await prisma.integration.findUnique({
         where: { id: integrationId },
         include: {
           userIntegrationAuths: {
@@ -495,7 +493,7 @@ export class SyncService {
       let issueIdForSync = externalIssueId;
       if (integration.provider === "GITHUB") {
         // Fetch the stored issue to get the repo context
-        const storedIssue = await userDb.issue.findFirst({
+        const storedIssue = await prisma.issue.findFirst({
           where: {
             integrationId,
             OR: [
@@ -547,7 +545,7 @@ export class SyncService {
       await issueCache.set(integrationId, issueData.id, issueData);
 
       // Update local database
-      await this.updateExistingIssue(userDb, integrationId, issueData);
+      await this.updateExistingIssue(prisma, integrationId, issueData);
 
       return { success: true };
     } catch (error: any) {
