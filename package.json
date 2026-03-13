@@ -93,7 +93,8 @@
             "tar-fs@2": ">=2.1.4",
             "glob@10": ">=10.5.0",
             "bn.js": "5.2.3",
-            "serialize-javascript": ">=7.0.3"
+            "serialize-javascript": ">=7.0.3",
+            "flatted": ">=3.4.0"
         }
     }
 }
