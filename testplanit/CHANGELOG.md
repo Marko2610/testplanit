@@ -1,3 +1,9 @@
+## [0.16.1](https://github.com/TestPlanIt/testplanit/compare/v0.16.0...v0.16.1) (2026-03-13)
+
+### Bug Fixes
+
+* Unable to expand project/admin menu sections in mobile mode ([3f0ab56](https://github.com/TestPlanIt/testplanit/commit/3f0ab565fdbe017b94ff3762b59440b4d56071b1))
+
 ## [0.16.0](https://github.com/TestPlanIt/testplanit/compare/v0.15.4...v0.16.0) (2026-03-12)
 
 ### Features
