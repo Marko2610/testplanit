@@ -279,7 +279,8 @@ export class SyncService {
 
       // Get the adapter
       const adapter = await integrationManager.getAdapter(
-        String(integrationId)
+        String(integrationId),
+        prisma
       );
 
       if (!adapter) {
@@ -474,7 +475,8 @@ export class SyncService {
 
       // Get the adapter
       const adapter = await integrationManager.getAdapter(
-        String(integrationId)
+        String(integrationId),
+        prisma
       );
 
       if (!adapter) {

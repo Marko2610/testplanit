@@ -63,14 +63,15 @@ export class IntegrationManager {
   /**
    * Get adapter for a specific integration
    */
-  async getAdapter(integrationId: string): Promise<IssueAdapter | null> {
+  async getAdapter(integrationId: string, prismaClient?: typeof prisma): Promise<IssueAdapter | null> {
     // Check cache first
     if (this.adapterCache.has(integrationId)) {
       return this.adapterCache.get(integrationId)!;
     }
 
-    // Fetch integration from database
-    const integration = await prisma.integration.findUnique({
+    // Fetch integration from database (use provided client for multi-tenant support)
+    const db = prismaClient || prisma;
+    const integration = await db.integration.findUnique({
       where: { id: parseInt(integrationId) },
       include: {
         userIntegrationAuths: {
