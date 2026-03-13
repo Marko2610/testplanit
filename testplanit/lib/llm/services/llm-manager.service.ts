@@ -26,7 +26,7 @@ const ALLOWED_BASE_URLS: Record<string, string[]> = {
 };
 
 // Providers that allow custom endpoints (must pass additional validation)
-const CUSTOM_ENDPOINT_PROVIDERS = ["AZURE_OPENAI", "OLLAMA", "CUSTOM_LLM"];
+const CUSTOM_ENDPOINT_PROVIDERS = ["ANTHROPIC", "AZURE_OPENAI", "OLLAMA", "CUSTOM_LLM"];
 
 
 /**
@@ -152,9 +152,11 @@ export class LlmManager {
   private static instance: LlmManager;
   private adapters: Map<number, BaseLlmAdapter> = new Map();
   private prisma: PrismaClient;
+  private tenantId?: string;
 
-  private constructor(prisma: PrismaClient) {
+  private constructor(prisma: PrismaClient, tenantId?: string) {
     this.prisma = prisma;
+    this.tenantId = tenantId;
   }
 
   static getInstance(prisma: PrismaClient): LlmManager {
@@ -167,9 +169,10 @@ export class LlmManager {
   /**
    * Create a fresh LlmManager instance for worker context.
    * Bypasses the singleton cache so each tenant gets its own instance.
+   * Accepts tenantId so budget checks can be enqueued with the correct tenant.
    */
-  static createForWorker(prisma: PrismaClient): LlmManager {
-    return new LlmManager(prisma);
+  static createForWorker(prisma: PrismaClient, tenantId?: string): LlmManager {
+    return new LlmManager(prisma, tenantId);
   }
 
   async getAdapter(llmIntegrationId: number): Promise<BaseLlmAdapter> {
@@ -494,7 +497,7 @@ export class LlmManager {
         getBudgetAlertQueue()
           ?.add(BUDGET_ALERT_JOB_CHECK, {
             llmIntegrationId,
-            tenantId: getCurrentTenantId(),
+            tenantId: this.tenantId ?? getCurrentTenantId(),
           })
           .catch((err: unknown) => {
             console.error(
@@ -555,7 +558,7 @@ export class LlmManager {
         getBudgetAlertQueue()
           ?.add(BUDGET_ALERT_JOB_CHECK, {
             llmIntegrationId,
-            tenantId: getCurrentTenantId(),
+            tenantId: this.tenantId ?? getCurrentTenantId(),
           })
           .catch((err: unknown) => {
             console.error(

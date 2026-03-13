@@ -2706,11 +2706,12 @@ var IntegrationManager = class _IntegrationManager {
   /**
    * Get adapter for a specific integration
    */
-  async getAdapter(integrationId) {
+  async getAdapter(integrationId, prismaClient2) {
     if (this.adapterCache.has(integrationId)) {
       return this.adapterCache.get(integrationId);
     }
-    const integration = await prisma.integration.findUnique({
+    const db = prismaClient2 || prisma;
+    const integration = await db.integration.findUnique({
       where: { id: parseInt(integrationId) },
       include: {
         userIntegrationAuths: {
@@ -3621,14 +3622,6 @@ function validateMultiTenantJobData(jobData) {
 }
 
 // lib/integrations/services/SyncService.ts
-var _enhance = null;
-async function getEnhance() {
-  if (!_enhance) {
-    const { enhance } = await import("@zenstackhq/runtime");
-    _enhance = enhance;
-  }
-  return _enhance;
-}
 var SyncService = class {
   /**
    * Queue a sync job for an integration
@@ -3771,9 +3764,7 @@ var SyncService = class {
       if (!user) {
         throw new Error("User not found");
       }
-      const enhance = await getEnhance();
-      const userDb = enhance(prisma2, { user }, { kinds: ["delegate"] });
-      const integration = await userDb.integration.findUnique({
+      const integration = await prisma2.integration.findUnique({
         where: { id: integrationId },
         include: {
           userIntegrationAuths: {
@@ -3805,12 +3796,13 @@ var SyncService = class {
         }
       }
       const adapter = await integrationManager.getAdapter(
-        String(integrationId)
+        String(integrationId),
+        prisma2
       );
       if (!adapter) {
         throw new Error("Invalid adapter for issue synchronization");
       }
-      const totalIssues = await userDb.issue.count({
+      const totalIssues = await prisma2.issue.count({
         where: {
           integrationId,
           ...projectId && { projectId: parseInt(projectId) }
@@ -3819,7 +3811,7 @@ var SyncService = class {
       const BATCH_SIZE = 50;
       let processedCount = 0;
       while (processedCount < totalIssues) {
-        const localIssues = await userDb.issue.findMany({
+        const localIssues = await prisma2.issue.findMany({
           where: {
             integrationId,
             ...projectId && { projectId: parseInt(projectId) }
@@ -3853,7 +3845,7 @@ var SyncService = class {
             }
             const issueData = await adapter.syncIssue(issueIdentifier);
             await issueCache.set(integrationId, issueData.id, issueData);
-            await this.updateExistingIssue(userDb, integrationId, issueData);
+            await this.updateExistingIssue(prisma2, integrationId, issueData);
             syncedCount++;
           } catch (error) {
             errors.push(
@@ -3909,9 +3901,7 @@ var SyncService = class {
       if (!user) {
         throw new Error("User not found");
       }
-      const enhance = await getEnhance();
-      const userDb = enhance(prisma2, { user }, { kinds: ["delegate"] });
-      const integration = await userDb.integration.findUnique({
+      const integration = await prisma2.integration.findUnique({
         where: { id: integrationId },
         include: {
           userIntegrationAuths: {
@@ -3943,7 +3933,8 @@ var SyncService = class {
         }
       }
       const adapter = await integrationManager.getAdapter(
-        String(integrationId)
+        String(integrationId),
+        prisma2
       );
       if (!adapter) {
         throw new Error("Invalid adapter for issue synchronization");
@@ -3956,7 +3947,7 @@ var SyncService = class {
       }
       let issueIdForSync = externalIssueId;
       if (integration.provider === "GITHUB") {
-        const storedIssue = await userDb.issue.findFirst({
+        const storedIssue = await prisma2.issue.findFirst({
           where: {
             integrationId,
             OR: [
@@ -3994,7 +3985,7 @@ var SyncService = class {
       }
       const issueData = await adapter.syncIssue(issueIdForSync);
       await issueCache.set(integrationId, issueData.id, issueData);
-      await this.updateExistingIssue(userDb, integrationId, issueData);
+      await this.updateExistingIssue(prisma2, integrationId, issueData);
       return { success: true };
     } catch (error) {
       console.error(`Failed to refresh issue ${externalIssueId}:`, error);

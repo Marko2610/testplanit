@@ -12,7 +12,10 @@ import {
 import { LlmManager } from "../lib/llm/services/llm-manager.service";
 import { PromptResolver } from "../lib/llm/services/prompt-resolver.service";
 import { TagAnalysisService } from "../lib/llm/services/auto-tag/tag-analysis.service";
-import type { EntityType, TagSuggestion } from "../lib/llm/services/auto-tag/types";
+import type {
+  EntityType,
+  TagSuggestion,
+} from "../lib/llm/services/auto-tag/types";
 
 // ─── Job data / result types ────────────────────────────────────────────────
 
@@ -61,10 +64,12 @@ function cancelKey(jobId: string | undefined): string {
 
 // ─── Processor ──────────────────────────────────────────────────────────────
 
-const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> => {
+const processor = async (
+  job: Job<AutoTagJobData>
+): Promise<AutoTagJobResult> => {
   console.log(
     `Processing auto-tag job ${job.id} for ${job.data.entityIds.length} entities` +
-      (job.data.tenantId ? ` (tenant: ${job.data.tenantId})` : ""),
+      (job.data.tenantId ? ` (tenant: ${job.data.tenantId})` : "")
   );
 
   // 1. Validate multi-tenant context
@@ -74,7 +79,7 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
   const prisma = getPrismaClientForJob(job.data);
 
   // 3. Create per-tenant service instances (bypass singleton for worker isolation)
-  const llmManager = LlmManager.createForWorker(prisma);
+  const llmManager = LlmManager.createForWorker(prisma, job.data.tenantId);
   const promptResolver = new PromptResolver(prisma);
   const service = new TagAnalysisService(prisma, llmManager, promptResolver);
 
@@ -112,7 +117,11 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
   }
 
   // 8. Signal "finalizing" so the UI knows analysis is done but results are being prepared
-  await job.updateProgress({ analyzed: job.data.entityIds.length, total: job.data.entityIds.length, finalizing: true });
+  await job.updateProgress({
+    analyzed: job.data.entityIds.length,
+    total: job.data.entityIds.length,
+    finalizing: true,
+  });
 
   // 9. Transform flat suggestions into grouped AutoTagJobResult format
   const entityMap = new Map<
@@ -136,20 +145,29 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
   const allRelevantIds = [...job.data.entityIds];
 
   // 10. Fetch entity names, current tags, and display metadata for all relevant entities
-  const entityMeta = new Map<number, {
-    name: string;
-    currentTags: string[];
-    automated?: boolean;
-    source?: string;
-    testRunType?: string;
-  }>();
+  const entityMeta = new Map<
+    number,
+    {
+      name: string;
+      currentTags: string[];
+      automated?: boolean;
+      source?: string;
+      testRunType?: string;
+    }
+  >();
 
   if (allRelevantIds.length > 0) {
     switch (job.data.entityType) {
       case "repositoryCase": {
         const entities = await prisma.repositoryCases.findMany({
           where: { id: { in: allRelevantIds } },
-          select: { id: true, name: true, automated: true, source: true, tags: { select: { name: true } } },
+          select: {
+            id: true,
+            name: true,
+            automated: true,
+            source: true,
+            tags: { select: { name: true } },
+          },
         });
         for (const e of entities) {
           entityMeta.set(e.id, {
@@ -164,7 +182,12 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
       case "testRun": {
         const entities = await prisma.testRuns.findMany({
           where: { id: { in: allRelevantIds } },
-          select: { id: true, name: true, testRunType: true, tags: { select: { name: true } } },
+          select: {
+            id: true,
+            name: true,
+            testRunType: true,
+            tags: { select: { name: true } },
+          },
         });
         for (const e of entities) {
           entityMeta.set(e.id, {
@@ -181,7 +204,10 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
           select: { id: true, name: true, tags: { select: { name: true } } },
         });
         for (const e of entities) {
-          entityMeta.set(e.id, { name: e.name, currentTags: e.tags.map((t) => t.name) });
+          entityMeta.set(e.id, {
+            name: e.name,
+            currentTags: e.tags.map((t) => t.name),
+          });
         }
         break;
       }
@@ -189,7 +215,9 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
   }
 
   // Build suggestions for successful entities
-  const suggestions: AutoTagJobResult["suggestions"] = Array.from(entityMap.entries()).map(([entityId, tags]) => {
+  const suggestions: AutoTagJobResult["suggestions"] = Array.from(
+    entityMap.entries()
+  ).map(([entityId, tags]) => {
     const meta = entityMeta.get(entityId);
     return {
       entityId,
@@ -204,9 +232,10 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
   });
 
   // Append failed entities with empty tags and error flag
-  const errorMessage = result.errors.length > 0
-    ? result.errors[result.errors.length - 1]
-    : "Analysis failed";
+  const errorMessage =
+    result.errors.length > 0
+      ? result.errors[result.errors.length - 1]
+      : "Analysis failed";
   for (const failedId of failedEntityIdSet) {
     if (!entityMap.has(failedId)) {
       const meta = entityMeta.get(failedId);
@@ -237,7 +266,8 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
         currentTags: meta?.currentTags ?? [],
         tags: [],
         truncated: true,
-        errorMessage: "LLM response was truncated — increase Max Output Tokens in LLM settings",
+        errorMessage:
+          "LLM response was truncated — increase Max Output Tokens in LLM settings",
         automated: meta?.automated,
         source: meta?.source,
         testRunType: meta?.testRunType,
@@ -247,7 +277,11 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
 
   // Append entities with no suggestions (successfully analyzed but LLM returned no tags)
   for (const entityId of job.data.entityIds) {
-    if (!entityMap.has(entityId) && !failedEntityIdSet.has(entityId) && !truncatedEntityIdSet.has(entityId)) {
+    if (
+      !entityMap.has(entityId) &&
+      !failedEntityIdSet.has(entityId) &&
+      !truncatedEntityIdSet.has(entityId)
+    ) {
       const meta = entityMeta.get(entityId);
       if (meta) {
         suggestions.push({
@@ -264,7 +298,9 @@ const processor = async (job: Job<AutoTagJobData>): Promise<AutoTagJobResult> =>
     }
   }
 
-  const existingTagCount = result.suggestions.filter((s) => s.isExisting).length;
+  const existingTagCount = result.suggestions.filter(
+    (s) => s.isExisting
+  ).length;
 
   return {
     suggestions,
@@ -298,8 +334,8 @@ const startWorker = async () => {
       processor,
       {
         connection: valkeyConnection as any,
-        concurrency: parseInt(process.env.AUTO_TAG_CONCURRENCY || '3', 10), // Process up to 3 jobs in parallel (one per entity type)
-      },
+        concurrency: parseInt(process.env.AUTO_TAG_CONCURRENCY || "3", 10), // Process up to 3 jobs in parallel (one per entity type)
+      }
     );
 
     worker.on("completed", (job) => {
@@ -316,7 +352,9 @@ const startWorker = async () => {
 
     console.log(`Auto-tag worker started for queue "${AUTO_TAG_QUEUE_NAME}".`);
   } else {
-    console.warn("Valkey connection not available. Auto-tag worker not started.");
+    console.warn(
+      "Valkey connection not available. Auto-tag worker not started."
+    );
   }
 
   // Graceful shutdown
@@ -347,8 +385,8 @@ const startWorker = async () => {
 if (
   (typeof import.meta !== "undefined" &&
     import.meta.url === pathToFileURL(process.argv[1]).href) ||
-  (typeof import.meta === "undefined" ||
-    (import.meta as any).url === undefined)
+  typeof import.meta === "undefined" ||
+  (import.meta as any).url === undefined
 ) {
   console.log("Auto-tag worker running...");
   startWorker().catch((err) => {
