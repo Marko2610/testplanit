@@ -55,6 +55,13 @@ type MenuOption = {
   section: MenuSection;
 };
 
+const sectionIcons: Record<MenuSection, React.ElementType> = {
+  testManagement: Boxes,
+  peopleAndAccess: Users,
+  toolsAndIntegrations: Plug,
+  system: Settings,
+};
+
 const sectionOrder: MenuSection[] = [
   "testManagement",
   "peopleAndAccess",
@@ -346,10 +353,20 @@ export default function AdminMenu() {
                 className="border-b-0"
                 data-testid={`admin-menu-section-${group.key}`}
               >
-                <AccordionTrigger className="ml-3 py-2 mt-2 uppercase text-xs hover:no-underline hidden md:flex">
-                  {t(group.key as any)}
+                <AccordionTrigger className="ml-3 py-2 mt-2 uppercase text-xs hover:no-underline flex border-b-2 border-primary/40 md:border-b-0">
+                  <span className="md:hidden">
+                    {(() => {
+                      const Icon = sectionIcons[group.key];
+                      return (
+                        <Icon className="w-5 h-5 shrink-0 stroke-primary" />
+                      );
+                    })()}
+                  </span>
+                  <span className="hidden md:inline">
+                    {t(group.key as any)}
+                  </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-0 pt-0 max-md:block! max-md:h-auto! max-md:overflow-visible!">
+                <AccordionContent className="pb-0 pt-0">
                   {group.items.map((option) => (
                     <MenuLink
                       key={option.path}

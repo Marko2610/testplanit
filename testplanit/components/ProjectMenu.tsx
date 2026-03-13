@@ -22,6 +22,8 @@ import {
   Sparkles,
   Share2,
   ScrollText,
+  Settings,
+  FolderKanban,
 } from "lucide-react";
 import { cn } from "~/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -52,6 +54,12 @@ type MenuOption = {
 };
 
 const sectionOrder: MenuSection[] = ["project", "management", "settings"];
+
+const sectionIcons: Record<MenuSection, React.ElementType> = {
+  project: Home,
+  management: FolderKanban,
+  settings: Settings,
+};
 
 interface ProjectMenuProps {
   isCollapsed: boolean;
@@ -354,14 +362,24 @@ export default function ProjectsMenu({
                 >
                   <AccordionTrigger
                     className={cn(
-                      "ml-3 py-2 mt-2 uppercase text-xs hover:no-underline hidden md:flex",
+                      "ml-3 py-2 mt-2 uppercase text-xs hover:no-underline flex border-b-2 border-primary/40 md:border-b-0",
                       isCollapsed &&
                         "md:max-h-0 md:opacity-0 md:overflow-hidden md:p-0 md:m-0"
                     )}
                   >
-                    {sectionLabels[group.key]}
+                    <span className="md:hidden">
+                      {(() => {
+                        const Icon = sectionIcons[group.key];
+                        return (
+                          <Icon className="w-5 h-5 shrink-0 stroke-primary" />
+                        );
+                      })()}
+                    </span>
+                    <span className="hidden md:inline">
+                      {sectionLabels[group.key]}
+                    </span>
                   </AccordionTrigger>
-                  <AccordionContent className="pb-0 pt-0 max-md:block! max-md:h-auto! max-md:overflow-visible!">
+                  <AccordionContent className="pb-0 pt-0">
                     {group.items.map((option) => {
                       const isActive = option.path.startsWith("settings/")
                         ? page === "settings" &&
