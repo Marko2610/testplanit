@@ -145,7 +145,16 @@ async function fetchAnthropicModels(apiKey?: string, endpoint?: string): Promise
     throw new Error("API key is required for Anthropic");
   }
 
-  const isCustomEndpoint = endpoint?.trim() && !endpoint.trim().startsWith("https://api.anthropic.com");
+  const trimmedEndpoint = endpoint?.trim();
+  let isCustomEndpoint = false;
+  if (trimmedEndpoint) {
+    try {
+      const url = new URL(trimmedEndpoint);
+      isCustomEndpoint = url.hostname !== "api.anthropic.com";
+    } catch {
+      isCustomEndpoint = true;
+    }
+  }
   const baseUrl = endpoint?.trim()?.replace(/\/$/, "") || "https://api.anthropic.com/v1";
 
   try {

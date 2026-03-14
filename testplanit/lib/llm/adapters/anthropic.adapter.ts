@@ -272,9 +272,13 @@ export class AnthropicAdapter extends BaseLlmAdapter {
   }
 
   private isCustomEndpoint(): boolean {
-    return (
-      !!this.baseUrl && !this.baseUrl.startsWith("https://api.anthropic.com")
-    );
+    if (!this.baseUrl) return false;
+    try {
+      const url = new URL(this.baseUrl);
+      return url.hostname !== "api.anthropic.com";
+    } catch {
+      return true;
+    }
   }
 
   private getAnthropicHeaders(): Record<string, string> {
