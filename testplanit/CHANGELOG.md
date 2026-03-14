@@ -1,3 +1,9 @@
+## [0.16.12](https://github.com/TestPlanIt/testplanit/compare/v0.16.11...v0.16.12) (2026-03-14)
+
+### Bug Fixes
+
+* **JunitTableSection:** streamline JUnit results fetching logic ([359999e](https://github.com/TestPlanIt/testplanit/commit/359999e20a961cd912a2de7f4c027beac427fa38))
+
 ## [0.16.11](https://github.com/TestPlanIt/testplanit/compare/v0.16.10...v0.16.11) (2026-03-14)
 
 ### Bug Fixes
