@@ -228,9 +228,10 @@ function JunitTableSection({
   }, [selectedTestCaseId, sortedJunitTestCases, junitPageSize, setJunitPage]);
 
   // Fetch all JUnit results for this run (only if automated test run type)
+  const isJUnitRun = isAutomatedTestRunType(testRunData?.testRunType);
   const { data: junitResults = [], isLoading: isJunitResultsLoading } =
     useFindManyJUnitTestResult(
-      isAutomatedTestRunType(testRunData?.testRunType)
+      isJUnitRun
         ? {
             where: { testSuiteId: Number(runId) },
             orderBy: { executedAt: "desc" },
@@ -242,7 +243,8 @@ function JunitTableSection({
               id: true,
             },
           }
-        : undefined
+        : undefined,
+      { enabled: isJUnitRun }
     );
   // Group by status for donut chart (JUnit)
   const donutChartData = useMemo(() => {
