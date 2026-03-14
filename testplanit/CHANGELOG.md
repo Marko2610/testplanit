@@ -1,3 +1,9 @@
+## [0.16.11](https://github.com/TestPlanIt/testplanit/compare/v0.16.10...v0.16.11) (2026-03-14)
+
+### Bug Fixes
+
+* **TestRunPage, Loading:** enhance loading behavior and JUnit data fetching ([482a767](https://github.com/TestPlanIt/testplanit/commit/482a76789ecf7df505a9b99ce5cd3ecc8c8567bd))
+
 ## [0.16.10](https://github.com/TestPlanIt/testplanit/compare/v0.16.9...v0.16.10) (2026-03-14)
 
 ### Bug Fixes
