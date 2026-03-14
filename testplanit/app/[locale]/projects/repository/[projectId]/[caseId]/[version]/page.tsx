@@ -103,31 +103,8 @@ export default function TestCaseVersions() {
   );
   const locale = useLocale();
 
-  // Fetch current issue data to display issues properly with all metadata
-  const { data: allIssues } = useFindManyIssue({
-    where: { isDeleted: false },
-    select: {
-      id: true,
-      name: true,
-      title: true,
-      externalId: true,
-      externalUrl: true,
-      externalStatus: true,
-      externalKey: true,
-      data: true,
-      integrationId: true,
-      lastSyncedAt: true,
-      issueTypeName: true,
-      issueTypeIconUrl: true,
-      integration: {
-        select: {
-          id: true,
-          provider: true,
-          name: true,
-        },
-      },
-    },
-  });
+  // Issue IDs from current and previous version snapshots, used to fetch only relevant issues
+  const [versionIssueIds, setVersionIssueIds] = useState<number[]>([]);
 
   const handleSelect = (attachments: Attachments[], index: number) => {
     setSelectedAttachments(attachments);
@@ -198,6 +175,52 @@ export default function TestCaseVersions() {
         source: (previousData as any).repositoryCase?.source,
       }
     : undefined;
+
+  // Extract issue IDs from version snapshots so we only fetch relevant issues
+  useEffect(() => {
+    const parseIds = (issuesData: any): number[] => {
+      if (!issuesData) return [];
+      try {
+        const parsed = typeof issuesData === "string" ? JSON.parse(issuesData) : issuesData;
+        return Array.isArray(parsed) ? parsed.map((i: any) => i.id).filter(Boolean) : [];
+      } catch { return []; }
+    };
+    const ids = [
+      ...parseIds(testcase?.issues),
+      ...parseIds(previousTestcase?.issues),
+    ];
+    const unique = [...new Set(ids)];
+    if (unique.length > 0) setVersionIssueIds(unique);
+  }, [testcase?.issues, previousTestcase?.issues]);
+
+  // Fetch only the issues referenced in this version (not all issues)
+  const { data: allIssues } = useFindManyIssue(
+    {
+      where: { id: { in: versionIssueIds } },
+      select: {
+        id: true,
+        name: true,
+        title: true,
+        externalId: true,
+        externalUrl: true,
+        externalStatus: true,
+        externalKey: true,
+        data: true,
+        integrationId: true,
+        lastSyncedAt: true,
+        issueTypeName: true,
+        issueTypeIconUrl: true,
+        integration: {
+          select: {
+            id: true,
+            provider: true,
+            name: true,
+          },
+        },
+      },
+    },
+    { enabled: versionIssueIds.length > 0 }
+  );
 
   const { data: templates } = useFindManyTemplates({
     where: {
