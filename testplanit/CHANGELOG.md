@@ -1,3 +1,9 @@
+## [0.16.10](https://github.com/TestPlanIt/testplanit/compare/v0.16.9...v0.16.10) (2026-03-14)
+
+### Bug Fixes
+
+* **AddCase, BulkEditModal, FieldValueInput:** optimize issue data handling - performance refactor ([246d038](https://github.com/TestPlanIt/testplanit/commit/246d038065f79939a2701e0594ac94281ddc7d8b))
+
 ## [0.16.9](https://github.com/TestPlanIt/testplanit/compare/v0.16.8...v0.16.9) (2026-03-14)
 
 ### Enhancements
