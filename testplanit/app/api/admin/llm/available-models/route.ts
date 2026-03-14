@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         models = await fetchGeminiModels(apiKey, endpoint);
         break;
       case "ANTHROPIC":
-        models = await fetchAnthropicModels(apiKey);
+        models = await fetchAnthropicModels(apiKey, endpoint);
         break;
       case "OLLAMA":
         models = await fetchOllamaModels(endpoint);
@@ -140,22 +140,37 @@ async function fetchGeminiModels(apiKey: string, endpoint?: string): Promise<str
   }
 }
 
-async function fetchAnthropicModels(apiKey?: string): Promise<string[]> {
+async function fetchAnthropicModels(apiKey?: string, endpoint?: string): Promise<string[]> {
   if (!apiKey) {
     throw new Error("API key is required for Anthropic");
   }
 
-  const url = "https://api.anthropic.com/v1/models?limit=1000";
+  const isCustomEndpoint = endpoint?.trim() && !endpoint.trim().startsWith("https://api.anthropic.com");
+  const baseUrl = endpoint?.trim()?.replace(/\/$/, "") || "https://api.anthropic.com/v1";
 
   try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      signal: AbortSignal.timeout(10000),
-    });
+    let response: Response;
+
+    if (isCustomEndpoint) {
+      // LiteLLM and other proxies use OpenAI-compatible /models endpoint with Bearer auth
+      response = await fetch(`${baseUrl}/models`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        signal: AbortSignal.timeout(10000),
+      });
+    } else {
+      // Direct Anthropic API uses x-api-key auth
+      response = await fetch(`${baseUrl}/models?limit=1000`, {
+        method: "GET",
+        headers: {
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        signal: AbortSignal.timeout(10000),
+      });
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -188,7 +203,10 @@ async function fetchAnthropicModels(apiKey?: string): Promise<string[]> {
 }
 
 async function fetchOllamaModels(endpoint?: string): Promise<string[]> {
-  const baseUrl = endpoint || "http://localhost:11434";
+  if (!endpoint?.trim()) {
+    throw new Error("Endpoint URL is required for Ollama");
+  }
+  const baseUrl = endpoint.trim();
   const url = `${baseUrl}/api/tags`;
 
   try {

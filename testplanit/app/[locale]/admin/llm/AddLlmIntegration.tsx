@@ -98,7 +98,7 @@ const providerDefaults: Record<string, Partial<FormData>> = {
   OPENAI: {
     defaultModel: "gpt-4o-mini",
     endpoint: "https://api.openai.com/v1",
-    maxTokensPerRequest: 4096,
+    maxTokensPerRequest: 16384,
     maxRequestsPerMinute: 60,
     costPerInputToken: 0.15,
     costPerOutputToken: 0.6,
@@ -107,33 +107,33 @@ const providerDefaults: Record<string, Partial<FormData>> = {
     timeout: 30000, // 30 seconds
   },
   ANTHROPIC: {
-    defaultModel: "claude-3-5-haiku-20241022",
+    defaultModel: "claude-haiku-4-5-20251001",
     endpoint: "https://api.anthropic.com/v1",
-    maxTokensPerRequest: 4096,
+    maxTokensPerRequest: 64000,
     maxRequestsPerMinute: 50,
-    costPerInputToken: 0.8,
-    costPerOutputToken: 4,
+    costPerInputToken: 1.0,
+    costPerOutputToken: 5.0,
     defaultTemperature: 0.7,
     defaultMaxTokens: 1000,
     timeout: 30000, // 30 seconds
   },
   AZURE_OPENAI: {
-    defaultModel: "gpt-4",
-    maxTokensPerRequest: 4096,
+    defaultModel: "gpt-4o-mini",
+    maxTokensPerRequest: 16384,
     maxRequestsPerMinute: 60,
-    costPerInputToken: 30,
-    costPerOutputToken: 60,
+    costPerInputToken: 0.15,
+    costPerOutputToken: 0.6,
     defaultTemperature: 0.7,
     defaultMaxTokens: 1000,
     timeout: 30000, // 30 seconds
   },
   GEMINI: {
-    defaultModel: "gemini-1.5-flash",
+    defaultModel: "gemini-2.0-flash",
     endpoint: "https://generativelanguage.googleapis.com/v1beta",
     maxTokensPerRequest: 8192,
     maxRequestsPerMinute: 60,
-    costPerInputToken: 0.075,
-    costPerOutputToken: 0.3,
+    costPerInputToken: 0.1,
+    costPerOutputToken: 0.4,
     defaultTemperature: 0.7,
     defaultMaxTokens: 2048,
     timeout: 30000, // 30 seconds
@@ -301,6 +301,11 @@ export function AddLlmIntegration({
 
     // For providers that require an API key, wait until one is provided
     if (["OPENAI", "ANTHROPIC", "GEMINI"].includes(provider) && !apiKey) {
+      return;
+    }
+
+    // Ollama and custom providers require an endpoint
+    if (["OLLAMA", "CUSTOM_LLM"].includes(provider) && !endpoint) {
       return;
     }
 

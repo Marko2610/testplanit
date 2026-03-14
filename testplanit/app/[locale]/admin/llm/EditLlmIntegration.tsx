@@ -12,7 +12,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -61,11 +60,19 @@ const createFormSchema = (t: any, existingNames: string[], currentName: string) 
           ),
         { message: t("validation.nameUnique") }
       ),
+    provider: z.enum([
+      "OPENAI",
+      "ANTHROPIC",
+      "AZURE_OPENAI",
+      "GEMINI",
+      "OLLAMA",
+      "CUSTOM_LLM",
+    ] as const),
     apiKey: z.string().optional(),
     endpoint: z.string().optional(),
     deploymentName: z.string().optional(),
     defaultModel: z.string().min(1, t("validation.defaultModelRequired")),
-    maxTokensPerRequest: z.number().min(1).max(128000),
+    maxTokensPerRequest: z.number().min(1).max(1048576),
     maxRequestsPerMinute: z.number().min(1).max(10000),
     costPerInputToken: z.number().min(0),
     costPerOutputToken: z.number().min(0),
@@ -112,6 +119,7 @@ export function EditLlmIntegration({
   const { mutateAsync: updateLlmIntegration } = useUpdateLlmIntegration();
   const { mutateAsync: updateLlmProviderConfig } = useUpdateLlmProviderConfig();
   const { mutateAsync: deleteManyLlmUsage } = useDeleteManyLlmUsage();
+  const [testingConnection, setTestingConnection] = useState(false);
   const [resettingSpend, setResettingSpend] = useState(false);
   const { data: existingDefaultConfigs } = useFindManyLlmProviderConfig({
     where: { isDefault: true },
@@ -127,6 +135,7 @@ export function EditLlmIntegration({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      provider: "OPENAI",
       defaultModel: "",
       maxTokensPerRequest: 4096,
       maxRequestsPerMinute: 60,
@@ -142,6 +151,7 @@ export function EditLlmIntegration({
     },
   });
 
+  const provider = form.watch("provider");
   const apiKey = form.watch("apiKey");
   const endpoint = form.watch("endpoint");
   const watchedBudget = form.watch("monthlyBudget");
@@ -202,13 +212,9 @@ export function EditLlmIntegration({
     }
   };
 
-  // Auto-fetch models when API key or endpoint changes (but not on initial load)
+  // Auto-fetch models when provider, API key, or endpoint changes
   useEffect(() => {
-    // Don't fetch on initial render or if provider doesn't support dynamic models
-    if (
-      !integration?.provider ||
-      !PROVIDERS_WITH_DYNAMIC_MODELS.includes(integration.provider)
-    ) {
+    if (!provider || !PROVIDERS_WITH_DYNAMIC_MODELS.includes(provider)) {
       return;
     }
 
@@ -218,25 +224,23 @@ export function EditLlmIntegration({
     }
 
     // For providers that require an API key, wait until one is provided
-    if (
-      ["OPENAI", "ANTHROPIC", "GEMINI"].includes(integration.provider) &&
-      !apiKey
-    ) {
+    if (["OPENAI", "ANTHROPIC", "GEMINI"].includes(provider) && !apiKey) {
       return;
     }
 
     // Debounce the API calls to avoid too many requests
     const timeoutId = setTimeout(() => {
-      fetchAvailableModels(integration.provider, apiKey, endpoint);
+      fetchAvailableModels(provider, apiKey, endpoint);
     }, 1000); // 1 second delay
 
     return () => clearTimeout(timeoutId);
-  }, [apiKey, endpoint, integration?.provider, open]); // Dependencies: fetch when any of these change
+  }, [apiKey, endpoint, provider, open]);
 
   useEffect(() => {
     if (integration && open) {
       form.reset({
         name: integration.name,
+        provider: integration.provider,
         apiKey: integration.credentials?.apiKey || "",
         endpoint: integration.credentials?.endpoint || "",
         deploymentName: integration.settings?.deploymentName || "",
@@ -263,6 +267,43 @@ export function EditLlmIntegration({
       });
     }
   }, [integration, open, form]);
+
+  const testConnection = async () => {
+    setTestingConnection(true);
+    const values = form.getValues();
+
+    try {
+      const response = await fetch("/api/admin/llm/test-credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider: values.provider,
+          apiKey: values.apiKey,
+          endpoint: values.endpoint,
+          deploymentName: values.deploymentName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(tIntegrations("testSuccess"), {
+          description: tAdd("connectionSuccessfulDescription"),
+        });
+      } else {
+        toast.error(tIntegrations("testFailed"), {
+          description: data.error || tAdd("failedToConnect"),
+        });
+      }
+    } catch (error) {
+      toast.error(tIntegrations("testFailed"), {
+        description:
+          error instanceof Error ? error.message : tAdd("failedToConnect"),
+      });
+    } finally {
+      setTestingConnection(false);
+    }
+  };
 
   const onSubmit = async (values: FormData) => {
     setLoading(true);
@@ -291,6 +332,7 @@ export function EditLlmIntegration({
         where: { id: integration.id },
         data: {
           name: values.name,
+          provider: values.provider,
           status: values.status,
           credentials: {
             ...(integration.credentials || {}),
@@ -427,6 +469,44 @@ export function EditLlmIntegration({
 
               <FormField
                 control={form.control}
+                name="provider"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center">
+                      {tCommon("fields.provider")}
+                      <HelpPopover helpKey="llm.provider" />
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={tAdd("selectProvider")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="OPENAI">{tAdd("openai")}</SelectItem>
+                        <SelectItem value="ANTHROPIC">
+                          {tAdd("anthropic")}
+                        </SelectItem>
+                        <SelectItem value="AZURE_OPENAI">
+                          {tAdd("azureOpenai")}
+                        </SelectItem>
+                        <SelectItem value="GEMINI">{tAdd("gemini")}</SelectItem>
+                        <SelectItem value="OLLAMA">{tAdd("ollama")}</SelectItem>
+                        <SelectItem value="CUSTOM_LLM">
+                          {tAdd("customLlm")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
@@ -445,7 +525,7 @@ export function EditLlmIntegration({
                 )}
               />
 
-              {integration?.provider !== "OLLAMA" && (
+              {provider !== "OLLAMA" && (
                 <FormField
                   control={form.control}
                   name="apiKey"
@@ -471,29 +551,25 @@ export function EditLlmIntegration({
                 />
               )}
 
-              {(integration?.provider === "AZURE_OPENAI" ||
-                integration?.provider === "OPENAI" ||
-                integration?.provider === "CUSTOM_LLM" ||
-                integration?.provider === "OLLAMA") && (
-                <FormField
-                  control={form.control}
-                  name="endpoint"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center">
-                        {tAdd("endpoint")}
-                        <HelpPopover helpKey="llm.endpoint" />
-                      </FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+              <FormField
+                control={form.control}
+                name="endpoint"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center">
+                      {tAdd("endpoint")}
+                      <HelpPopover helpKey="llm.endpoint" />
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder={tAdd("endpointPlaceholder")} {...field} />
+                    </FormControl>
+                    <FormDescription>{tAdd("endpointDescription")}</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              {integration?.provider === "AZURE_OPENAI" && (
+              {provider === "AZURE_OPENAI" && (
                 <FormField
                   control={form.control}
                   name="deploymentName"
@@ -523,7 +599,7 @@ export function EditLlmIntegration({
                         <HelpPopover helpKey="llm.defaultModel" />
                       </span>
                       {PROVIDERS_WITH_DYNAMIC_MODELS.includes(
-                        integration?.provider
+                        provider
                       ) &&
                         fetchingModels && (
                           <div className="flex items-center text-sm text-muted-foreground">
@@ -534,7 +610,7 @@ export function EditLlmIntegration({
                     </FormLabel>
                     <FormControl>
                       {PROVIDERS_WITH_DYNAMIC_MODELS.includes(
-                        integration?.provider
+                        provider
                       ) && availableModels.length > 0 ? (
                         <Select
                           onValueChange={field.onChange}
@@ -556,7 +632,7 @@ export function EditLlmIntegration({
                       )}
                     </FormControl>
                     {PROVIDERS_WITH_DYNAMIC_MODELS.includes(
-                      integration?.provider
+                      provider
                     ) &&
                       modelsError && (
                         <div className="text-sm text-destructive mt-1">
@@ -564,16 +640,16 @@ export function EditLlmIntegration({
                         </div>
                       )}
                     {PROVIDERS_WITH_DYNAMIC_MODELS.includes(
-                      integration?.provider
+                      provider
                     ) &&
                       availableModels.length === 0 &&
                       !fetchingModels &&
                       !modelsError && (
                         <FormDescription className="text-muted-foreground">
-                          {integration?.provider === "GEMINI"
+                          {provider === "GEMINI"
                             ? "Enter your API key and endpoint above. Models will be fetched automatically."
-                            : integration?.provider === "OPENAI" ||
-                                integration?.provider === "ANTHROPIC"
+                            : provider === "OPENAI" ||
+                                provider === "ANTHROPIC"
                               ? "Enter your API key above. We'll fetch the available models automatically."
                               : "Models will be fetched automatically from your Ollama instance."}
                         </FormDescription>
@@ -923,6 +999,21 @@ export function EditLlmIntegration({
               />
 
               <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={testConnection}
+                  disabled={
+                    testingConnection ||
+                    !form.watch("name") ||
+                    (provider !== "OLLAMA" && !form.watch("apiKey"))
+                  }
+                >
+                  {testingConnection && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {tIntegrations("testConnection")}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"

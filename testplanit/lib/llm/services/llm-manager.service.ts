@@ -103,7 +103,7 @@ function getValidatedBaseUrl(
     return undefined;
   }
 
-  // For providers with allowlists, check against the allowlist
+  // Check against the provider's allowlist first (fast path for known-good URLs)
   const allowedUrls = ALLOWED_BASE_URLS[provider];
   if (allowedUrls && allowedUrls.length > 0) {
     const normalizedUserUrl = userProvidedUrl.toLowerCase().replace(/\/$/, "");
@@ -116,13 +116,11 @@ function getValidatedBaseUrl(
         return userProvidedUrl;
       }
     }
-    console.warn(
-      `LLM base URL "${userProvidedUrl}" not in allowlist for provider ${provider}. Using default.`
-    );
-    return undefined;
+    // URL not in allowlist — fall through to custom endpoint check below
   }
 
-  // For providers that allow custom endpoints, block private/internal addresses
+  // For providers that allow custom endpoints, permit any non-private URL
+  // (e.g. LiteLLM proxies, Azure AI endpoints for Anthropic models)
   if (CUSTOM_ENDPOINT_PROVIDERS.includes(provider)) {
     if (isPrivateOrInternalHost(parsedUrl.hostname)) {
       console.warn(

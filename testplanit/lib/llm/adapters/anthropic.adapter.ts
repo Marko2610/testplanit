@@ -237,17 +237,29 @@ export class AnthropicAdapter extends BaseLlmAdapter {
 
   async testConnection(): Promise<boolean> {
     try {
+      if (this.isCustomEndpoint()) {
+        // For proxies (LiteLLM, etc.), test with the /models endpoint
+        // which doesn't require a valid model name
+        const response = await this.safeFetch(`${this.baseUrl}/models`, {
+          method: "GET",
+          headers: this.getAnthropicHeaders(),
+          signal: AbortSignal.timeout(10000),
+        });
+        return response.ok;
+      }
+
+      // Direct Anthropic API — send a minimal chat request
       const response = await this.safeFetch(`${this.baseUrl}/messages`, {
         method: "POST",
         headers: this.getAnthropicHeaders(),
         body: JSON.stringify({
-          model: "claude-3-haiku-20240307",
+          model: this.getDefaultModel(),
           messages: [{ role: "user", content: "Hi" }],
           max_tokens: 1,
         }),
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(10000),
       });
-      
+
       return response.status === 200 || response.status === 400;
     } catch {
       return false;
@@ -268,11 +280,23 @@ export class AnthropicAdapter extends BaseLlmAdapter {
     return "Unknown Anthropic error";
   }
 
+  private isCustomEndpoint(): boolean {
+    return (
+      !!this.baseUrl && !this.baseUrl.startsWith("https://api.anthropic.com")
+    );
+  }
+
   private getAnthropicHeaders(): Record<string, string> {
     const headers = this.getHeaders();
-    headers["x-api-key"] = this.apiKey;
     headers["anthropic-version"] = this.anthropicVersion;
-    
+
+    if (this.isCustomEndpoint()) {
+      // LiteLLM and other proxies expect Bearer auth
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+    } else {
+      headers["x-api-key"] = this.apiKey;
+    }
+
     return headers;
   }
 
@@ -357,31 +381,33 @@ export class AnthropicAdapter extends BaseLlmAdapter {
   }
 
   private mapModelInfo(modelId: string): LlmModelInfo {
+    // Costs are per 1K tokens (divide $/1M by 1000)
     const modelConfigs: Record<string, Partial<LlmModelInfo>> = {
-      "claude-3-opus-20240229": {
-        name: "Claude 3 Opus",
-        contextWindow: 200000,
-        maxOutputTokens: 4096,
-        inputCostPer1k: 0.015,
-        outputCostPer1k: 0.075,
+      "claude-opus-4-6": {
+        name: "Claude Opus 4.6",
+        contextWindow: 1000000,
+        maxOutputTokens: 128000,
+        inputCostPer1k: 0.005,
+        outputCostPer1k: 0.025,
         capabilities: ["text", "code", "vision"],
       },
-      "claude-3-sonnet-20240229": {
-        name: "Claude 3 Sonnet",
-        contextWindow: 200000,
-        maxOutputTokens: 4096,
+      "claude-sonnet-4-6": {
+        name: "Claude Sonnet 4.6",
+        contextWindow: 1000000,
+        maxOutputTokens: 64000,
         inputCostPer1k: 0.003,
         outputCostPer1k: 0.015,
         capabilities: ["text", "code", "vision"],
       },
-      "claude-3-haiku-20240307": {
-        name: "Claude 3 Haiku",
+      "claude-haiku-4-5-20251001": {
+        name: "Claude Haiku 4.5",
         contextWindow: 200000,
-        maxOutputTokens: 4096,
-        inputCostPer1k: 0.00025,
-        outputCostPer1k: 0.00125,
+        maxOutputTokens: 64000,
+        inputCostPer1k: 0.001,
+        outputCostPer1k: 0.005,
         capabilities: ["text", "code", "vision"],
       },
+      // Legacy models
       "claude-3-5-sonnet-20241022": {
         name: "Claude 3.5 Sonnet",
         contextWindow: 200000,
@@ -389,22 +415,33 @@ export class AnthropicAdapter extends BaseLlmAdapter {
         inputCostPer1k: 0.003,
         outputCostPer1k: 0.015,
         capabilities: ["text", "code", "vision"],
+        deprecated: true,
       },
       "claude-3-5-haiku-20241022": {
-        name: "Claude 3.5 Haiku",
+        name: "Claude 3.5 Haiku (Retired)",
         contextWindow: 200000,
         maxOutputTokens: 8192,
         inputCostPer1k: 0.0008,
         outputCostPer1k: 0.004,
         capabilities: ["text", "code", "vision"],
+        deprecated: true,
+      },
+      "claude-3-opus-20240229": {
+        name: "Claude 3 Opus",
+        contextWindow: 200000,
+        maxOutputTokens: 4096,
+        inputCostPer1k: 0.015,
+        outputCostPer1k: 0.075,
+        capabilities: ["text", "code", "vision"],
+        deprecated: true,
       },
     };
 
     const config = modelConfigs[modelId] || {
       name: modelId,
-      contextWindow: 100000,
-      maxOutputTokens: 4096,
-      capabilities: ["text"],
+      contextWindow: 200000,
+      maxOutputTokens: 64000,
+      capabilities: ["text", "code", "vision"],
     };
 
     return {
@@ -420,11 +457,10 @@ export class AnthropicAdapter extends BaseLlmAdapter {
 
   private getDefaultModels(): LlmModelInfo[] {
     return [
+      "claude-opus-4-6",
+      "claude-sonnet-4-6",
+      "claude-haiku-4-5-20251001",
       "claude-3-5-sonnet-20241022",
-      "claude-3-5-haiku-20241022",
-      "claude-3-opus-20240229",
-      "claude-3-sonnet-20240229",
-      "claude-3-haiku-20240307",
     ].map((id) => this.mapModelInfo(id));
   }
 }
