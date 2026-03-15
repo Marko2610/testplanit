@@ -1,3 +1,9 @@
+## [0.16.15](https://github.com/TestPlanIt/testplanit/compare/v0.16.14...v0.16.15) (2026-03-15)
+
+### Bug Fixes
+
+* revert broken ZenStack query optimization and provider changes ([b99f696](https://github.com/TestPlanIt/testplanit/commit/b99f6968d5488e1047f6320860d37b5818191ec5))
+
 ## [0.16.14](https://github.com/TestPlanIt/testplanit/compare/v0.16.13...v0.16.14) (2026-03-15)
 
 ### Enhancements
