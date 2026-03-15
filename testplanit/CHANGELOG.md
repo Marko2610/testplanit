@@ -1,3 +1,9 @@
+## [0.16.14](https://github.com/TestPlanIt/testplanit/compare/v0.16.13...v0.16.14) (2026-03-15)
+
+### Enhancements
+
+* **Providers, Cases, TestRunPage:** streamline component logic and enhance data fetching ([e799864](https://github.com/TestPlanIt/testplanit/commit/e7998648d82ef4f20d8ffdbfa9117403923ff570))
+
 ## [0.16.13](https://github.com/TestPlanIt/testplanit/compare/v0.16.12...v0.16.13) (2026-03-15)
 
 ### Enhancements
