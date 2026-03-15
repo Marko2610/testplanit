@@ -1,3 +1,9 @@
+## [0.16.13](https://github.com/TestPlanIt/testplanit/compare/v0.16.12...v0.16.13) (2026-03-15)
+
+### Enhancements
+
+* integrate ZenStack for optimized query handling ([70520b8](https://github.com/TestPlanIt/testplanit/commit/70520b8466bfbd784d21e6bb2d15105b165e5f75))
+
 ## [0.16.12](https://github.com/TestPlanIt/testplanit/compare/v0.16.11...v0.16.12) (2026-03-14)
 
 ### Bug Fixes
