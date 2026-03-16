@@ -1,3 +1,9 @@
+## [0.16.20](https://github.com/TestPlanIt/testplanit/compare/v0.16.19...v0.16.20) (2026-03-16)
+
+### Bug Fixes
+
+* **api:** update file upload handling to use Uint8Array for Buffer instances ([1d4dba0](https://github.com/TestPlanIt/testplanit/commit/1d4dba0a1ca549ae1eb8604bf677c8151700cd71))
+
 ## [0.16.19](https://github.com/TestPlanIt/testplanit/compare/v0.16.18...v0.16.19) (2026-03-16)
 
 ### Enhancements
