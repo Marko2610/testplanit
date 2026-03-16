@@ -79,7 +79,7 @@ export function DeleteMilestoneTypeModal({
       });
       setOpen(false);
       setIsSubmitting(false);
-    } catch (err: any) {
+    } catch {
       form.setError("root", {
         type: "custom",
         message: tCommon("errors.unknown"),

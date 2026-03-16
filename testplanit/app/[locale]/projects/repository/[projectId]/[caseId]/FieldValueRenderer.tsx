@@ -91,7 +91,7 @@ const FieldValueRenderer: React.FC<FieldValueRendererProps> = ({
         if (isEmptyEditor) {
           return true;
         }
-      } catch (e) {
+      } catch {
         // Silently handle parsing errors
       }
     }
@@ -486,7 +486,7 @@ const FieldValueRenderer: React.FC<FieldValueRendererProps> = ({
                 initialEditorContent = value
                   ? JSON.parse(value)
                   : emptyEditorContent;
-              } catch (error) {
+              } catch {
                 // console.warn("Error parsing JSON:", error);
                 initialEditorContent = ensureTipTapJSON(value);
               }
@@ -536,7 +536,7 @@ const FieldValueRenderer: React.FC<FieldValueRendererProps> = ({
             let content = null;
             try {
               content = val ? JSON.parse(val) : emptyEditorContent;
-            } catch (error) {
+            } catch {
               // console.warn("Error parsing JSON in diff view:", error);
               content = ensureTipTapJSON(val);
             }
@@ -556,7 +556,7 @@ const FieldValueRenderer: React.FC<FieldValueRendererProps> = ({
               content = fieldValue
                 ? JSON.parse(fieldValue)
                 : emptyEditorContent;
-            } catch (error) {
+            } catch {
               // console.warn("Error parsing JSON in view mode:", error);
               content = ensureTipTapJSON(fieldValue);
             }

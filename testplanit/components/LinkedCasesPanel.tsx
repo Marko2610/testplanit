@@ -316,7 +316,7 @@ const LinkedCasesPanel: React.FC<LinkedCasesPanelProps> = ({
       // --- Trigger forecast update for both cases ---
       fetch(`/api/forecast/update?caseId=${caseId}`);
       if (otherCaseId) fetch(`/api/forecast/update?caseId=${otherCaseId}`);
-    } catch (e) {
+    } catch {
       // Optionally show error
     }
   };

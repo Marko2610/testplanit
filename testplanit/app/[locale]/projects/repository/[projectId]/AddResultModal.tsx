@@ -1544,7 +1544,7 @@ export function AddResultModal({
                   // Otherwise, try to use the default value
                   try {
                     initialContent = JSON.parse(definedDefaultValue);
-                  } catch (e) {
+                  } catch {
                     if (typeof definedDefaultValue === "string") {
                       initialContent = {
                         type: "doc",
@@ -1865,7 +1865,7 @@ export function AddResultModal({
                         typeof step.step === "string"
                           ? JSON.parse(step.step)
                           : step.step;
-                    } catch (error) {
+                    } catch {
                       // console.warn("Error parsing step content:", error);
                       stepContent = emptyEditorContent;
                     }
@@ -2194,7 +2194,7 @@ const SharedStepGroupInputs: React.FC<SharedStepGroupInputsProps> = ({
             typeof item.step === "string"
               ? JSON.parse(item.step)
               : item.step || emptyEditorContent;
-        } catch (e) {
+        } catch {
           stepContent = emptyEditorContent;
         }
         try {
@@ -2202,7 +2202,7 @@ const SharedStepGroupInputs: React.FC<SharedStepGroupInputsProps> = ({
             typeof item.expectedResult === "string"
               ? JSON.parse(item.expectedResult)
               : item.expectedResult || emptyEditorContent;
-        } catch (e) {
+        } catch {
           expectedResultContent = emptyEditorContent;
         }
 

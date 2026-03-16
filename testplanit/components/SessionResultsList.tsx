@@ -479,7 +479,7 @@ export function SessionResultsList({
           // Register field with the form
           try {
             form.register(fieldId);
-          } catch (err) {
+          } catch {
             // Error registering field
           }
         }
@@ -583,7 +583,7 @@ export function SessionResultsList({
           const parsed = JSON.parse(result.resultData);
           // Use editorContent if it exists, otherwise use the whole resultData
           editorContent = parsed.editorContent || parsed;
-        } catch (e) {
+        } catch {
           editorContent = emptyEditorContent;
         }
       } else if (result.resultData && typeof result.resultData === "object") {
@@ -623,7 +623,7 @@ export function SessionResultsList({
               formValues[fieldId] = fieldValue.value;
               initialDynamicValues[fieldId] = fieldValue.value;
             }
-          } catch (e) {
+          } catch {
             formValues[fieldId] = fieldValue.value;
             initialDynamicValues[fieldId] = fieldValue.value;
           }
@@ -896,7 +896,7 @@ export function SessionResultsList({
         setResultToEdit(null);
         setSelectedFiles([]);
         userHasSelectedFilesRef.current = false; // Reset ref after successful save
-      } catch (error) {
+      } catch {
         // Error updating session result
         toast.error(t("updateError"));
       } finally {
@@ -1044,7 +1044,7 @@ export function SessionResultsList({
       return (
         JSON.stringify(parsedContent) === JSON.stringify(emptyEditorContent)
       );
-    } catch (error) {
+    } catch {
       // Error parsing content
       return false;
     }
@@ -1243,7 +1243,7 @@ export function SessionResultsList({
             // If it's not a valid TipTap document, use empty content
             content = emptyEditorContent;
           }
-        } catch (e) {
+        } catch {
           // If it's not JSON or parsing fails, use emptyEditorContent
           content = emptyEditorContent;
         }
@@ -1276,7 +1276,7 @@ export function SessionResultsList({
 
       // Return the value as is for other types
       return fieldValue;
-    } catch (e) {
+    } catch {
       // If any error occurs during parsing/rendering
       return (
         <span className="italic text-muted-foreground">
@@ -1291,7 +1291,7 @@ export function SessionResultsList({
     try {
       JSON.parse(str);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   }

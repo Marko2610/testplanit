@@ -56,7 +56,7 @@ export class AzureDevOpsAdapter extends BaseAdapter {
       await this.makeRequest(
         `${this.organizationUrl}/_apis/projects?api-version=${this.apiVersion}`
       );
-    } catch (error) {
+    } catch {
       throw new Error(
         "Invalid Azure DevOps Personal Access Token or Organization URL"
       );

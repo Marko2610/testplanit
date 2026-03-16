@@ -57,7 +57,7 @@ export function TestLlmIntegration({ integration }: TestLlmIntegrationProps) {
           description: data.error || t("failedToConnect"),
         });
       }
-    } catch (error) {
+    } catch {
       setConnectionStatus("failed");
       toast.error(tGlobal("admin.integrations.testFailed"), {
         description: t("errorTestingConnection"),

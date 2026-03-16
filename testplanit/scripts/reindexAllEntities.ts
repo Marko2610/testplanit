@@ -210,7 +210,7 @@ async function reindexAllEntities() {
         const stats = await client.indices.stats({ index: indexName });
         const docCount = stats._all?.primaries?.docs?.count || 0;
         console.log(`${indexName}: ${docCount} documents`);
-      } catch (error) {
+      } catch {
         console.log(`${indexName}: No stats available`);
       }
     }

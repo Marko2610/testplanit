@@ -14,7 +14,7 @@ export function extractStepText(stepData: any): string {
     }
     // Otherwise, assume it's already an object
     return extractTextFromNode(stepData);
-  } catch (error) {
+  } catch {
     // If parsing fails, return the original string
     return typeof stepData === 'string' ? stepData : "";
   }

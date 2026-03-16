@@ -66,9 +66,8 @@ export async function POST(request: NextRequest) {
   try {
     // Check authentication - try session first, then API token
     const session = await getServerAuthSession();
-    let authenticated = !!session?.user;
 
-    if (!authenticated) {
+    if (!session?.user) {
       const apiAuth = await authenticateApiToken(request);
       if (!apiAuth.authenticated) {
         return NextResponse.json(
@@ -76,7 +75,6 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         );
       }
-      authenticated = true;
     }
 
     // Parse and validate request body
@@ -119,9 +117,8 @@ export async function GET(request: NextRequest) {
   try {
     // Check authentication - try session first, then API token
     const session = await getServerAuthSession();
-    let authenticated = !!session?.user;
 
-    if (!authenticated) {
+    if (!session?.user) {
       const apiAuth = await authenticateApiToken(request);
       if (!apiAuth.authenticated) {
         return NextResponse.json(
@@ -129,7 +126,6 @@ export async function GET(request: NextRequest) {
           { status: 401 }
         );
       }
-      authenticated = true;
     }
 
     // Get query parameters

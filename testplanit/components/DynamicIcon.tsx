@@ -77,7 +77,7 @@ const useDynamicIcon = (name: keyof typeof dynamicIconImports) => {
         if (mounted) {
           setIconComponent(iconCache.get(name) || null);
         }
-      } catch (err) {
+      } catch {
         if (mounted) {
           setIconComponent(null);
         }

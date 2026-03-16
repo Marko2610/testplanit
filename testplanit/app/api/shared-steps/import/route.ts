@@ -18,7 +18,7 @@ const safeJsonParse = (jsonString: any, defaultValue: any = null): any => {
   try {
     if (jsonString.trim() === "") return defaultValue;
     return JSON.parse(jsonString);
-  } catch (e) {
+  } catch {
     return jsonString; // Return original string if parsing fails
   }
 };
@@ -69,7 +69,7 @@ const parseCombinedStepData = (
         order: item.stepNumber || index,
       }));
     }
-  } catch (e) {
+  } catch {
     // Fall back to plain text parsing
   }
 
@@ -335,7 +335,7 @@ export async function POST(request: NextRequest) {
           try {
             const parsedStep = safeJsonParse(step.step);
             stepJson = ensureTipTapJSON(parsedStep);
-          } catch (e) {
+          } catch {
             stepJson = convertTextToTipTapJSON(step.step ?? "");
           }
 
@@ -346,7 +346,7 @@ export async function POST(request: NextRequest) {
               // Try to parse as existing JSON first
               const parsedExpected = safeJsonParse(step.expectedResult);
               expectedResultJson = ensureTipTapJSON(parsedExpected);
-            } catch (e) {
+            } catch {
               // Fallback to plain text conversion
               expectedResultJson = convertTextToTipTapJSON(
                 step.expectedResult || ""

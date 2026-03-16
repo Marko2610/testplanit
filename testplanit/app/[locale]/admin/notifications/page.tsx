@@ -210,7 +210,7 @@ function NotificationSettingsContent() {
             result.error || t("systemNotification.error.description"),
         });
       }
-    } catch (error) {
+    } catch {
       toast.error(tGlobal("common.errors.error"), {
         description: t("systemNotification.error.description"),
       });

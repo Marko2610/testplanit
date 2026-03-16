@@ -38,7 +38,7 @@ const TextFromJson: React.FC<TextFromJsonProps> = ({
       } else {
         setPlainText(jsonString);
       }
-    } catch (error) {
+    } catch {
       setPlainText(jsonString);
     }
   }, [jsonString, format]);
@@ -141,7 +141,7 @@ const TipTapEditorWrapper: React.FC<{
 
   try {
     content = JSON.parse(jsonString);
-  } catch (error) {
+  } catch {
     return <span>{jsonString}</span>;
   }
 

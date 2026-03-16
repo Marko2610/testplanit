@@ -1464,11 +1464,11 @@ export class JiraAdapter extends BaseAdapter {
             const accountUsers =
               await this.makeRequest<any[]>(accountSearchUrl);
             allUsers.push(...accountUsers);
-          } catch (e) {
+          } catch {
             // This might fail, that's ok
             // console.log(`[JiraAdapter.searchUsers] Account search failed (expected): ${e}`);
           }
-        } catch (error) {
+        } catch {
           // console.log(`[JiraAdapter.searchUsers] Email search error: ${error}`);
         }
       }

@@ -380,7 +380,7 @@ export default function SSOAdminPage() {
         toast.success(t("admin.sso.messages.googleCreated"));
       }
       refetch();
-    } catch (error) {
+    } catch {
       setToggleState((prev) => ({ ...prev, [SsoProviderType.GOOGLE]: !enabled }));
       toast.error(t("admin.sso.messages.googleUpdateFailed"));
     }
@@ -469,7 +469,7 @@ export default function SSOAdminPage() {
         toast.success(t("admin.sso.messages.appleCreated"));
       }
       refetch();
-    } catch (error) {
+    } catch {
       setToggleState((prev) => ({ ...prev, [SsoProviderType.APPLE]: !enabled }));
       toast.error(t("admin.sso.messages.appleUpdateFailed"));
     }
@@ -557,7 +557,7 @@ export default function SSOAdminPage() {
         toast.success(t("admin.sso.messages.microsoftCreated"));
       }
       refetch();
-    } catch (error) {
+    } catch {
       setToggleState((prev) => ({ ...prev, [SsoProviderType.MICROSOFT]: !enabled }));
       toast.error(t("admin.sso.messages.microsoftUpdateFailed"));
     }
@@ -595,7 +595,7 @@ export default function SSOAdminPage() {
         toast.success(t("admin.sso.messages.magicLinkCreated"));
       }
       refetch();
-    } catch (error) {
+    } catch {
       setToggleState((prev) => ({ ...prev, [SsoProviderType.MAGIC_LINK]: !enabled }));
       toast.error(t("admin.sso.messages.magicLinkUpdateFailed"));
     }
@@ -637,7 +637,7 @@ export default function SSOAdminPage() {
         );
       }
       refetch();
-    } catch (error) {
+    } catch {
       setToggleState((prev) => ({ ...prev, [SsoProviderType.SAML]: !enabled }));
       toast.error(t("admin.sso.messages.updateFailed"));
     }
@@ -661,7 +661,7 @@ export default function SSOAdminPage() {
           : t("admin.sso.messages.forceSsoDisabled")
       );
       refetch();
-    } catch (error) {
+    } catch {
       setToggleState((prev) => ({ ...prev, forceSso: !enabled }));
       toast.error(t("admin.sso.messages.forceSsoUpdateFailed"));
     }
@@ -686,7 +686,7 @@ export default function SSOAdminPage() {
           : t("admin.sso.messages.force2FANonSSODisabled")
       );
       refetchSettings();
-    } catch (error) {
+    } catch {
       setToggleState((prev) => ({ ...prev, force2FANonSSO: !enabled }));
       toast.error(t("admin.sso.messages.force2FAUpdateFailed"));
     }
@@ -720,7 +720,7 @@ export default function SSOAdminPage() {
           : t("admin.sso.messages.force2FAAllLoginsDisabled")
       );
       refetchSettings();
-    } catch (error) {
+    } catch {
       setToggleState((prev) => ({ ...prev, force2FAAllLogins: !enabled }));
       toast.error(t("admin.sso.messages.force2FAUpdateFailed"));
     }
@@ -744,7 +744,7 @@ export default function SSOAdminPage() {
           : t("admin.sso.messages.domainRestrictionDisabled")
       );
       refetchSettings();
-    } catch (error) {
+    } catch {
       toast.error(t("admin.sso.messages.domainRestrictionUpdateFailed"));
     }
   };
@@ -798,7 +798,7 @@ export default function SSOAdminPage() {
           : t("admin.sso.messages.domainDisabled")
       );
       refetchDomains();
-    } catch (error) {
+    } catch {
       toast.error(t("admin.sso.messages.domainUpdateFailed"));
     }
   };
@@ -810,7 +810,7 @@ export default function SSOAdminPage() {
       });
       toast.success(t("admin.sso.messages.domainDeleted"));
       refetchDomains();
-    } catch (error) {
+    } catch {
       toast.error(t("admin.sso.messages.domainDeleteFailed"));
     }
   };
@@ -826,7 +826,7 @@ export default function SSOAdminPage() {
       });
       refetchSettings();
       toast.success(t("admin.sso.messages.defaultAccessUpdated"));
-    } catch (error) {
+    } catch {
       toast.error(t("admin.sso.messages.defaultAccessUpdateFailed"));
     }
   };
@@ -858,7 +858,7 @@ export default function SSOAdminPage() {
       });
       toast.success(t("admin.sso.messages.emailVerificationEnabled"));
       refetchSettings();
-    } catch (error) {
+    } catch {
       toast.error(t("admin.sso.messages.emailVerificationUpdateFailed"));
     }
   };

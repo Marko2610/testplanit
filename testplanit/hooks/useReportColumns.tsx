@@ -183,14 +183,12 @@ export function useReportColumns(
                 // Extract userId from the dimension value or assignedToData
                 let userId: string | undefined;
                 let userName: string | undefined;
-                let userEmail: string | undefined;
 
                 // Handle different value formats
                 if (assignedToData && typeof assignedToData === "object") {
                   // If we have the full object from the API
                   userId = assignedToData.id;
                   userName = assignedToData.name;
-                  userEmail = assignedToData.email;
                 } else if (typeof value === "string") {
                   // If value is already a string ID
                   userId = value;
@@ -202,7 +200,6 @@ export function useReportColumns(
                   // If value is an object with an id property
                   userId = value.id;
                   userName = value.name;
-                  userEmail = value.email;
                 } else {
                   // Try to get it from the row as fallback
                   userId = getUserIdFromRow(info.row);
@@ -262,7 +259,7 @@ export function useReportColumns(
                   const day = String(date.getUTCDate()).padStart(2, '0');
                   const formattedDate = new Date(`${year}-${month}-${day}T12:00:00.000Z`);
                   return <span>{formattedDate.toLocaleDateString(locale)}</span>;
-                } catch (error) {
+                } catch {
                   return <span>-</span>;
                 }
               case "project": {
@@ -534,7 +531,7 @@ export function useReportColumns(
                     const day = String(date.getUTCDate()).padStart(2, '0');
                     const formattedDate = new Date(`${year}-${month}-${day}T12:00:00.000Z`);
                     return <span>{formattedDate.toLocaleDateString(locale)}</span>;
-                  } catch (error) {
+                  } catch {
                     return "-";
                   }
                 },

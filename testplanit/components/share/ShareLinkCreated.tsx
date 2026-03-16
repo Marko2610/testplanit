@@ -34,7 +34,7 @@ export function ShareLinkCreated({
         description: tToast("linkCopiedDescription"),
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       toast.error(tToast("copyFailed"), {
         description: tToast("copyFailedDescription"),
       });

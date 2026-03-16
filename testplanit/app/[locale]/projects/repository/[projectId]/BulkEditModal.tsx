@@ -516,7 +516,7 @@ export function BulkEditModal({
         // Perform replacement
         const result = text.replace(regex, replacePattern);
         return { result, matchCount };
-      } catch (error) {
+      } catch {
         // Invalid regex
         return { result: text, matchCount: 0 };
       }
@@ -1007,7 +1007,7 @@ export function BulkEditModal({
         if (options.useRegex && searchPattern) {
           try {
             new RegExp(searchPattern);
-          } catch (e) {
+          } catch {
             errors[fieldKey] = [tBulkEdit("invalidRegexPattern")];
             continue;
           }
@@ -1039,7 +1039,7 @@ export function BulkEditModal({
         continue; // Skip normal Zod validation for Date fields
       }
 
-      let schema: z.ZodTypeAny = z.any(); // Initialize schema
+      let schema: z.ZodTypeAny;
       const isRequired = fieldDef.isCustom
         ? (fieldDef.field?.isRequired ?? false)
         : false; // Standard fields aren't typically marked required here

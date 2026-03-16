@@ -109,7 +109,7 @@ export function ShareContent({ shareKey, shareData, session }: ShareContentProps
       viewCountedRef.current = false;
       sessionStorage.removeItem(getSessionViewKey());
       return false;
-    } catch (error) {
+    } catch {
       // Reset flags on error
       viewCountedRef.current = false;
       sessionStorage.removeItem(getSessionViewKey());
@@ -132,7 +132,7 @@ export function ShareContent({ shareKey, shareData, session }: ShareContentProps
         try {
           const parsed = JSON.parse(stored);
           token = parsed.token;
-        } catch (e) {
+        } catch {
           // Invalid token, ignore
         }
       }
@@ -228,7 +228,7 @@ export function ShareContent({ shareKey, shareData, session }: ShareContentProps
         try {
           const parsed = JSON.parse(stored);
           token = parsed.token;
-        } catch (e) {
+        } catch {
           // Invalid token, ignore
         }
       }

@@ -149,7 +149,7 @@ export function IntegrationModal({
         });
         setTestPassed(false);
       }
-    } catch (error) {
+    } catch {
       toast.error(t("testError"), {
         description: t("testErrorDescription"),
       });

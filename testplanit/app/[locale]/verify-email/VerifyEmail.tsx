@@ -111,7 +111,7 @@ const VerifyEmail = () => {
           position: "top-center",
         });
       }
-    } catch (error) {
+    } catch {
       await toast.error(tGlobal("auth.verifyEmail.error"), {
         description: t("toast.verifyError.description"),
         position: "top-center",

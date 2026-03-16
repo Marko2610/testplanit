@@ -433,7 +433,7 @@ const StepResultsDisplay = ({
                 typeof stepResult.step.step === "string"
                   ? JSON.parse(stepResult.step.step)
                   : stepResult.step.step;
-            } catch (error) {
+            } catch {
               // console.warn("Error parsing step content:", error);
               stepContent = emptyEditorContent;
             }
@@ -447,7 +447,7 @@ const StepResultsDisplay = ({
                   ? JSON.parse(stepResult.step.expectedResult.expectedResult)
                   : stepResult.step.expectedResult.expectedResult
                 : emptyEditorContent;
-            } catch (error) {
+            } catch {
               // console.warn("Error parsing expected result content:", error);
               expectedResultContent = emptyEditorContent;
             }

@@ -257,14 +257,14 @@ const RenderField: React.FC<RenderFieldProps> = ({
         if (value) {
           try {
             initialContent = JSON.parse(value);
-          } catch (e) {
+          } catch {
             // console.warn("Error parsing field value in RenderField:", e);
             // Keep initialContent as emptyEditorContent if value parsing fails
           }
         } else if (field.caseField.defaultValue) {
           try {
             initialContent = JSON.parse(field.caseField.defaultValue);
-          } catch (e) {
+          } catch {
             // console.warn("Error parsing default value in RenderField:", e);
             // If defaultValue parsing fails, check if it's a plain string
             if (typeof field.caseField.defaultValue === "string") {

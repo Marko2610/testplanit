@@ -55,7 +55,7 @@ export function DeleteQuickScriptTemplateModal({
 
       setOpen(false);
       reset();
-    } catch (err: any) {
+    } catch {
       setError("root", {
         type: "custom",
         message: tCommon("errors.unknown"),

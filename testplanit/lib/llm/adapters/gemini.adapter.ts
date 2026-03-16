@@ -336,7 +336,7 @@ export class GeminiAdapter extends BaseLlmAdapter {
                 finishReason: candidate.finishReason ? this.mapFinishReason(candidate.finishReason) : undefined,
               };
             }
-          } catch (parseError) {
+          } catch {
             // Skip malformed chunks
             continue;
           }

@@ -69,7 +69,7 @@ export function useAutomationTrendsColumns(projects: Project[] = [], dateGroupin
                 {formattedStart} - {formattedEnd}
               </span>
             );
-          } catch (error) {
+          } catch {
             return "-";
           }
         },

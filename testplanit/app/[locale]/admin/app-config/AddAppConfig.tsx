@@ -58,7 +58,7 @@ export function AddAppConfigModal() {
       });
       setOpen(false);
       form.reset();
-    } catch (err) {
+    } catch {
       form.setError("value", {
         type: "custom",
         message: t("errors.invalidJson"),

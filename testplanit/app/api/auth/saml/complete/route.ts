@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         token,
         process.env.NEXTAUTH_SECRET || "development-secret"
       );
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: "Invalid or expired token" },
         { status: 401 }

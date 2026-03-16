@@ -358,13 +358,13 @@ const formatItemData = (
     } else if (value instanceof Date) {
       try {
         value = format(value, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-      } catch (e) {
+      } catch {
         value = "[Date Error]";
       }
     } else if (typeof value === "object") {
       try {
         value = JSON.stringify(value);
-      } catch (e) {
+      } catch {
         value = "[JSON Error]";
       }
     } else if (typeof value !== "string" && typeof value !== "boolean") {

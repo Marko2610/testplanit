@@ -104,7 +104,7 @@ const UserWorkGanttChart: React.FC<UserWorkGanttChartProps> = ({
             `${t.id}-${t.start.toISOString()}-${t.end.toISOString()}-${t.name}-${t.groupName}` // Added groupName to key
         )
       );
-    } catch (e) {
+    } catch {
       tasksKey = "tasks-error-stringifying";
     }
 

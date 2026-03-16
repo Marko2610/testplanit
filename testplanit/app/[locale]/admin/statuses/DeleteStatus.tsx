@@ -53,7 +53,7 @@ export function DeleteStatusModal({ status }: DeleteStatusModalProps) {
       });
       setOpen(false);
       reset();
-    } catch (err: any) {
+    } catch {
       setError("root", {
         type: "custom",
         message: tCommon("errors.unknown"),

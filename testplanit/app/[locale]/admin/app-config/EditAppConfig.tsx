@@ -48,7 +48,7 @@ export function EditAppConfigModal({ config }: EditAppConfigModalProps) {
         data: { value: parsedValue },
       });
       setOpen(false);
-    } catch (err) {
+    } catch {
       setError(t("errors.invalidJson"));
     } finally {
       setIsSubmitting(false);

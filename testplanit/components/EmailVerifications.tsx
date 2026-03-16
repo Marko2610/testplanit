@@ -57,7 +57,7 @@ export const resendVerificationEmail = async (email: string) => {
     });
 
     await sendVerificationEmail(email, await emailVerificationToken);
-  } catch (error) {
+  } catch {
     return false;
   }
   return true;

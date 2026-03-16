@@ -92,7 +92,7 @@ export function DeleteTestRunModal({
                  JSON.stringify(queryKey).includes("TestRuns");
         },
       });
-    } catch (err: any) {
+    } catch {
       form.setError("root", {
         type: "custom",
         message: tCommon("errors.unknown"),

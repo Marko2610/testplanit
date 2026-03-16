@@ -159,7 +159,7 @@ const renderFieldValue = (
         // If it's an object, stringify it
         return JSON.stringify(value);
       }
-    } catch (error) {
+    } catch {
       // If parsing fails, it might be a plain string or invalid JSON
       // Try to wrap it in a document structure
       try {
@@ -471,7 +471,7 @@ export const StepsDisplay: React.FC<StepsProps> = ({
                     } else {
                       return JSON.stringify(value);
                     }
-                  } catch (error) {
+                  } catch {
                     try {
                       const textContent = String(value);
                       if (textContent.startsWith('{"type":"doc","content":[')) {

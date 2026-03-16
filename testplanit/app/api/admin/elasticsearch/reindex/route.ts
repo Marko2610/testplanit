@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
           health: idx.health,
         })),
       });
-    } catch (error) {
+    } catch {
       return NextResponse.json({
         available: false,
         message: "Elasticsearch is not responding",

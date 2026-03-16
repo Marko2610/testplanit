@@ -471,7 +471,7 @@ export function ManageExternalIssues({
       } else {
         toast.error(t("issues.linkError"));
       }
-    } catch (error) {
+    } catch {
       toast.error(t("common.errors.issueManagement.linkError"));
     } finally {
       setIsLinking(false);
@@ -532,7 +532,7 @@ export function ManageExternalIssues({
       } else {
         toast.error(t("issues.unlinkError"));
       }
-    } catch (error) {
+    } catch {
       toast.error(t("common.errors.issueManagement.unlinkError"));
     }
   };

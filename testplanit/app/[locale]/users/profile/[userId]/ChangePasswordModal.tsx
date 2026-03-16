@@ -75,7 +75,7 @@ export function ChangePasswordModal() {
         setNewPassword("");
         setConfirmPassword("");
       }
-    } catch (err) {
+    } catch {
       setError(tCommon("errors.somethingWentWrong"));
     }
     setIsLoading(false);

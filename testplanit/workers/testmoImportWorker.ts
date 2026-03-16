@@ -837,7 +837,7 @@ function getSharedHappyDOM() {
     if (sharedHappyDOMWindow) {
       try {
         sharedHappyDOMWindow.close();
-      } catch (e) {
+      } catch {
         // Ignore cleanup errors
       }
     }
@@ -1743,7 +1743,7 @@ const importProjects = async (
               templateId: fallbackTemplate.id,
             },
           });
-        } catch (error) {
+        } catch {
           // Ignore duplicate errors
         }
         resolvedDefaultTemplateId = fallbackTemplate.id;
@@ -5764,13 +5764,6 @@ async function processImportMode(importJob: TestmoImportJob, jobId: string, pris
     recordEntitySummary(context, templateSummary);
     await persistProgress("templates", formatSummaryStatus(templateSummary));
 
-    // Build field maps from configuration (includes only mapped fields at this point)
-    const initialFieldMaps = buildTemplateFieldMaps(
-      normalizedConfiguration.templateFields ?? {}
-    );
-    let caseFieldMap = initialFieldMaps.caseFields;
-    let resultFieldMap = initialFieldMaps.resultFields;
-
     logMessage(context, "Processing template field mappings");
     await persistProgress(
       "templateFields",
@@ -5791,13 +5784,13 @@ async function processImportMode(importJob: TestmoImportJob, jobId: string, pris
     );
     releaseDatasetRows(datasetRowsByName, "template_fields");
 
-    // Rebuild caseFieldMap and resultFieldMap after template fields are created
+    // Build caseFieldMap and resultFieldMap from template fields configuration
     // This ensures newly created fields (action='create') are included
     const updatedFieldMaps = buildTemplateFieldMaps(
       normalizedConfiguration.templateFields ?? {}
     );
-    caseFieldMap = updatedFieldMaps.caseFields;
-    resultFieldMap = updatedFieldMaps.resultFields;
+    const caseFieldMap = updatedFieldMaps.caseFields;
+    const resultFieldMap = updatedFieldMaps.resultFields;
 
     logMessage(context, "Processing user mappings");
     await persistProgress("users", "Processing user mappings");

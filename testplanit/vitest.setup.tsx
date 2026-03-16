@@ -189,7 +189,7 @@ vi.mock("next-intl", () => {
   const getNested = (obj: any, path: string): string | undefined => {
     try {
       return path.split(".").reduce((acc, part) => acc && acc[part], obj);
-    } catch (e) {
+    } catch {
       return undefined;
     }
   };

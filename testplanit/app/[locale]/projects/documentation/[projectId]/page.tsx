@@ -119,7 +119,7 @@ export default function ProjectDocumentation({
               typeof project.docs === "string"
                 ? JSON.parse(project.docs)
                 : project.docs;
-          } catch (error) {
+          } catch {
             // console.error("Failed to parse project.docs as JSON:", error);
           }
         }
@@ -127,7 +127,7 @@ export default function ProjectDocumentation({
         // Step 3: Set the docs state and the original docs ref
         setDocs(parsedDocs || appConfig?.value);
         originalDocsRef.current = parsedDocs || appConfig?.value;
-      } catch (error) {
+      } catch {
         // console.error("Failed to parse docs as JSON:", error);
         // Fallback to default content if parsing fails
         setDocs(appConfig?.value);

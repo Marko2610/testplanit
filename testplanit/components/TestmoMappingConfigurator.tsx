@@ -449,7 +449,7 @@ function translateWorkflowType(
   if (translationKey) {
     try {
       return t(translationKey);
-    } catch (error) {
+    } catch {
       return type;
     }
   }
@@ -744,7 +744,7 @@ export default function TestmoMappingConfigurator({
         if (typeKey) {
           try {
             typeLabel = tWorkflowTypes(typeKey);
-          } catch (error) {
+          } catch {
             typeLabel = typeKey;
           }
         }
@@ -3425,7 +3425,7 @@ function formatWorkflowScopeLabel(
   const normalized = scope.toLowerCase();
   try {
     return t(`workflowScope.${normalized}`);
-  } catch (error) {
+  } catch {
     return scope;
   }
 }

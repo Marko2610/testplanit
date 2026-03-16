@@ -23,11 +23,11 @@ try {
     gitTag = execSync('git describe --exact-match --tags HEAD').toString().trim();
     // Check if this tag matches our version format
     isTaggedRelease = gitTag === `v${version}` || gitTag === version;
-  } catch (e) {
+  } catch {
     // Not on a tag, try to get the most recent tag for reference
     try {
       gitTag = execSync('git describe --tags --abbrev=0').toString().trim();
-    } catch (e2) {
+    } catch {
       // No tags found at all, that's okay
       gitTag = '';
     }

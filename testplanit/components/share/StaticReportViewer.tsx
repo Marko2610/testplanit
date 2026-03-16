@@ -121,7 +121,7 @@ export function StaticReportViewer({ shareData, shareMode, isAuthenticatedUser =
         try {
           const parsed = JSON.parse(stored);
           token = parsed.token;
-        } catch (e) {
+        } catch {
           // Invalid token, ignore
         }
       }

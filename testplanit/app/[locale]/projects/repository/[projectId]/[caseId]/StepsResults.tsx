@@ -63,7 +63,7 @@ const RenderSharedGroupItemsForResults: React.FC<
             typeof item.step === "string"
               ? JSON.parse(item.step)
               : item.step || emptyEditorContent;
-        } catch (e) {
+        } catch {
           stepContent = emptyEditorContent;
         }
         try {
@@ -71,7 +71,7 @@ const RenderSharedGroupItemsForResults: React.FC<
             typeof item.expectedResult === "string"
               ? JSON.parse(item.expectedResult)
               : item.expectedResult || emptyEditorContent;
-        } catch (e) {
+        } catch {
           expectedResultContent = emptyEditorContent;
         }
 
@@ -169,7 +169,7 @@ export const StepsResults: React.FC<StepsResultsProps> = ({
           try {
             stepContent =
               typeof step.step === "string" ? JSON.parse(step.step) : step.step;
-          } catch (error) {
+          } catch {
             stepContent = emptyEditorContent;
           }
 
@@ -179,7 +179,7 @@ export const StepsResults: React.FC<StepsResultsProps> = ({
               typeof step.expectedResult === "string"
                 ? JSON.parse(step.expectedResult)
                 : step.expectedResult || emptyEditorContent;
-          } catch (error) {
+          } catch {
             expectedResultContent = emptyEditorContent;
           }
 

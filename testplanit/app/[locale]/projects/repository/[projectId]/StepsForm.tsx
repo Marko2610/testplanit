@@ -555,7 +555,7 @@ const StepsForm: React.FC<StepsFormProps> = ({
           return parsed;
         }
         return emptyEditorContent;
-      } catch (e) {
+      } catch {
         if (data.trim() !== "") {
           return {
             type: "doc",
@@ -904,7 +904,7 @@ const StepsForm: React.FC<StepsFormProps> = ({
                 type="button"
                 variant="outline"
                 onClick={() => setShowCreateSharedDialog(true)}
-                disabled={readOnly || selectedStepIndices.length === 0}
+                disabled={selectedStepIndices.length === 0}
                 className="flex items-center"
               >
                 <Layers className="h-5 w-5" />

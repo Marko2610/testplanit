@@ -475,7 +475,7 @@ export function TestRunCaseDetails({
         if (isEmptyEditor) {
           return false;
         }
-      } catch (e) {
+      } catch {
         // Silently handle parsing errors
       }
     }
@@ -1080,7 +1080,7 @@ export function TestRunCaseDetails({
                       ) {
                         return true;
                       }
-                    } catch (e) {
+                    } catch {
                       // Silently handle parsing errors
                     }
                   }

@@ -53,7 +53,7 @@ export class GitHubAdapter extends BaseAdapter {
     // Validate the token by making a test request
     try {
       await this.makeRequest(`${this.baseUrl}/user`);
-    } catch (error) {
+    } catch {
       throw new Error("Invalid GitHub Personal Access Token");
     }
   }

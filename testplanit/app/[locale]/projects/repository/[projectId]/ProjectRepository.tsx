@@ -98,7 +98,7 @@ const parseTipTapContent = (content: any) => {
         return emptyEditorContent;
       }
       return parsed;
-    } catch (e) {
+    } catch {
       if (content.trim() !== "") {
         return {
           type: "doc",

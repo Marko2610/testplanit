@@ -493,7 +493,7 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
           if (errorData.error) {
             errorMessage = errorData.error;
           }
-        } catch (parseError) {
+        } catch {
           // Keep the default error message if we can't parse the response
         }
         throw new Error(errorMessage);

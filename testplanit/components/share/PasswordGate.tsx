@@ -34,7 +34,7 @@ export function PasswordGate({ shareKey, onVerified, projectName }: PasswordGate
           // Token expired, remove it
           sessionStorage.removeItem(tokenKey);
         }
-      } catch (error) {
+      } catch {
         sessionStorage.removeItem(tokenKey);
       }
     }

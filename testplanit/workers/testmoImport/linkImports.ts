@@ -32,7 +32,7 @@ const getSharedHappyDOM = () => {
     if (sharedHappyDOMWindow) {
       try {
         sharedHappyDOMWindow.close();
-      } catch (error) {
+      } catch {
         // Ignore cleanup errors
       }
     }
@@ -112,7 +112,7 @@ function createTipTapLink(
       // Each html snippet is wrapped in a doc node. Return the paragraph node.
       return doc.content[0];
     }
-  } catch (error) {
+  } catch {
     // Fallback to direct JSON construction if HTML conversion fails
   }
 
@@ -168,7 +168,7 @@ function parseExistingDocs(existingDocs: any): Record<string, unknown> {
       if (parsed && typeof parsed === "object" && parsed.type === "doc") {
         return parsed;
       }
-    } catch (e) {
+    } catch {
       // If parsing fails, start fresh
     }
   }

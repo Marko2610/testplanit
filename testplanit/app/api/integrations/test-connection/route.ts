@@ -198,7 +198,7 @@ async function testSimpleUrlConnection(
       // Test with a sample issue ID
       const testUrl = baseUrl.replace("{issueId}", "TEST-123");
       new URL(testUrl); // This will throw if URL is invalid
-    } catch (urlError) {
+    } catch {
       return {
         success: false,
         error: "Invalid URL pattern",
@@ -275,7 +275,7 @@ export async function POST(req: NextRequest) {
                   // If not encrypted, use as-is
                   testCredentials[key] = value;
                 }
-              } catch (e) {
+              } catch {
                 // If decryption fails, use the value as-is
                 console.warn(`Failed to decrypt credential ${key}, using as-is`);
                 testCredentials[key] = value;

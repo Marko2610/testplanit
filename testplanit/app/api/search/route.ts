@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
           if (exists) {
             existingIndices.push(index);
           }
-        } catch (e) {
+        } catch {
           console.error(`Index ${index} does not exist`);
         }
       }

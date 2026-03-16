@@ -46,7 +46,7 @@ export function DeleteAppConfigModal({ config }: DeleteAppConfigModalProps) {
       });
       setOpen(false);
       reset();
-    } catch (err: any) {
+    } catch {
       setError("root", {
         type: "custom",
         message: tCommon("errors.unknown"),

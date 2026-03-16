@@ -43,7 +43,7 @@ vi.mock("~/utils/extractTextFromJson", () => ({
         };
         return extractFromContent(parsed.content);
       }
-    } catch (e) {
+    } catch {
       // Not JSON, return as is
     }
     return node?.toString() || "";

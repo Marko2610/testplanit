@@ -1638,7 +1638,7 @@ export async function GET(req: NextRequest) {
         let values: any[] = [];
         try {
           values = await dim.getValues(prisma, projectId ?? 0);
-        } catch (e) {
+        } catch {
           // fallback: ignore errors for dimensions that require projectId if not provided
         }
         return {

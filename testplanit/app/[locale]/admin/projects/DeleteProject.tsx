@@ -43,7 +43,7 @@ export function DeleteProjectModal({ project }: DeleteProjectModalProps) {
       });
       setOpen(false);
       setIsSubmitting(false);
-    } catch (err: any) {
+    } catch {
       form.setError("root", {
         type: "custom",
         message: tCommon("errors.unknown"),

@@ -99,7 +99,7 @@ export function ManageSimpleUrlIssues({
 
       toast.success(t("common.messages.created"));
       refetch();
-    } catch (error) {
+    } catch {
       toast.error(t("common.messages.createError"));
     }
   };
@@ -108,7 +108,7 @@ export function ManageSimpleUrlIssues({
     try {
       setLinkedIssueIds(linkedIssueIds.filter((id) => id !== issueId));
       toast.success(t("common.status.deleted"));
-    } catch (error) {
+    } catch {
       toast.error(t("common.errors.error"));
     }
   };

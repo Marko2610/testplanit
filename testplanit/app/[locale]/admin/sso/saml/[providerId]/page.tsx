@@ -173,7 +173,7 @@ export default function SAMLConfigurationPage() {
       }
 
       router.push("/admin/sso");
-    } catch (error) {
+    } catch {
       toast.error(t("admin.sso.messages.configSaveFailed"));
     } finally {
       setIsSaving(false);

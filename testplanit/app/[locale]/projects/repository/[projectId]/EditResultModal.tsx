@@ -252,7 +252,7 @@ const parseTipTapContent = (content: any) => {
   if (typeof content === "string") {
     try {
       return JSON.parse(content);
-    } catch (e) {
+    } catch {
       return emptyEditorContent;
     }
   }
@@ -516,7 +516,7 @@ export function EditResultModal({
                     typeof field.value === "string"
                       ? JSON.parse(field.value)
                       : field.value || emptyEditorContent;
-                } catch (e) {
+                } catch {
                   acc[field.fieldId] = emptyEditorContent;
                 }
               } else {
@@ -1518,7 +1518,7 @@ export function EditResultModal({
                         typeof step.step === "string"
                           ? JSON.parse(step.step)
                           : step.step;
-                    } catch (error) {
+                    } catch {
                       // console.warn("Error parsing step content:", error);
                       stepContent = emptyEditorContent;
                     }

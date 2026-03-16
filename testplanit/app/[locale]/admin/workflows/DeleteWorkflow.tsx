@@ -54,7 +54,7 @@ export function DeleteWorkflowsModal({
       });
       setOpen(false);
       reset();
-    } catch (err: any) {
+    } catch {
       setError("root", {
         type: "custom",
         message: tGlobal("common.errors.unknown"),

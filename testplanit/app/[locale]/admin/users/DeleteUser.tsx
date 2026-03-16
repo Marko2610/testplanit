@@ -52,7 +52,7 @@ export function DeleteUserModal({ user }: DeleteUserModalProps) {
 
       // Refetch all queries to refresh the table with soft-deleted user removed
       queryClient.refetchQueries();
-    } catch (err: any) {
+    } catch {
       form.setError("root", {
         type: "custom",
         message: t("common.errors.unknown"),

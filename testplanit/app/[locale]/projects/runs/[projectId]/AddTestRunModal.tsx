@@ -226,7 +226,7 @@ const BasicInfoDialog = React.memo(
                     if (typeof field.value === "string" && field.value) {
                       try {
                         editorContent = JSON.parse(field.value);
-                      } catch (e) {}
+                      } catch {}
                     }
                     return (
                       <FormItem>
@@ -374,7 +374,7 @@ const BasicInfoDialog = React.memo(
                     if (typeof field.value === "string" && field.value) {
                       try {
                         editorContent = JSON.parse(field.value);
-                      } catch (e) {}
+                      } catch {}
                     }
                     return (
                       <FormItem>

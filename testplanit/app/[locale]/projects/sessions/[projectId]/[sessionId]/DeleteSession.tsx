@@ -93,7 +93,7 @@ export function DeleteSessionModal({
           );
         },
       });
-    } catch (err: any) {
+    } catch {
       form.setError("root", {
         type: "custom",
         message: t("common.errors.unknown"),

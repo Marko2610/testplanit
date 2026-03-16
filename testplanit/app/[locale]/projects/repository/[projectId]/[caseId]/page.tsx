@@ -107,7 +107,7 @@ const parseJsonToTipTap = (
       return typeof parsed === "object" && parsed !== null
         ? parsed
         : emptyEditorContent;
-    } catch (e) {
+    } catch {
       return emptyEditorContent;
     }
   }

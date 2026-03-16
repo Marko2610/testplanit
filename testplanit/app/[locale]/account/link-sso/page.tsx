@@ -48,7 +48,7 @@ export default function LinkSSOPage() {
         // For SAML, initiate SAML flow with linking parameter
         window.location.href = `/api/auth/saml?provider=${provider.samlConfig.id}&callbackUrl=${encodeURIComponent("/account/link-sso?linked=saml")}`;
       }
-    } catch (err) {
+    } catch {
       setError(t("account.linkSso.linkingFailed"));
       setLinking(null);
     }

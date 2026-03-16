@@ -62,7 +62,7 @@ export function DeleteMilestoneModal({
       }
 
       onOpenChange(false);
-    } catch (err: any) {
+    } catch {
       setError(tCommon("errors.unknown"));
     } finally {
       setIsSubmitting(false);

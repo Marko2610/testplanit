@@ -191,7 +191,7 @@ export class SimpleUrlAdapter extends BaseAdapter {
     // Basic URL validation
     try {
       new URL(url);
-    } catch (error) {
+    } catch {
       throw new Error(`Invalid URL generated: ${url}`);
     }
 
@@ -221,7 +221,7 @@ export class SimpleUrlAdapter extends BaseAdapter {
       try {
         const testUrl = baseUrl.replace("{issueId}", "TEST-1").replace("'{issueId}'", "TEST-1");
         new URL(testUrl);
-      } catch (error) {
+      } catch {
         errors.push("Base URL pattern is not a valid URL format");
       }
     }

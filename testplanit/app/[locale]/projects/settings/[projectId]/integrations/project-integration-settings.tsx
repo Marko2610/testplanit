@@ -90,7 +90,7 @@ export function ProjectIntegrationSettings({
 
       const data = await response.json();
       setExternalProjects(data.projects || []);
-    } catch (error) {
+    } catch {
       toast.error(t("integration.loadProjectsError"));
     } finally {
       setIsLoadingProjects(false);

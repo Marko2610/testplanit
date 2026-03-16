@@ -426,7 +426,7 @@ export function TestmoImportPanel() {
         .join(" ");
       try {
         return tDatasetLabels(datasetKey as any);
-      } catch (error) {
+      } catch {
         return fallback;
       }
     },
@@ -440,7 +440,7 @@ export function TestmoImportPanel() {
       });
       try {
         return tDatasetDescriptions(datasetKey as any);
-      } catch (error) {
+      } catch {
         return fallback;
       }
     },

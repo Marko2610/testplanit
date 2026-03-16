@@ -35,7 +35,7 @@ const parseTipTapContent = (content: any) => {
   if (typeof content === "string") {
     try {
       return JSON.parse(content);
-    } catch (e) {
+    } catch {
       return emptyEditorContent;
     }
   }

@@ -77,7 +77,7 @@ export function EditAvatarModal({ user }: EditAvatarModalProps) {
 
       // Refetch all queries to refresh UI with new avatar
       queryClient.refetchQueries();
-    } catch (err: any) {
+    } catch {
       form.setError("root", {
         type: "custom",
         message: tCommon("errors.unknown"),

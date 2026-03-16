@@ -85,7 +85,7 @@ export function AddTagModal() {
           setOpen(false);
           setIsSubmitting(false);
           return;
-        } catch (err: any) {
+        } catch {
           form.setError("root", {
             type: "custom",
             message: tCommon("errors.unknown"),

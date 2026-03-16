@@ -86,7 +86,7 @@ export function DeleteTemplateModal({ template }: DeleteTemplateModalProps) {
 
       setOpen(false);
       reset();
-    } catch (err: any) {
+    } catch {
       setError("root", {
         type: "custom",
         message: t("errors.unknown"),

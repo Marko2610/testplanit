@@ -276,7 +276,7 @@ export function AddUserModal() {
       setDeletedUser(null);
       setOpen(false);
       setIsSubmitting(false);
-    } catch (err) {
+    } catch {
       form.setError("root", {
         type: "custom",
         message: tCommon("errors.unknown"),

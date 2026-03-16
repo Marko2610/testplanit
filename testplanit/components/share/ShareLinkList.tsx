@@ -85,7 +85,7 @@ export function ShareLinkList({ projectId, entityType, showProjectColumn = false
         description: t("toast.linkCopiedDescription"),
       });
       setTimeout(() => setCopiedId(null), 2000);
-    } catch (error) {
+    } catch {
       toast.error(t("toast.copyFailed"), {
         description: t("toast.copyFailedDescription"),
       });
@@ -112,7 +112,7 @@ export function ShareLinkList({ projectId, entityType, showProjectColumn = false
       refetch();
       setRevokeDialogOpen(false);
       setSelectedShareId(null);
-    } catch (error) {
+    } catch {
       toast.error(t("toast.revokeFailed"), {
         description: t("toast.revokeFailedDescription"),
       });
@@ -136,7 +136,7 @@ export function ShareLinkList({ projectId, entityType, showProjectColumn = false
       refetch();
       setDeleteDialogOpen(false);
       setSelectedShareId(null);
-    } catch (error) {
+    } catch {
       toast.error(t("toast.deleteFailed"), {
         description: t("toast.deleteFailedDescription"),
       });
@@ -160,7 +160,7 @@ export function ShareLinkList({ projectId, entityType, showProjectColumn = false
       );
 
       refetch();
-    } catch (error) {
+    } catch {
       toast.error(t("toast.notificationUpdateFailed"), {
         description: t("toast.notificationUpdateFailedDescription"),
       });

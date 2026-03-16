@@ -313,7 +313,7 @@ async function handler(
             requestBody = modifiedBody;
           }
         }
-      } catch (e) {
+      } catch {
         // Ignore body parsing errors
       }
     }

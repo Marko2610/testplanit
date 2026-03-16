@@ -40,7 +40,7 @@ export function DeleteGroupModal({ group }: DeleteGroupModalProps) {
       await updateGroup({ where: { id: group.id }, data: { isDeleted: true } });
       setOpen(false);
       setIsSubmitting(false);
-    } catch (err: any) {
+    } catch {
       form.setError("root", {
         type: "custom",
         message: tGlobal("common.errors.unknown"),

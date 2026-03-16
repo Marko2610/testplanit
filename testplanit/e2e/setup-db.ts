@@ -59,7 +59,7 @@ async function resetDatabase() {
     try {
       await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tableNames} CASCADE;`);
       console.log(`   Truncated ${tables.length} tables`);
-    } catch (error: any) {
+    } catch {
       // If truncate fails, try deleting from each table individually
       console.log("   TRUNCATE failed, trying DELETE approach...");
       for (const { tablename } of tables.reverse()) {
