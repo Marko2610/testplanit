@@ -88,9 +88,10 @@ describe("NotificationPreferences - Email Server Configuration", () => {
       />
     );
 
-    // Wait for the email server check to complete
+    // Wait for the email server check to complete and email options to be hidden
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith("/api/admin/sso/magic-link-status");
+      expect(screen.queryByLabelText(/In-App \+ Immediate Email/i)).toBeNull();
     });
 
     // Verify non-email options are visible
@@ -99,7 +100,6 @@ describe("NotificationPreferences - Email Server Configuration", () => {
     expect(screen.getByLabelText(/In-App Only/i)).toBeDefined();
 
     // Verify email options are NOT visible
-    expect(screen.queryByLabelText(/In-App \+ Immediate Email/i)).toBeNull();
     expect(screen.queryByLabelText(/In-App \+ Daily Digest/i)).toBeNull();
   });
 
