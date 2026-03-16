@@ -1,3 +1,9 @@
+## [0.16.19](https://github.com/TestPlanIt/testplanit/compare/v0.16.18...v0.16.19) (2026-03-16)
+
+### Enhancements
+
+* Chore/code cleanup ([#133](https://github.com/TestPlanIt/testplanit/issues/133)) ([a6bd870](https://github.com/TestPlanIt/testplanit/commit/a6bd8708d05cb7a76a41fbd487fba0a617b38c00))
+
 ## [0.16.18](https://github.com/TestPlanIt/testplanit/compare/v0.16.17...v0.16.18) (2026-03-16)
 
 ### Bug Fixes
