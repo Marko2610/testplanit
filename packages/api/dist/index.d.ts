@@ -797,7 +797,7 @@ declare class TestPlanItClient {
     /**
      * List all configurations
      */
-    listConfigurations(projectId: number): Promise<Configuration[]>;
+    listConfigurations(_projectId?: number): Promise<Configuration[]>;
     /**
      * Find a configuration by name using CLI lookup
      */
@@ -846,7 +846,7 @@ declare class TestPlanItClient {
      * List all templates accessible to the user
      * ZenStack access control handles permission filtering automatically
      */
-    listTemplates(projectId: number): Promise<Template[]>;
+    listTemplates(_projectId?: number): Promise<Template[]>;
     /**
      * Find a template by name (case-insensitive)
      * Logs available templates if template not found for debugging
@@ -855,7 +855,7 @@ declare class TestPlanItClient {
     /**
      * List all tags
      */
-    listTags(projectId: number): Promise<Tag[]>;
+    listTags(_projectId?: number): Promise<Tag[]>;
     /**
      * Create a new tag
      */

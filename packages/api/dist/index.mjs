@@ -496,7 +496,7 @@ var TestPlanItClient = class {
   /**
    * List all configurations
    */
-  async listConfigurations(projectId) {
+  async listConfigurations(_projectId) {
     return this.zenstack("configurations", "findMany", {
       where: {
         isDeleted: false,
@@ -728,7 +728,7 @@ var TestPlanItClient = class {
    * List all templates accessible to the user
    * ZenStack access control handles permission filtering automatically
    */
-  async listTemplates(projectId) {
+  async listTemplates(_projectId) {
     return this.zenstack("templates", "findMany", {
       where: {
         isDeleted: false,
@@ -768,7 +768,7 @@ var TestPlanItClient = class {
   /**
    * List all tags
    */
-  async listTags(projectId) {
+  async listTags(_projectId) {
     return this.zenstack("tags", "findMany", {
       where: {
         isDeleted: false

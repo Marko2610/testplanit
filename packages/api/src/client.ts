@@ -752,7 +752,7 @@ export class TestPlanItClient {
   /**
    * List all configurations
    */
-  async listConfigurations(projectId: number): Promise<Configuration[]> {
+  async listConfigurations(_projectId?: number): Promise<Configuration[]> {
     return this.zenstack<Configuration[]>("configurations", "findMany", {
       where: {
         isDeleted: false,
@@ -1038,7 +1038,7 @@ export class TestPlanItClient {
    * List all templates accessible to the user
    * ZenStack access control handles permission filtering automatically
    */
-  async listTemplates(projectId: number): Promise<Template[]> {
+  async listTemplates(_projectId?: number): Promise<Template[]> {
     return this.zenstack<Template[]>("templates", "findMany", {
       where: {
         isDeleted: false,
@@ -1088,7 +1088,7 @@ export class TestPlanItClient {
   /**
    * List all tags
    */
-  async listTags(projectId: number): Promise<Tag[]> {
+  async listTags(_projectId?: number): Promise<Tag[]> {
     return this.zenstack<Tag[]>("tags", "findMany", {
       where: {
         isDeleted: false,
