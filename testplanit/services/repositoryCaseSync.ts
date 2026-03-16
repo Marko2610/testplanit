@@ -268,9 +268,8 @@ export async function syncProjectCasesToElasticsearch(
     }
 
     let processed = 0;
-    let hasMore = true;
 
-    while (hasMore) {
+    while (true) {
       const cases = await prisma.repositoryCases.findMany({
         where: {
           projectId,
@@ -282,7 +281,6 @@ export async function syncProjectCasesToElasticsearch(
       });
 
       if (cases.length === 0) {
-        hasMore = false;
         break;
       }
 

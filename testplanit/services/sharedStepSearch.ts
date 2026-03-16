@@ -223,9 +223,8 @@ export async function syncProjectSharedStepsToElasticsearch(
     );
 
     let processed = 0;
-    let hasMore = true;
 
-    while (hasMore) {
+    while (true) {
       const steps = await prisma.sharedStepGroup.findMany({
         where: {
           projectId,
@@ -237,7 +236,6 @@ export async function syncProjectSharedStepsToElasticsearch(
       });
 
       if (steps.length === 0) {
-        hasMore = false;
         break;
       }
 
