@@ -27,36 +27,6 @@ interface UploadAttachmentsProps {
   multiple?: boolean;
 }
 
-function ImagePreview({ file }: { file: File }) {
-  const [url, setUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const objectUrl = URL.createObjectURL(file);
-    setUrl(objectUrl);
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [file]);
-
-  if (!url) {
-    return (
-      <div className="w-8 h-8 bg-accent rounded-full" aria-hidden="true" />
-    );
-  }
-
-  return (
-    <div className="w-8 h-8 bg-accent rounded-full overflow-hidden flex items-center justify-center">
-      <Image
-        src={url}
-        alt={file.name}
-        className="w-full h-full object-cover"
-        width={32}
-        height={32}
-      />
-    </div>
-  );
-}
-
 export default function UploadAttachments({
   onFileSelect,
   compact = false,
