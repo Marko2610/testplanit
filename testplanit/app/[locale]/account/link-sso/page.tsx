@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckCircle2, InfoIcon, Shield } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { siGoogle } from "simple-icons";
@@ -25,7 +24,6 @@ const GoogleIcon = ({ className }: { className?: string }) => (
 
 export default function LinkSSOPage() {
   const router = useRouter();
-  const { data: session } = useSession();
   const t = useTranslations();
   const [linking, setLinking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

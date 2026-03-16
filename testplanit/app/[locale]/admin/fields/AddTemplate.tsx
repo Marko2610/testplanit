@@ -1,7 +1,6 @@
 "use client";
 /* eslint-disable react-hooks/incompatible-library */
 import { Projects, Templates } from "@prisma/client";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
   useCreateManyTemplateCaseAssignment, useCreateManyTemplateProjectAssignment, useCreateManyTemplateResultAssignment, useCreateTemplates, useFindManyCaseFields, useFindManyProjects, useFindManyResultFields, useUpdateManyTemplates
@@ -56,7 +55,6 @@ interface ExtendedTemplates extends Templates {
 export function AddTemplateModal() {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: session } = useSession();
   const t = useTranslations("admin.templates.add");
   const tCommon = useTranslations("common");
 

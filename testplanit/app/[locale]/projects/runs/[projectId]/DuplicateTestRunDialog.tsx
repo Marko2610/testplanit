@@ -19,7 +19,6 @@ import {
 import { HelpPopover } from "@/components/ui/help-popover";
 import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -71,7 +70,6 @@ const DuplicateTestRunDialog: React.FC<DuplicateTestRunDialogProps> = ({
   const t = useTranslations("runs.duplicateDialog");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
-  const { data: session } = useSession();
   const [isSubmittingThisDialog, setIsSubmittingThisDialog] = useState(false);
   const [initialStatusesSet, setInitialStatusesSet] = useState(false);
 

@@ -66,7 +66,7 @@ import { useFindFirstRepositoryCasesFiltered } from "~/hooks/useRepositoryCasesW
 import { useRequireAuth } from "~/hooks/useRequireAuth";
 import {
   useCreateAttachments, useCreateCaseFieldValues, useCreateCaseFieldVersionValues, useCreateSteps, useDeleteManyCaseFieldValues, useFindFirstProjects, useFindManyJUnitAttachment,
-  useFindManyJUnitProperty, useFindManyJUnitTestStep, useFindManyJUnitTestSuite, useFindManyRepositoryCaseVersions, useFindManyRepositoryFolders, useFindManySharedStepGroup, useFindManyTags, useFindManyTemplates, useFindManyWorkflows, useFindUniqueProjects, useUpdateAttachments, useUpdateCaseFieldValues, useUpdateManySteps, useUpdateRepositoryCases
+  useFindManyJUnitProperty, useFindManyJUnitTestStep, useFindManyRepositoryCaseVersions, useFindManyRepositoryFolders, useFindManySharedStepGroup, useFindManyTags, useFindManyTemplates, useFindManyWorkflows, useFindUniqueProjects, useUpdateAttachments, useUpdateCaseFieldValues, useUpdateManySteps, useUpdateRepositoryCases
 } from "~/lib/hooks";
 import { Link, useRouter } from "~/lib/navigation";
 import { IconName } from "~/types/globals";
@@ -1587,12 +1587,6 @@ export default function TestCaseDetails() {
 
   // Fetch JUnit-specific data if this is an automated case
   const isJUnitCase = isAutomatedCaseSource(testcase?.source);
-  const { data: junitSuites } = useFindManyJUnitTestSuite(
-    isJUnitCase
-      ? { where: { results: { some: { repositoryCaseId: testcase.id } } } }
-      : undefined,
-    { enabled: isJUnitCase }
-  );
   const { data: junitSteps } = useFindManyJUnitTestStep(
     isJUnitCase ? { where: { repositoryCaseId: testcase.id } } : undefined,
     { enabled: isJUnitCase }

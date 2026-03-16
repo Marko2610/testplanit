@@ -25,7 +25,7 @@ import {
   useFindManyMilestones,
   useFindManyProjectAssignment,
   useFindManySessionVersions,
-  useFindManyTags, useFindManyTemplates, useFindManyWorkflows, useUpdateAttachments, useUpdateSessions
+  useFindManyTemplates, useFindManyWorkflows, useUpdateAttachments, useUpdateSessions
 } from "~/lib/hooks";
 
 import { AttachmentsCarousel } from "@/components/AttachmentsCarousel";
@@ -784,7 +784,7 @@ export default function SessionPage() {
     const id = parseInt(safeProjectId, 10);
     return isNaN(id) ? null : id;
   }, [safeProjectId]);
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session } = useSession();
   const [isEditMode, setIsEditMode] = useState(
     searchParams.get("edit") === "true"
   );
@@ -998,12 +998,6 @@ export default function SessionPage() {
       orderBy: { version: "desc" },
     });
 
-  // Fetch all tags to get their correct names
-  const { data: allTags, isLoading: isLoadingTags } = useFindManyTags({
-    where: {
-      isDeleted: false,
-    },
-  });
 
   // Set up form with proper typing
   const form = useForm<FormValues>({

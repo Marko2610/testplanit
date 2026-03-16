@@ -14,7 +14,7 @@ import { ExternalLink, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useDeleteIssue, useFindManyIssue, useUpsertIssue } from "~/lib/hooks";
+import { useFindManyIssue, useUpsertIssue } from "~/lib/hooks";
 
 interface ManageSimpleUrlIssuesProps {
   projectId: number;
@@ -50,7 +50,6 @@ export function ManageSimpleUrlIssues({
   });
 
   const { mutateAsync: upsertIssue } = useUpsertIssue();
-  const { mutateAsync: deleteIssue } = useDeleteIssue();
 
   const handleAddIssue = async () => {
     if (!issueId.trim()) {

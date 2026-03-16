@@ -55,7 +55,7 @@ function ProjectIssues() {
   const maxScrollAttempts = 10;
   const scrollInterval = useRef<NodeJS.Timeout | null>(null);
 
-  const { data: project, isLoading: isLoadingProject } = useFindFirstProjects(
+  const { data: project } = useFindFirstProjects(
     {
       where: {
         id: projectId ?? -1,

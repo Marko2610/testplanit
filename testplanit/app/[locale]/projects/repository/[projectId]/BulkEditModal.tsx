@@ -38,8 +38,7 @@ import { z } from "zod/v4";
 import { emptyEditorContent, MAX_DURATION } from "~/app/constants";
 import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import {
-  useCreateCaseFieldValues, useCreateCaseFieldVersionValues, useCreateRepositoryCaseVersions, useCreateSteps,
-  useDeleteManySteps, useFindManyTags, useFindManyWorkflows, useUpdateCaseFieldValues, useUpdateManyRepositoryCases, useUpdateRepositoryCases, useUpdateSteps
+  useCreateCaseFieldVersionValues, useCreateRepositoryCaseVersions, useFindManyTags, useFindManyWorkflows, useUpdateManyRepositoryCases, useUpdateRepositoryCases
 } from "~/lib/hooks";
 import { IconName } from "~/types/globals";
 import { extractTextFromNode } from "~/utils/extractTextFromJson";
@@ -285,13 +284,8 @@ export function BulkEditModal({
 
   const { mutateAsync: updateCasesMutation, isPending: isUpdating } =
     useUpdateRepositoryCases();
-  const { mutateAsync: updateCaseFieldValue } = useUpdateCaseFieldValues();
-  const { mutateAsync: createCaseFieldValues } = useCreateCaseFieldValues();
-  const { mutateAsync: createSteps } = useCreateSteps();
-  const { mutateAsync: deleteManySteps } = useDeleteManySteps();
   const { mutateAsync: updateManyRepositoryCases, isPending: isDeleting } =
     useUpdateManyRepositoryCases();
-  const { mutateAsync: updateSteps } = useUpdateSteps();
   const { mutateAsync: createRepositoryCaseVersions } =
     useCreateRepositoryCaseVersions();
   const { mutateAsync: createCaseFieldVersionValues } =
@@ -312,7 +306,7 @@ export function BulkEditModal({
   }, [casesData]);
 
   // Determine template consistency and get template fields
-  const { templateId, templateFields, hasMultipleTemplates } = useMemo(() => {
+  const { templateFields, hasMultipleTemplates } = useMemo(() => {
     if (!casesData || casesData.length === 0) {
       return {
         templateId: null,

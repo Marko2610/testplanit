@@ -12,7 +12,6 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -48,7 +47,6 @@ export function AssignTestCaseModal({
   isBulkAssign = false,
   selectedCases = [],
 }: AssignTestCaseModalProps) {
-  const { data: session } = useSession();
   const t = useTranslations();
   const [selectedUser, setSelectedUser] = useState<{
     id: string;

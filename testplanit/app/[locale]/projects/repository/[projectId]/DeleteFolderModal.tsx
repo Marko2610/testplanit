@@ -12,7 +12,6 @@ import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   useFindManyRepositoryCases, useUpdateManyRepositoryCases,
-  useUpdateManyRepositoryFolders,
   useUpdateRepositoryFolders
 } from "~/lib/hooks";
 
@@ -50,7 +49,6 @@ export function DeleteFolderModal({
   const setOpen = onOpenChange || setUncontrolledOpen;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutateAsync: updateManyCases } = useUpdateManyRepositoryCases();
-  const { mutateAsync: updateManyFolders } = useUpdateManyRepositoryFolders();
   const { mutateAsync: updateFolder } = useUpdateRepositoryFolders();
   const { projectId } = useParams<{ projectId: string }>();
 

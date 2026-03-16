@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   useCreateManyGroupAssignment, useCreateManyProjectAssignment, useCreateUser,
-  useCreateUserPreferences, useFindFirstRegistrationSettings, useFindManyGroups, useFindManyProjects, useFindManyRoles, useUpdateUser
+  useCreateUserPreferences, useFindFirstRegistrationSettings, useFindManyGroups, useFindManyProjects, useFindManyRoles
 } from "~/lib/hooks";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,7 +68,6 @@ export function AddUserModal() {
     useCreateManyProjectAssignment();
   const { mutateAsync: createManyGroupAssignment } =
     useCreateManyGroupAssignment();
-  const { mutateAsync: updateUser } = useUpdateUser();
 
   // Theme the MultiSelect component
   const { theme } = useTheme();
@@ -106,7 +105,7 @@ export function AddUserModal() {
     });
 
   // Fetch roles, projects, groups, and registration settings...
-  const { data: roles, isLoading: isLoadingRoles } = useFindManyRoles();
+  const { data: roles } = useFindManyRoles();
   const defaultRoleId = roles?.find((role) => role.isDefault)?.id;
   const { data: registrationSettings } = useFindFirstRegistrationSettings();
 

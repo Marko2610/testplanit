@@ -487,7 +487,7 @@ const StepsForm: React.FC<StepsFormProps> = ({
   const tCommon = useTranslations("common");
   const tRepoSteps = useTranslations("repository.steps");
   const { data: session } = useSession();
-  const { watch, setValue, getValues } = useFormContext();
+  const { setValue } = useFormContext();
   const { fields, append, remove, move, update, replace } = useFieldArray({
     control,
     name: name,

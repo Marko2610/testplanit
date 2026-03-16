@@ -106,7 +106,7 @@ export default function TestCaseVersions() {
     setSelectedAttachments([]);
   };
 
-  const { data, isLoading, refetch } = useFindFirstRepositoryCaseVersions({
+  const { data, isLoading } = useFindFirstRepositoryCaseVersions({
     where: {
       repositoryCaseId: Number(caseId),
       version: Number(version),

@@ -1269,7 +1269,7 @@ function extractStepText(stepData) {
       return extractTextFromNode(parsed);
     }
     return extractTextFromNode(stepData);
-  } catch (error) {
+  } catch {
     return typeof stepData === "string" ? stepData : "";
   }
 }

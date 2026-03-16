@@ -18,7 +18,6 @@ import UploadAttachments from "@/components/UploadAttachments";
 import { Attachments, Tags } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import React from "react";
-import { useFormContext } from "react-hook-form";
 import { CommentsSection } from "~/components/comments/CommentsSection";
 import { ForecastDisplay } from "~/components/ForecastDisplay";
 import { isAutomatedCaseSource } from "~/utils/testResultTypes";
@@ -58,7 +57,6 @@ const TestCaseFormControls: React.FC<TestCaseFormControlsProps> = ({
   session,
   onAttachmentPendingChanges,
 }) => {
-  const { control } = useFormContext();
   const t = useTranslations();
 
   return (

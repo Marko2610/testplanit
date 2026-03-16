@@ -419,7 +419,7 @@ const ProjectRepository: React.FC<ProjectRepositoryProps> = ({
     );
 
   // Fetch aggregated view options for filters (lightweight query)
-  const { data: viewOptionsData, isLoading: isLoadingViewOptions } = useQuery({
+  const { data: viewOptionsData } = useQuery({
     queryKey: [
       "viewOptions",
       numericProjectId,

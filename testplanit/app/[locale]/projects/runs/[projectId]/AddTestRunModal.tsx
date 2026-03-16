@@ -58,7 +58,7 @@ import LoadingSpinner from "~/components/LoadingSpinner";
 import LoadingSpinnerAlert from "~/components/LoadingSpinnerAlert";
 import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import {
-  useCreateAttachments, useCreateTestRuns, useFindFirstProjects, useFindManyConfigurations, useFindManyMilestones,
+  useCreateAttachments, useCreateTestRuns, useFindManyConfigurations, useFindManyMilestones,
   useFindManyProjectAssignment,
   useFindManyTags, useFindManyWorkflows
 } from "~/lib/hooks";
@@ -1134,9 +1134,6 @@ export default function AddTestRunModal({
   }, [open, initialSelectedCaseIds]);
 
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
-  const { data: project } = useFindFirstProjects({
-    where: { id: Number(projectId) },
-  });
   const userName = session?.user?.name || "Unknown User";
   const [selectedAttachmentIndex, setSelectedAttachmentIndex] = useState<
     number | null

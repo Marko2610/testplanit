@@ -82,7 +82,7 @@ export default function MilestoneFormControls({
   const t = useTranslations("milestones");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
-  const { data: colors, isLoading: isColorsLoading } = useFindManyColor({
+  const { data: colors } = useFindManyColor({
     include: { colorFamily: true },
     orderBy: { colorFamily: { order: "asc" } },
   });

@@ -113,7 +113,7 @@ export default function SharedStepsPage() {
   const urlGroupId = searchParams.get("groupId");
 
   // Permissions
-  const { permissions: perms, isLoading: permsLoading } = useProjectPermissions(
+  const { permissions: perms } = useProjectPermissions(
     projectId,
     ApplicationArea.SharedSteps
   );

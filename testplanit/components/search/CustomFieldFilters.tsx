@@ -24,7 +24,6 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   useFindManyCaseFields,
-  useFindManyCaseFieldTypes
 } from "~/lib/hooks";
 import {
   CustomFieldFilter,
@@ -102,8 +101,6 @@ export function CustomFieldFilters({
       enabled: entityType === SearchableEntityType.REPOSITORY_CASE,
     }
   );
-
-  const { data: fieldTypes } = useFindManyCaseFieldTypes();
 
   // Update local filters when props change
   useEffect(() => {

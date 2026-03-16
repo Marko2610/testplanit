@@ -1456,7 +1456,7 @@ var AzureDevOpsAdapter = class extends BaseAdapter {
       await this.makeRequest(
         `${this.organizationUrl}/_apis/projects?api-version=${this.apiVersion}`
       );
-    } catch (error) {
+    } catch {
       throw new Error(
         "Invalid Azure DevOps Personal Access Token or Organization URL"
       );
@@ -1903,7 +1903,7 @@ var GitHubAdapter = class extends BaseAdapter {
     }
     try {
       await this.makeRequest(`${this.baseUrl}/user`);
-    } catch (error) {
+    } catch {
       throw new Error("Invalid GitHub Personal Access Token");
     }
   }
@@ -3197,9 +3197,9 @@ var JiraAdapter = class extends BaseAdapter {
           try {
             const accountUsers = await this.makeRequest(accountSearchUrl);
             allUsers.push(...accountUsers);
-          } catch (e) {
+          } catch {
           }
-        } catch (error) {
+        } catch {
         }
       }
       let endpoint;
@@ -3405,7 +3405,7 @@ var SimpleUrlAdapter = class extends BaseAdapter {
     const url = baseUrl.replace("{issueId}", issueId).replace("'{issueId}'", issueId);
     try {
       new URL(url);
-    } catch (error) {
+    } catch {
       throw new Error(`Invalid URL generated: ${url}`);
     }
   }
@@ -3424,7 +3424,7 @@ var SimpleUrlAdapter = class extends BaseAdapter {
       try {
         const testUrl = baseUrl.replace("{issueId}", "TEST-1").replace("'{issueId}'", "TEST-1");
         new URL(testUrl);
-      } catch (error) {
+      } catch {
         errors.push("Base URL pattern is not a valid URL format");
       }
     }

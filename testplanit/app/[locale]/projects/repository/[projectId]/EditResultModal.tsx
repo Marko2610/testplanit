@@ -20,7 +20,7 @@ import * as z from "zod/v4";
 import { emptyEditorContent } from "~/app/constants";
 import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import {
-  useCreateAttachments, useCreateResultFieldValues, useCreateTestRunStepResults, useFindFirstProjects, useFindFirstRepositoryCases, useFindFirstWorkflows, useFindManyStatus, useFindManyTemplateResultAssignment, useFindManyTestRunResults, useUpdateResultFieldValues, useUpdateTestRunResults, useUpdateTestRunStepResults
+  useCreateAttachments, useCreateResultFieldValues, useCreateTestRunStepResults, useFindFirstProjects, useFindFirstRepositoryCases, useFindManyStatus, useFindManyTemplateResultAssignment, useFindManyTestRunResults, useUpdateResultFieldValues, useUpdateTestRunResults, useUpdateTestRunStepResults
 } from "~/lib/hooks";
 import { toHumanReadable } from "~/utils/duration";
 import { fetchSignedUrl } from "~/utils/fetchSignedUrl";
@@ -600,31 +600,6 @@ export function EditResultModal({
   const { mutateAsync: createTestRunStepResults } =
     useCreateTestRunStepResults();
   const { mutateAsync: updateResultFieldValues } = useUpdateResultFieldValues();
-
-  // Check if this is the first result for this test run
-  const { data: existingResults } = useFindManyTestRunResults({
-    where: {
-      testRunId,
-    },
-    take: 1,
-  });
-
-  // Find the first IN_PROGRESS workflow state for this project
-  const { data: inProgressWorkflow } = useFindFirstWorkflows({
-    where: {
-      projects: {
-        some: {
-          projectId: projectId,
-        },
-      },
-      workflowType: "IN_PROGRESS",
-      isEnabled: true,
-      isDeleted: false,
-    },
-    orderBy: {
-      order: "asc",
-    },
-  });
 
   const handleStatusChange = (statusId: number) => {
     form.setValue("statusId", statusId);

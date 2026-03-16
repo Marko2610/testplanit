@@ -5241,7 +5241,7 @@ var getSharedHappyDOM = () => {
     if (sharedHappyDOMWindow) {
       try {
         sharedHappyDOMWindow.close();
-      } catch (error) {
+      } catch {
       }
     }
     sharedHappyDOMWindow = new import_happy_dom.Window();
@@ -5301,7 +5301,7 @@ function createTipTapLink(name, url, note) {
       }
       return doc.content[0];
     }
-  } catch (error) {
+  } catch {
   }
   const linkContent = [
     {
@@ -5345,7 +5345,7 @@ function parseExistingDocs(existingDocs) {
       if (parsed && typeof parsed === "object" && parsed.type === "doc") {
         return parsed;
       }
-    } catch (e) {
+    } catch {
     }
   }
   return {
@@ -6699,7 +6699,7 @@ function getSharedHappyDOM2() {
     if (sharedHappyDOMWindow2) {
       try {
         sharedHappyDOMWindow2.close();
-      } catch (e) {
+      } catch {
       }
     }
     sharedHappyDOMWindow2 = new import_happy_dom2.Window();
@@ -7366,7 +7366,7 @@ var importProjects = async (tx, datasetRows, importJob, userIdMap, statusIdMap, 
               templateId: fallbackTemplate.id
             }
           });
-        } catch (error) {
+        } catch {
         }
         resolvedDefaultTemplateId = fallbackTemplate.id;
       }
@@ -10425,11 +10425,6 @@ async function processImportMode(importJob, jobId, prisma2, tenantId) {
     );
     recordEntitySummary(context, templateSummary);
     await persistProgress("templates", formatSummaryStatus(templateSummary));
-    const initialFieldMaps = buildTemplateFieldMaps(
-      normalizedConfiguration.templateFields ?? {}
-    );
-    let caseFieldMap = initialFieldMaps.caseFields;
-    let resultFieldMap = initialFieldMaps.resultFields;
     logMessage(context, "Processing template field mappings");
     await persistProgress(
       "templateFields",
@@ -10452,8 +10447,8 @@ async function processImportMode(importJob, jobId, prisma2, tenantId) {
     const updatedFieldMaps = buildTemplateFieldMaps(
       normalizedConfiguration.templateFields ?? {}
     );
-    caseFieldMap = updatedFieldMaps.caseFields;
-    resultFieldMap = updatedFieldMaps.resultFields;
+    const caseFieldMap = updatedFieldMaps.caseFields;
+    const resultFieldMap = updatedFieldMaps.resultFields;
     logMessage(context, "Processing user mappings");
     await persistProgress("users", "Processing user mappings");
     const userSummary = await withTransaction(

@@ -24,7 +24,7 @@ import * as z from "zod/v4";
 import { emptyEditorContent } from "~/app/constants";
 import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import {
-  useCreateAttachments, useCreateIssue, useCreateResultFieldValues, useCreateTestRunResults, useCreateTestRunStepResults, useDeleteIssue, useFindFirstProjects, useFindFirstRepositoryCases, useFindFirstWorkflows, useFindManyIssue, useFindManySharedStepItem, useFindManyStatus, useFindManyTemplateResultAssignment, useFindManyTestRunResults, useUpdateTestRunCases, useUpdateTestRuns
+  useCreateAttachments, useCreateResultFieldValues, useCreateTestRunResults, useCreateTestRunStepResults, useFindFirstProjects, useFindFirstRepositoryCases, useFindFirstWorkflows, useFindManyIssue, useFindManySharedStepItem, useFindManyStatus, useFindManyTemplateResultAssignment, useFindManyTestRunResults, useUpdateTestRunCases, useUpdateTestRuns
 } from "~/lib/hooks";
 import { toHumanReadable } from "~/utils/duration";
 import { fetchSignedUrl } from "~/utils/fetchSignedUrl";
@@ -469,8 +469,6 @@ export function AddResultModal({
   const { mutateAsync: createResultFieldValue } = useCreateResultFieldValues();
   const { mutateAsync: createTestRunStepResult } =
     useCreateTestRunStepResults();
-  const { mutateAsync: createIssue } = useCreateIssue();
-  const { mutateAsync: deleteIssue } = useDeleteIssue();
 
   // Check if this is the first result for this test run
   const { data: existingResults } = useFindManyTestRunResults({
