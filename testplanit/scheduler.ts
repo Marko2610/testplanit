@@ -23,7 +23,7 @@ async function scheduleJobs() {
 
   if (!forecastQueue || !notificationQueue || !repoCacheQueue) {
     console.error("Required queues are not initialized. Cannot schedule jobs.");
-    process.exit(1); // Exit if queues aren't available
+    process.exit(1);
   }
 
   try {
@@ -205,18 +205,22 @@ async function scheduleJobs() {
 
 // Run the scheduling function
 scheduleJobs()
-  .then(() => {
+  .then(async () => {
     console.log("Scheduling script finished successfully.");
-    // Close the connection used by the queue ONLY if this script is standalone
-    // If part of app init, the main app should manage connection lifecycle
-    // forecastQueue?.client.disconnect();
-    process.exit(0); // Exit successfully
+    // Close all queue instances before exiting to flush pending Redis
+    // operations and tear down event stream listeners cleanly.
+    const forecastQueue = getForecastQueue();
+    const notificationQueue = getNotificationQueue();
+    const repoCacheQueue = getRepoCacheQueue();
+    await Promise.all([
+      forecastQueue?.close(),
+      notificationQueue?.close(),
+      repoCacheQueue?.close(),
+    ]);
+    console.log("All queues closed.");
+    process.exit(0);
   })
   .catch((err) => {
     console.error("Scheduling script failed unexpectedly:", err);
-    process.exit(1); // Exit with error
+    process.exit(1);
   });
-
-// Keep the script running if it's part of a larger initialization process
-// or exit if it's standalone.
-// setTimeout(() => {}, 10000); // Example keep-alive

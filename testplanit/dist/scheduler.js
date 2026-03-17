@@ -2776,8 +2776,17 @@ async function scheduleJobs() {
     process.exit(1);
   }
 }
-scheduleJobs().then(() => {
+scheduleJobs().then(async () => {
   console.log("Scheduling script finished successfully.");
+  const forecastQueue = getForecastQueue();
+  const notificationQueue = getNotificationQueue();
+  const repoCacheQueue = getRepoCacheQueue();
+  await Promise.all([
+    forecastQueue?.close(),
+    notificationQueue?.close(),
+    repoCacheQueue?.close()
+  ]);
+  console.log("All queues closed.");
   process.exit(0);
 }).catch((err) => {
   console.error("Scheduling script failed unexpectedly:", err);

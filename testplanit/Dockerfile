@@ -154,8 +154,13 @@ RUN apk add --no-cache curl
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-# Install PM2 globally
-RUN npm install -g pm2
+# Install PM2 globally with log rotation module
+RUN npm install -g pm2 && pm2 install pm2-logrotate && \
+    pm2 set pm2-logrotate:max_size 50M && \
+    pm2 set pm2-logrotate:retain 3 && \
+    pm2 set pm2-logrotate:compress true && \
+    pm2 set pm2-logrotate:workerInterval 60 && \
+    pm2 set pm2-logrotate:rotateInterval '0 0 * * *'
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
@@ -238,8 +243,13 @@ WORKDIR /app
 # Add postgresql client for pg_isready used in wait script
 RUN apk add --no-cache postgresql-client
 
-# Install PM2 globally
-RUN npm install -g pm2
+# Install PM2 globally with log rotation module
+RUN npm install -g pm2 && pm2 install pm2-logrotate && \
+    pm2 set pm2-logrotate:max_size 50M && \
+    pm2 set pm2-logrotate:retain 3 && \
+    pm2 set pm2-logrotate:compress true && \
+    pm2 set pm2-logrotate:workerInterval 60 && \
+    pm2 set pm2-logrotate:rotateInterval '0 0 * * *'
 
 # Install tsx for TypeScript execution
 RUN npm install -g tsx
