@@ -59,35 +59,7 @@ export class AzureDevOpsRepoAdapter extends GitRepoAdapter {
 
   async getFileContent(path: string, branch: string): Promise<string> {
     const url = `${this.organizationUrl}/${encodeURIComponent(this.project)}/_apis/git/repositories/${encodeURIComponent(this.repositoryId)}/items?path=${encodeURIComponent(path)}&versionDescriptor.version=${encodeURIComponent(branch)}&versionDescriptor.versionType=branch&api-version=7.0`;
-
-    return this.executeWithRetry(async () => {
-      await this.applyRateLimit();
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(
-        () => controller.abort(),
-        this.requestTimeout
-      );
-
-      try {
-        const safeUrl = this.sanitizeUrl(url);
-        const response = await fetch(safeUrl, {
-          headers: this.authHeaders,
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          const text = await response.text().catch(() => "");
-          throw new Error(
-            `Azure DevOps HTTP ${response.status}: ${text.slice(0, 200)}`
-          );
-        }
-
-        return await response.text();
-      } finally {
-        clearTimeout(timeoutId);
-      }
-    });
+    return this.makeTextRequest(url, { headers: this.authHeaders });
   }
 
   async testConnection(): Promise<TestConnectionResult> {

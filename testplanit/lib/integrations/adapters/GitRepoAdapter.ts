@@ -165,6 +165,65 @@ export abstract class GitRepoAdapter {
   }
 
   /**
+   * Same as makeRequest but returns plain text instead of JSON.
+   * Shares the same rate-limit header parsing and retry logic.
+   */
+  protected async makeTextRequest(
+    url: string,
+    options: RequestInit = {}
+  ): Promise<string> {
+    await this.applyRateLimit();
+
+    return this.executeWithRetry(async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        this.requestTimeout
+      );
+
+      try {
+        const safeUrl = this.sanitizeUrl(url);
+        const response = await fetch(safeUrl, {
+          ...options,
+          signal: controller.signal,
+        });
+
+        // Track rate limit state from response headers
+        const remaining = response.headers.get("X-RateLimit-Remaining");
+        const reset = response.headers.get("X-RateLimit-Reset");
+        const retryAfter = response.headers.get("Retry-After");
+        if (remaining !== null) this.rateLimitRemaining = parseInt(remaining);
+        if (reset !== null) this.rateLimitResetAt = parseInt(reset);
+        if (retryAfter !== null)
+          this.rateLimitResetAt = Math.floor(Date.now() / 1000) + parseInt(retryAfter);
+
+        if (!response.ok) {
+          const isRateLimited =
+            response.status === 429 ||
+            (response.status === 403 &&
+              (remaining === "0" || retryAfter !== null));
+
+          if (isRateLimited) {
+            this.rateLimitRemaining = 0;
+            if (!this.rateLimitResetAt) {
+              this.rateLimitResetAt = Math.floor(Date.now() / 1000) + 60;
+            }
+            throw new Error(`Rate limit exceeded.`);
+          }
+          const errorText = await response.text().catch(() => "");
+          throw new Error(
+            `HTTP ${response.status} ${response.statusText}: ${errorText.slice(0, 200)}`
+          );
+        }
+
+        return await response.text();
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    });
+  }
+
+  /**
    * Validate a URL is safe for server-side requests (blocks private/internal addresses).
    * Returns the parsed+normalized URL so callers use the validated value for
    * fetch — this breaks the taint chain for static analysis (CodeQL).
