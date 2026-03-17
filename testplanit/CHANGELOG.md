@@ -1,3 +1,9 @@
+## [0.16.21](https://github.com/TestPlanIt/testplanit/compare/v0.16.20...v0.16.21) (2026-03-17)
+
+### Enhancements
+
+* **Dockerfile, scheduler:** enhance PM2 installation and job scheduling cleanup ([2b13f8d](https://github.com/TestPlanIt/testplanit/commit/2b13f8de3a1046b31e81361f3f20d92235bcd20f))
+
 ## [0.16.20](https://github.com/TestPlanIt/testplanit/compare/v0.16.19...v0.16.20) (2026-03-16)
 
 ### Bug Fixes
