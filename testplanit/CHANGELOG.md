@@ -1,3 +1,9 @@
+## [0.16.22](https://github.com/TestPlanIt/testplanit/compare/v0.16.21...v0.16.22) (2026-03-17)
+
+### Enhancements
+
+* **GitRepoAdapter, repoCacheRefreshService:** implement rate-limit handling for file content fetching ([9ace2f7](https://github.com/TestPlanIt/testplanit/commit/9ace2f7950f0ae79b63cc77aca4281de27c28e93))
+
 ## [0.16.21](https://github.com/TestPlanIt/testplanit/compare/v0.16.20...v0.16.21) (2026-03-17)
 
 ### Enhancements
