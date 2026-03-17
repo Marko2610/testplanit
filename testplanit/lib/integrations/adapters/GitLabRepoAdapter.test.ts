@@ -161,22 +161,18 @@ describe("GitLabRepoAdapter", () => {
 
   describe("getFileContent", () => {
     it("fetches raw file content", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        text: () => Promise.resolve("const x = 1;"),
-      });
+      const resp = makeResponse({});
+      resp.text = () => Promise.resolve("const x = 1;");
+      mockFetch.mockResolvedValueOnce(resp);
 
       const result = await adapter.getFileContent("src/index.ts", "main");
       expect(result).toBe("const x = 1;");
     });
 
     it("URL-encodes path and branch", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        text: () => Promise.resolve("test"),
-      });
+      const resp = makeResponse({});
+      resp.text = () => Promise.resolve("test");
+      mockFetch.mockResolvedValueOnce(resp);
 
       await adapter.getFileContent("src/my file.ts", "feat/branch");
 

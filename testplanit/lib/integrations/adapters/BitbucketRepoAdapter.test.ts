@@ -192,11 +192,9 @@ describe("BitbucketRepoAdapter", () => {
 
   describe("getFileContent", () => {
     it("fetches raw file content", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        text: () => Promise.resolve("const x = 1;"),
-      });
+      const resp = makeResponse({});
+      resp.text = () => Promise.resolve("const x = 1;");
+      mockFetch.mockResolvedValueOnce(resp);
 
       const result = await adapter.getFileContent("src/index.ts", "main");
       expect(result).toBe("const x = 1;");
