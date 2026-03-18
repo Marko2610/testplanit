@@ -19,6 +19,7 @@ export class ApiHelper {
   private createdTemplateIds: number[] = [];
   private createdFieldOptionIds: number[] = [];
   private createdShareLinkIds: string[] = [];
+  private createdConfigurationIds: number[] = [];
   private cachedTemplateIds: Map<number, number> = new Map(); // projectId -> templateId
   private cachedStateIds: Map<number, number> = new Map(); // projectId -> stateId
   private cachedRepositoryIds: Map<number, number> = new Map(); // projectId -> repositoryId
@@ -1252,6 +1253,53 @@ export class ApiHelper {
   }
 
   /**
+   * Create a configuration via API
+   */
+  async createConfiguration(name: string): Promise<number> {
+    const response = await this.request.post(
+      `${this.baseURL}/api/model/configurations/create`,
+      {
+        data: {
+          data: {
+            name,
+            isEnabled: true,
+            isDeleted: false,
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to create configuration: ${error}`);
+    }
+
+    const result = await response.json();
+    const configId = result.data.id;
+    this.createdConfigurationIds.push(configId);
+    return configId;
+  }
+
+  /**
+   * Delete a configuration via API (soft delete)
+   */
+  private async deleteConfiguration(configId: number): Promise<void> {
+    try {
+      await this.request.put(
+        `${this.baseURL}/api/model/configurations/update`,
+        {
+          data: {
+            where: { id: configId },
+            data: { isDeleted: true },
+          },
+        }
+      );
+    } catch {
+      // Ignore cleanup errors
+    }
+  }
+
+  /**
    * Create a test run via API
    * Test runs contain test cases and track execution status
    */
@@ -1262,6 +1310,7 @@ export class ApiHelper {
       stateId?: number;
       milestoneId?: number;
       configId?: number;
+      configurationGroupId?: string;
       testRunType?: "REGULAR" | "JUNIT" | "TESTNG" | "XUNIT" | "NUNIT" | "MSTEST" | "MOCHA" | "CUCUMBER";
     }
   ): Promise<number> {
@@ -1284,6 +1333,10 @@ export class ApiHelper {
 
     if (options?.configId) {
       data.config = { connect: { id: options.configId } };
+    }
+
+    if (options?.configurationGroupId) {
+      data.configurationGroupId = options.configurationGroupId;
     }
 
     const response = await this.request.post(
@@ -2934,6 +2987,12 @@ export class ApiHelper {
       await this.deleteResultField(fieldId);
     }
     this.createdResultFieldIds = [];
+
+    // Delete configurations
+    for (const configId of this.createdConfigurationIds) {
+      await this.deleteConfiguration(configId);
+    }
+    this.createdConfigurationIds = [];
   }
 
   /**
