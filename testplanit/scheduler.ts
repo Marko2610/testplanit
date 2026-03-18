@@ -34,167 +34,101 @@ async function scheduleJobs() {
       console.log(`Multi-tenant mode enabled. Scheduling jobs for ${tenantIds.length} tenants.`);
     }
 
-    // Clean up any old versions of the repeatable forecast jobs first
-    const repeatableJobs = await forecastQueue.getRepeatableJobs();
-    let removedCount = 0;
-    for (const job of repeatableJobs) {
-      // Check job name specifically - avoids removing unrelated repeatable jobs
-      if (
-        job.name === JOB_UPDATE_ALL_CASES ||
-        job.name === JOB_AUTO_COMPLETE_MILESTONES ||
-        job.name === JOB_MILESTONE_DUE_NOTIFICATIONS
-      ) {
-        console.log(
-          `Removing existing repeatable job "${job.name}" with key: ${job.key}`
-        );
-        await forecastQueue.removeRepeatableByKey(job.key);
-        removedCount++;
-      }
-    }
-    if (removedCount > 0) {
-      console.log(`Removed ${removedCount} old repeatable forecast jobs.`);
-    }
-
-    // Schedule forecast jobs for each tenant (or single job if not multi-tenant)
+    // Upsert forecast job schedulers for each tenant (or single job if not multi-tenant).
+    // Using upsertJobScheduler avoids the race condition where concurrent scheduler
+    // replicas remove-then-add, causing some tenants' jobs to be lost.
     for (const tenantId of tenantIds) {
-      const jobId = tenantId
+      const updateAllCasesId = tenantId
         ? `${JOB_UPDATE_ALL_CASES}-${tenantId}`
         : JOB_UPDATE_ALL_CASES;
 
-      await forecastQueue.add(
-        JOB_UPDATE_ALL_CASES,
-        { tenantId }, // Include tenantId for multi-tenant support
+      await forecastQueue.upsertJobScheduler(
+        updateAllCasesId,
+        { pattern: CRON_SCHEDULE_DAILY_3AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_3AM,
-          },
-          jobId,
+          name: JOB_UPDATE_ALL_CASES,
+          data: { tenantId },
         }
       );
 
       console.log(
-        `Successfully scheduled repeatable job "${JOB_UPDATE_ALL_CASES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_3AM}" on queue "${FORECAST_QUEUE_NAME}".`
+        `Upserted job scheduler "${JOB_UPDATE_ALL_CASES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_3AM}" on queue "${FORECAST_QUEUE_NAME}".`
       );
 
       // Schedule milestone auto-completion job
-      const autoCompleteJobId = tenantId
+      const autoCompleteId = tenantId
         ? `${JOB_AUTO_COMPLETE_MILESTONES}-${tenantId}`
         : JOB_AUTO_COMPLETE_MILESTONES;
 
-      await forecastQueue.add(
-        JOB_AUTO_COMPLETE_MILESTONES,
-        { tenantId },
+      await forecastQueue.upsertJobScheduler(
+        autoCompleteId,
+        { pattern: CRON_SCHEDULE_DAILY_6AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_6AM,
-          },
-          jobId: autoCompleteJobId,
+          name: JOB_AUTO_COMPLETE_MILESTONES,
+          data: { tenantId },
         }
       );
 
       console.log(
-        `Successfully scheduled repeatable job "${JOB_AUTO_COMPLETE_MILESTONES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_6AM}" on queue "${FORECAST_QUEUE_NAME}".`
+        `Upserted job scheduler "${JOB_AUTO_COMPLETE_MILESTONES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_6AM}" on queue "${FORECAST_QUEUE_NAME}".`
       );
 
       // Schedule milestone due notifications job
-      const notificationsJobId = tenantId
+      const notificationsId = tenantId
         ? `${JOB_MILESTONE_DUE_NOTIFICATIONS}-${tenantId}`
         : JOB_MILESTONE_DUE_NOTIFICATIONS;
 
-      await forecastQueue.add(
-        JOB_MILESTONE_DUE_NOTIFICATIONS,
-        { tenantId },
+      await forecastQueue.upsertJobScheduler(
+        notificationsId,
+        { pattern: CRON_SCHEDULE_DAILY_6AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_6AM,
-          },
-          jobId: notificationsJobId,
+          name: JOB_MILESTONE_DUE_NOTIFICATIONS,
+          data: { tenantId },
         }
       );
 
       console.log(
-        `Successfully scheduled repeatable job "${JOB_MILESTONE_DUE_NOTIFICATIONS}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_6AM}" on queue "${FORECAST_QUEUE_NAME}".`
+        `Upserted job scheduler "${JOB_MILESTONE_DUE_NOTIFICATIONS}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_6AM}" on queue "${FORECAST_QUEUE_NAME}".`
       );
     }
 
-    // Clean up any old versions of the repeatable notification jobs
-    const notificationRepeatableJobs =
-      await notificationQueue.getRepeatableJobs();
-    let removedNotificationCount = 0;
-    for (const job of notificationRepeatableJobs) {
-      if (job.name === JOB_SEND_DAILY_DIGEST) {
-        console.log(
-          `Removing existing repeatable job "${job.name}" with key: ${job.key}`
-        );
-        await notificationQueue.removeRepeatableByKey(job.key);
-        removedNotificationCount++;
-      }
-    }
-    if (removedNotificationCount > 0) {
-      console.log(
-        `Removed ${removedNotificationCount} old repeatable notification jobs.`
-      );
-    }
-
-    // Schedule notification digest jobs for each tenant (or single job if not multi-tenant)
+    // Upsert notification digest job schedulers for each tenant
     for (const tenantId of tenantIds) {
-      const jobId = tenantId
+      const digestId = tenantId
         ? `${JOB_SEND_DAILY_DIGEST}-${tenantId}`
         : JOB_SEND_DAILY_DIGEST;
 
-      await notificationQueue.add(
-        JOB_SEND_DAILY_DIGEST,
-        { tenantId }, // Include tenantId for multi-tenant support
+      await notificationQueue.upsertJobScheduler(
+        digestId,
+        { pattern: CRON_SCHEDULE_DAILY_8AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_8AM,
-          },
-          jobId,
+          name: JOB_SEND_DAILY_DIGEST,
+          data: { tenantId },
         }
       );
 
       console.log(
-        `Successfully scheduled repeatable job "${JOB_SEND_DAILY_DIGEST}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_8AM}" on queue "${NOTIFICATION_QUEUE_NAME}".`
+        `Upserted job scheduler "${JOB_SEND_DAILY_DIGEST}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_8AM}" on queue "${NOTIFICATION_QUEUE_NAME}".`
       );
     }
 
-    // Clean up any old versions of the repeatable repo cache jobs
-    const repoCacheRepeatableJobs = await repoCacheQueue.getRepeatableJobs();
-    let removedRepoCacheCount = 0;
-    for (const job of repoCacheRepeatableJobs) {
-      if (job.name === JOB_REFRESH_EXPIRED_CACHES) {
-        console.log(
-          `Removing existing repeatable job "${job.name}" with key: ${job.key}`
-        );
-        await repoCacheQueue.removeRepeatableByKey(job.key);
-        removedRepoCacheCount++;
-      }
-    }
-    if (removedRepoCacheCount > 0) {
-      console.log(
-        `Removed ${removedRepoCacheCount} old repeatable repo cache jobs.`
-      );
-    }
-
-    // Schedule repo cache refresh jobs for each tenant (or single job if not multi-tenant)
+    // Upsert repo cache refresh job schedulers for each tenant
     for (const tenantId of tenantIds) {
-      const jobId = tenantId
+      const repoCacheId = tenantId
         ? `${JOB_REFRESH_EXPIRED_CACHES}-${tenantId}`
         : JOB_REFRESH_EXPIRED_CACHES;
 
-      await repoCacheQueue.add(
-        JOB_REFRESH_EXPIRED_CACHES,
-        { tenantId },
+      await repoCacheQueue.upsertJobScheduler(
+        repoCacheId,
+        { pattern: CRON_SCHEDULE_DAILY_4AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_4AM,
-          },
-          jobId,
+          name: JOB_REFRESH_EXPIRED_CACHES,
+          data: { tenantId },
         }
       );
 
       console.log(
-        `Successfully scheduled repeatable job "${JOB_REFRESH_EXPIRED_CACHES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_4AM}" on queue "${REPO_CACHE_QUEUE_NAME}".`
+        `Upserted job scheduler "${JOB_REFRESH_EXPIRED_CACHES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_4AM}" on queue "${REPO_CACHE_QUEUE_NAME}".`
       );
     }
   } catch (error) {
