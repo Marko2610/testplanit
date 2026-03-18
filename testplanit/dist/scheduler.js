@@ -335,30 +335,7 @@ var init_GitLabRepoAdapter = __esm({
       }
       async getFileContent(path, branch) {
         const url = `${this.baseUrl}/api/v4/projects/${this.encodedProjectPath}/repository/files/${encodeURIComponent(path)}/raw?ref=${encodeURIComponent(branch)}`;
-        return this.executeWithRetry(async () => {
-          await this.applyRateLimit();
-          const controller = new AbortController();
-          const timeoutId = setTimeout(
-            () => controller.abort(),
-            this.requestTimeout
-          );
-          try {
-            const safeUrl = this.sanitizeUrl(url);
-            const response = await fetch(safeUrl, {
-              headers: this.authHeaders,
-              signal: controller.signal
-            });
-            if (!response.ok) {
-              const text = await response.text().catch(() => "");
-              throw new Error(
-                `GitLab HTTP ${response.status}: ${text.slice(0, 200)}`
-              );
-            }
-            return await response.text();
-          } finally {
-            clearTimeout(timeoutId);
-          }
-        });
+        return this.makeTextRequest(url, { headers: this.authHeaders });
       }
       async testConnection() {
         try {
@@ -454,30 +431,7 @@ var init_BitbucketRepoAdapter = __esm({
       }
       async getFileContent(path, branch) {
         const url = `https://api.bitbucket.org/2.0/repositories/${this.workspace}/${this.repoSlug}/src/${encodeURIComponent(branch)}/${path}`;
-        return this.executeWithRetry(async () => {
-          await this.applyRateLimit();
-          const controller = new AbortController();
-          const timeoutId = setTimeout(
-            () => controller.abort(),
-            this.requestTimeout
-          );
-          try {
-            const safeUrl = this.sanitizeUrl(url);
-            const response = await fetch(safeUrl, {
-              headers: this.authHeaders,
-              signal: controller.signal
-            });
-            if (!response.ok) {
-              const text = await response.text().catch(() => "");
-              throw new Error(
-                `Bitbucket HTTP ${response.status}: ${text.slice(0, 200)}`
-              );
-            }
-            return await response.text();
-          } finally {
-            clearTimeout(timeoutId);
-          }
-        });
+        return this.makeTextRequest(url, { headers: this.authHeaders });
       }
       async testConnection() {
         try {
@@ -549,30 +503,7 @@ var init_AzureDevOpsRepoAdapter = __esm({
       }
       async getFileContent(path, branch) {
         const url = `${this.organizationUrl}/${encodeURIComponent(this.project)}/_apis/git/repositories/${encodeURIComponent(this.repositoryId)}/items?path=${encodeURIComponent(path)}&versionDescriptor.version=${encodeURIComponent(branch)}&versionDescriptor.versionType=branch&api-version=7.0`;
-        return this.executeWithRetry(async () => {
-          await this.applyRateLimit();
-          const controller = new AbortController();
-          const timeoutId = setTimeout(
-            () => controller.abort(),
-            this.requestTimeout
-          );
-          try {
-            const safeUrl = this.sanitizeUrl(url);
-            const response = await fetch(safeUrl, {
-              headers: this.authHeaders,
-              signal: controller.signal
-            });
-            if (!response.ok) {
-              const text = await response.text().catch(() => "");
-              throw new Error(
-                `Azure DevOps HTTP ${response.status}: ${text.slice(0, 200)}`
-              );
-            }
-            return await response.text();
-          } finally {
-            clearTimeout(timeoutId);
-          }
-        });
+        return this.makeTextRequest(url, { headers: this.authHeaders });
       }
       async testConnection() {
         try {
@@ -629,12 +560,21 @@ var init_GitRepoAdapter = __esm({
       // Populated from response headers to drive adaptive throttling
       rateLimitRemaining = null;
       rateLimitResetAt = null;
+      // Unix seconds
+      /**
+       * Seconds until the rate-limit window resets (from server headers).
+       * Returns 0 if unknown or already reset.
+       */
+      get retryAfterSeconds() {
+        if (!this.rateLimitResetAt) return 0;
+        return Math.max(0, this.rateLimitResetAt - Math.floor(Date.now() / 1e3));
+      }
       /**
        * List files scoped to specific base paths. Falls back to full listing
        * for providers that don't support path-scoped queries.
        * @param onProgress Optional callback invoked after each API page with the running file count.
        */
-      async listFilesInPaths(branch, basePaths, onProgress) {
+      async listFilesInPaths(branch, _basePaths, _onProgress) {
         return this.listAllFiles(branch);
       }
       /**
@@ -690,6 +630,51 @@ var init_GitRepoAdapter = __esm({
               );
             }
             return await response.json();
+          } finally {
+            clearTimeout(timeoutId);
+          }
+        });
+      }
+      /**
+       * Same as makeRequest but returns plain text instead of JSON.
+       * Shares the same rate-limit header parsing and retry logic.
+       */
+      async makeTextRequest(url, options = {}) {
+        await this.applyRateLimit();
+        return this.executeWithRetry(async () => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(
+            () => controller.abort(),
+            this.requestTimeout
+          );
+          try {
+            const safeUrl = this.sanitizeUrl(url);
+            const response = await fetch(safeUrl, {
+              ...options,
+              signal: controller.signal
+            });
+            const remaining = response.headers.get("X-RateLimit-Remaining");
+            const reset = response.headers.get("X-RateLimit-Reset");
+            const retryAfter = response.headers.get("Retry-After");
+            if (remaining !== null) this.rateLimitRemaining = parseInt(remaining);
+            if (reset !== null) this.rateLimitResetAt = parseInt(reset);
+            if (retryAfter !== null)
+              this.rateLimitResetAt = Math.floor(Date.now() / 1e3) + parseInt(retryAfter);
+            if (!response.ok) {
+              const isRateLimited = response.status === 429 || response.status === 403 && (remaining === "0" || retryAfter !== null);
+              if (isRateLimited) {
+                this.rateLimitRemaining = 0;
+                if (!this.rateLimitResetAt) {
+                  this.rateLimitResetAt = Math.floor(Date.now() / 1e3) + 60;
+                }
+                throw new Error(`Rate limit exceeded.`);
+              }
+              const errorText = await response.text().catch(() => "");
+              throw new Error(
+                `HTTP ${response.status} ${response.statusText}: ${errorText.slice(0, 200)}`
+              );
+            }
+            return await response.text();
           } finally {
             clearTimeout(timeoutId);
           }
@@ -1370,13 +1355,13 @@ var NotificationService = class {
   /**
    * Mark notifications as read
    */
-  static async markNotificationsAsRead(notificationIds, userId) {
+  static async markNotificationsAsRead(notificationIds, _userId) {
     return notificationIds;
   }
   /**
    * Get unread notification count for a user
    */
-  static async getUnreadCount(userId) {
+  static async getUnreadCount(_userId) {
     return 0;
   }
   /**
@@ -2377,6 +2362,58 @@ function isRateLimitError(err) {
   const msg = err.message.toLowerCase();
   return msg.includes("rate limit") || msg.includes("429");
 }
+var MAX_RATE_LIMIT_RETRIES = 3;
+var DEFAULT_RETRY_SECONDS = 60;
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+async function fetchContentsBatched(files, adapter, branch, initialConcurrency) {
+  const contentMap = /* @__PURE__ */ new Map();
+  let concurrency = initialConcurrency;
+  let consecutiveRateLimits = 0;
+  let i = 0;
+  while (i < files.length) {
+    if (consecutiveRateLimits >= MAX_RATE_LIMIT_RETRIES) {
+      console.warn(
+        `[repoCacheRefresh] Giving up after ${MAX_RATE_LIMIT_RETRIES} consecutive rate limits \u2014 ${contentMap.size}/${files.length} files cached`
+      );
+      return { contentMap, contentRateLimited: true };
+    }
+    const batch = files.slice(i, i + concurrency);
+    const results = await Promise.allSettled(
+      batch.map(async (file) => {
+        const content = await adapter.getFileContent(file.path, branch);
+        return { path: file.path, content };
+      })
+    );
+    let batchRateLimited = false;
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        contentMap.set(result.value.path, result.value.content);
+      } else if (isRateLimitError(result.reason)) {
+        batchRateLimited = true;
+      } else {
+        console.warn(
+          `[repoCacheRefresh] Skipping content for a file:`,
+          result.reason
+        );
+      }
+    }
+    if (batchRateLimited) {
+      consecutiveRateLimits++;
+      concurrency = 1;
+      const waitSeconds = adapter.retryAfterSeconds || DEFAULT_RETRY_SECONDS;
+      console.warn(
+        `[repoCacheRefresh] Rate limited (attempt ${consecutiveRateLimits}/${MAX_RATE_LIMIT_RETRIES}) \u2014 waiting ${waitSeconds}s, then continuing sequentially (${contentMap.size}/${files.length} cached so far)`
+      );
+      await sleep(waitSeconds * 1e3);
+      continue;
+    }
+    consecutiveRateLimits = 0;
+    i += concurrency;
+  }
+  return { contentMap, contentRateLimited: false };
+}
 async function refreshRepoCache(configId, prismaClient2) {
   const config = await prismaClient2.projectCodeRepositoryConfig.findUnique({
     where: { id: configId },
@@ -2434,34 +2471,12 @@ async function refreshRepoCache(configId, prismaClient2) {
         cacheError: null
       }
     });
-    const CONTENT_FETCH_CONCURRENCY = 10;
-    const contentMap = /* @__PURE__ */ new Map();
-    let contentRateLimited = false;
-    for (let i = 0; i < files.length; i += CONTENT_FETCH_CONCURRENCY) {
-      if (contentRateLimited) break;
-      const batch = files.slice(i, i + CONTENT_FETCH_CONCURRENCY);
-      const results = await Promise.allSettled(
-        batch.map(async (file) => {
-          const content = await adapter.getFileContent(file.path, branch);
-          return { path: file.path, content };
-        })
-      );
-      for (const result of results) {
-        if (result.status === "fulfilled") {
-          contentMap.set(result.value.path, result.value.content);
-        } else if (isRateLimitError(result.reason)) {
-          contentRateLimited = true;
-          console.warn(
-            `[repoCacheRefresh] Rate limited \u2014 stopping content fetch after ${contentMap.size}/${files.length} files cached`
-          );
-        } else {
-          console.warn(
-            `[repoCacheRefresh] Skipping content for a file:`,
-            result.reason
-          );
-        }
-      }
-    }
+    const { contentMap, contentRateLimited } = await fetchContentsBatched(
+      files,
+      adapter,
+      branch,
+      10
+    );
     if (contentMap.size > 0) {
       await repoFileCache.setFileContents(
         config.id,
@@ -2647,128 +2662,70 @@ async function scheduleJobs() {
     if (multiTenant) {
       console.log(`Multi-tenant mode enabled. Scheduling jobs for ${tenantIds.length} tenants.`);
     }
-    const repeatableJobs = await forecastQueue.getRepeatableJobs();
-    let removedCount = 0;
-    for (const job of repeatableJobs) {
-      if (job.name === JOB_UPDATE_ALL_CASES || job.name === JOB_AUTO_COMPLETE_MILESTONES || job.name === JOB_MILESTONE_DUE_NOTIFICATIONS) {
-        console.log(
-          `Removing existing repeatable job "${job.name}" with key: ${job.key}`
-        );
-        await forecastQueue.removeRepeatableByKey(job.key);
-        removedCount++;
-      }
-    }
-    if (removedCount > 0) {
-      console.log(`Removed ${removedCount} old repeatable forecast jobs.`);
-    }
     for (const tenantId of tenantIds) {
-      const jobId = tenantId ? `${JOB_UPDATE_ALL_CASES}-${tenantId}` : JOB_UPDATE_ALL_CASES;
-      await forecastQueue.add(
-        JOB_UPDATE_ALL_CASES,
-        { tenantId },
-        // Include tenantId for multi-tenant support
+      const updateAllCasesId = tenantId ? `${JOB_UPDATE_ALL_CASES}-${tenantId}` : JOB_UPDATE_ALL_CASES;
+      await forecastQueue.upsertJobScheduler(
+        updateAllCasesId,
+        { pattern: CRON_SCHEDULE_DAILY_3AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_3AM
-          },
-          jobId
+          name: JOB_UPDATE_ALL_CASES,
+          data: { tenantId }
         }
       );
       console.log(
-        `Successfully scheduled repeatable job "${JOB_UPDATE_ALL_CASES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_3AM}" on queue "${FORECAST_QUEUE_NAME}".`
+        `Upserted job scheduler "${JOB_UPDATE_ALL_CASES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_3AM}" on queue "${FORECAST_QUEUE_NAME}".`
       );
-      const autoCompleteJobId = tenantId ? `${JOB_AUTO_COMPLETE_MILESTONES}-${tenantId}` : JOB_AUTO_COMPLETE_MILESTONES;
-      await forecastQueue.add(
-        JOB_AUTO_COMPLETE_MILESTONES,
-        { tenantId },
+      const autoCompleteId = tenantId ? `${JOB_AUTO_COMPLETE_MILESTONES}-${tenantId}` : JOB_AUTO_COMPLETE_MILESTONES;
+      await forecastQueue.upsertJobScheduler(
+        autoCompleteId,
+        { pattern: CRON_SCHEDULE_DAILY_6AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_6AM
-          },
-          jobId: autoCompleteJobId
+          name: JOB_AUTO_COMPLETE_MILESTONES,
+          data: { tenantId }
         }
       );
       console.log(
-        `Successfully scheduled repeatable job "${JOB_AUTO_COMPLETE_MILESTONES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_6AM}" on queue "${FORECAST_QUEUE_NAME}".`
+        `Upserted job scheduler "${JOB_AUTO_COMPLETE_MILESTONES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_6AM}" on queue "${FORECAST_QUEUE_NAME}".`
       );
-      const notificationsJobId = tenantId ? `${JOB_MILESTONE_DUE_NOTIFICATIONS}-${tenantId}` : JOB_MILESTONE_DUE_NOTIFICATIONS;
-      await forecastQueue.add(
-        JOB_MILESTONE_DUE_NOTIFICATIONS,
-        { tenantId },
+      const notificationsId = tenantId ? `${JOB_MILESTONE_DUE_NOTIFICATIONS}-${tenantId}` : JOB_MILESTONE_DUE_NOTIFICATIONS;
+      await forecastQueue.upsertJobScheduler(
+        notificationsId,
+        { pattern: CRON_SCHEDULE_DAILY_6AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_6AM
-          },
-          jobId: notificationsJobId
+          name: JOB_MILESTONE_DUE_NOTIFICATIONS,
+          data: { tenantId }
         }
       );
       console.log(
-        `Successfully scheduled repeatable job "${JOB_MILESTONE_DUE_NOTIFICATIONS}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_6AM}" on queue "${FORECAST_QUEUE_NAME}".`
-      );
-    }
-    const notificationRepeatableJobs = await notificationQueue.getRepeatableJobs();
-    let removedNotificationCount = 0;
-    for (const job of notificationRepeatableJobs) {
-      if (job.name === JOB_SEND_DAILY_DIGEST) {
-        console.log(
-          `Removing existing repeatable job "${job.name}" with key: ${job.key}`
-        );
-        await notificationQueue.removeRepeatableByKey(job.key);
-        removedNotificationCount++;
-      }
-    }
-    if (removedNotificationCount > 0) {
-      console.log(
-        `Removed ${removedNotificationCount} old repeatable notification jobs.`
+        `Upserted job scheduler "${JOB_MILESTONE_DUE_NOTIFICATIONS}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_6AM}" on queue "${FORECAST_QUEUE_NAME}".`
       );
     }
     for (const tenantId of tenantIds) {
-      const jobId = tenantId ? `${JOB_SEND_DAILY_DIGEST}-${tenantId}` : JOB_SEND_DAILY_DIGEST;
-      await notificationQueue.add(
-        JOB_SEND_DAILY_DIGEST,
-        { tenantId },
-        // Include tenantId for multi-tenant support
+      const digestId = tenantId ? `${JOB_SEND_DAILY_DIGEST}-${tenantId}` : JOB_SEND_DAILY_DIGEST;
+      await notificationQueue.upsertJobScheduler(
+        digestId,
+        { pattern: CRON_SCHEDULE_DAILY_8AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_8AM
-          },
-          jobId
+          name: JOB_SEND_DAILY_DIGEST,
+          data: { tenantId }
         }
       );
       console.log(
-        `Successfully scheduled repeatable job "${JOB_SEND_DAILY_DIGEST}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_8AM}" on queue "${NOTIFICATION_QUEUE_NAME}".`
-      );
-    }
-    const repoCacheRepeatableJobs = await repoCacheQueue.getRepeatableJobs();
-    let removedRepoCacheCount = 0;
-    for (const job of repoCacheRepeatableJobs) {
-      if (job.name === JOB_REFRESH_EXPIRED_CACHES) {
-        console.log(
-          `Removing existing repeatable job "${job.name}" with key: ${job.key}`
-        );
-        await repoCacheQueue.removeRepeatableByKey(job.key);
-        removedRepoCacheCount++;
-      }
-    }
-    if (removedRepoCacheCount > 0) {
-      console.log(
-        `Removed ${removedRepoCacheCount} old repeatable repo cache jobs.`
+        `Upserted job scheduler "${JOB_SEND_DAILY_DIGEST}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_8AM}" on queue "${NOTIFICATION_QUEUE_NAME}".`
       );
     }
     for (const tenantId of tenantIds) {
-      const jobId = tenantId ? `${JOB_REFRESH_EXPIRED_CACHES}-${tenantId}` : JOB_REFRESH_EXPIRED_CACHES;
-      await repoCacheQueue.add(
-        JOB_REFRESH_EXPIRED_CACHES,
-        { tenantId },
+      const repoCacheId = tenantId ? `${JOB_REFRESH_EXPIRED_CACHES}-${tenantId}` : JOB_REFRESH_EXPIRED_CACHES;
+      await repoCacheQueue.upsertJobScheduler(
+        repoCacheId,
+        { pattern: CRON_SCHEDULE_DAILY_4AM },
         {
-          repeat: {
-            pattern: CRON_SCHEDULE_DAILY_4AM
-          },
-          jobId
+          name: JOB_REFRESH_EXPIRED_CACHES,
+          data: { tenantId }
         }
       );
       console.log(
-        `Successfully scheduled repeatable job "${JOB_REFRESH_EXPIRED_CACHES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_4AM}" on queue "${REPO_CACHE_QUEUE_NAME}".`
+        `Upserted job scheduler "${JOB_REFRESH_EXPIRED_CACHES}"${tenantId ? ` for tenant ${tenantId}` : ""} with pattern "${CRON_SCHEDULE_DAILY_4AM}" on queue "${REPO_CACHE_QUEUE_NAME}".`
       );
     }
   } catch (error) {

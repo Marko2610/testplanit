@@ -1255,7 +1255,7 @@ var BaseAdapter = class {
   /**
    * Add a comment to an issue (should be implemented by adapters that support it)
    */
-  async addComment(issueId, comment) {
+  async addComment(_issueId, _comment) {
     throw new Error("Adding comments is not supported by this adapter");
   }
   /**
@@ -1377,19 +1377,19 @@ var BaseAdapter = class {
   /**
    * Default implementation for webhook registration (not supported by default)
    */
-  async registerWebhook(url, events, secret) {
+  async registerWebhook(_url, _events, _secret) {
     throw new Error("Webhook registration is not supported by this adapter");
   }
   /**
    * Default implementation for webhook unregistration
    */
-  async unregisterWebhook(webhookId) {
+  async unregisterWebhook(_webhookId) {
     throw new Error("Webhook unregistration is not supported by this adapter");
   }
   /**
    * Default implementation for webhook processing
    */
-  async processWebhook(payload, signature) {
+  async processWebhook(_payload, _signature) {
     throw new Error("Webhook processing is not supported by this adapter");
   }
   /**
@@ -4013,7 +4013,7 @@ var SyncService = class {
       }
     });
     if (!existingIssue) {
-      const anyIssueWithKey = await db.issue.findFirst({
+      const _anyIssueWithKey = await db.issue.findFirst({
         where: {
           OR: [
             { externalId: issueData.id },

@@ -1874,7 +1874,7 @@ var TestmoExportAnalyzer = class {
     this.jobId = options.jobId;
     this.masterRepositoryIds.clear();
     const startedAt = /* @__PURE__ */ new Date();
-    const preserveDatasets = options.preserveDatasets ?? this.defaults.preserveDatasets;
+    const _preserveDatasets = options.preserveDatasets ?? this.defaults.preserveDatasets;
     const sampleRowLimit = options.sampleRowLimit ?? this.defaults.sampleRowLimit;
     const { stream, dispose, size } = resolveSource(source);
     const abortSignal = options.signal;
@@ -2018,7 +2018,7 @@ var TestmoExportAnalyzer = class {
                 purpose: "row",
                 completed: false,
                 rowIndex: currentIndex,
-                store: (value) => {
+                store: (_value) => {
                 }
               };
               activeCaptures.push(capture);
@@ -2083,7 +2083,7 @@ var TestmoExportAnalyzer = class {
         await finalizeCapture(capture);
       }
       if (options.onDatasetComplete) {
-        for (const [name, dataset] of datasets) {
+        for (const [_name, dataset] of datasets) {
           const datasetSummary = {
             name: dataset.name,
             rowCount: dataset.rowCount,
@@ -2331,7 +2331,7 @@ var buildStringIdMap = (entries) => {
 var buildTemplateFieldMaps = (templateFields) => {
   const caseFields = /* @__PURE__ */ new Map();
   const resultFields = /* @__PURE__ */ new Map();
-  for (const [key, entry] of Object.entries(templateFields ?? {})) {
+  for (const [_key, entry] of Object.entries(templateFields ?? {})) {
     if (!entry || entry.mappedTo === null || entry.mappedTo === void 0) {
       continue;
     }
@@ -2786,10 +2786,10 @@ var importAutomationCases = async (prisma2, configuration, datasetRows, projectI
               projectMap.set(testmoCaseId, repositoryCase.id);
             }
             summary.created += 1;
-            const projectName = await getProjectName(tx, projectId);
-            const templateName = await getTemplateName(tx, resolvedTemplateId);
+            const _projectName = await getProjectName(tx, projectId);
+            const _templateName = await getTemplateName(tx, resolvedTemplateId);
             const workflowName = await getWorkflowName(tx, defaultWorkflowId);
-            const resolvedFolderName = folderNameForVersion ?? await getFolderName(tx, folderId);
+            const _resolvedFolderName = folderNameForVersion ?? await getFolderName(tx, folderId);
             const creatorName = await getUserName(tx, repositoryCase.creatorId);
             const caseVersion = await createTestCaseVersionInTransaction(
               tx,
@@ -4877,7 +4877,7 @@ var importIssues = async (tx, datasetRows, integrationIdMap, projectIdMap, creat
   }
   return { summary, issueIdMap };
 };
-var importMilestoneIssues = async (tx, datasetRows, milestoneIdMap, issueIdMap, context, persistProgress) => {
+var importMilestoneIssues = async (tx, datasetRows, _milestoneIdMap, _issueIdMap, _context, _persistProgress) => {
   const summary = {
     entity: "milestoneIssues",
     total: 0,
@@ -5368,7 +5368,7 @@ var prepareDocsForUpdate = (existingDocs, updatedDocs) => {
   }
   return toInputJsonValue(updatedDocs);
 };
-var importProjectLinks = async (tx, configuration, datasetRows, projectIdMap, context) => {
+var importProjectLinks = async (tx, configuration, datasetRows, projectIdMap, _context) => {
   const summary = {
     entity: "projectLinks",
     total: 0,
@@ -5415,7 +5415,7 @@ var importProjectLinks = async (tx, configuration, datasetRows, projectIdMap, co
   }
   return summary;
 };
-var importMilestoneLinks = async (tx, configuration, datasetRows, milestoneIdMap, context) => {
+var importMilestoneLinks = async (tx, configuration, datasetRows, milestoneIdMap, _context) => {
   const summary = {
     entity: "milestoneLinks",
     total: 0,
@@ -5462,7 +5462,7 @@ var importMilestoneLinks = async (tx, configuration, datasetRows, milestoneIdMap
   }
   return summary;
 };
-var importRunLinks = async (tx, configuration, datasetRows, testRunIdMap, context) => {
+var importRunLinks = async (tx, configuration, datasetRows, testRunIdMap, _context) => {
   const summary = {
     entity: "runLinks",
     total: 0,
@@ -6336,9 +6336,9 @@ var s3Client = new import_client_s3.S3Client({
   // Retry transient network errors
 });
 var FINAL_STATUSES = /* @__PURE__ */ new Set(["COMPLETED", "FAILED", "CANCELED"]);
-var VALID_APPLICATION_AREAS = new Set(Object.values(import_client6.ApplicationArea));
-var VALID_WORKFLOW_TYPES = new Set(Object.values(import_client6.WorkflowType));
-var VALID_WORKFLOW_SCOPES = new Set(Object.values(import_client6.WorkflowScope));
+var _VALID_APPLICATION_AREAS = new Set(Object.values(import_client6.ApplicationArea));
+var _VALID_WORKFLOW_TYPES = new Set(Object.values(import_client6.WorkflowType));
+var _VALID_WORKFLOW_SCOPES = new Set(Object.values(import_client6.WorkflowScope));
 var SYSTEM_NAME_REGEX2 = /^[A-Za-z][A-Za-z0-9_]*$/;
 var DEFAULT_STATUS_COLOR_HEX = "#B1B2B3";
 var MAX_INT_32 = 2147483647;
@@ -8680,27 +8680,27 @@ var importRepositoryCases = async (prisma2, datasetRows, projectIdMap, repositor
             if (mappedTemplateId !== void 0) {
               templateId = mappedTemplateId;
             } else {
-              const templateName2 = templateNameBySourceId.get(templateSourceId);
-              if (templateName2) {
-                templateId = resolvedTemplateIdsByName.get(templateName2) ?? null;
+              const templateName = templateNameBySourceId.get(templateSourceId);
+              if (templateName) {
+                templateId = resolvedTemplateIdsByName.get(templateName) ?? null;
                 if (!templateId) {
                   const existingTemplate = await tx.templates.findFirst({
-                    where: { templateName: templateName2, isDeleted: false }
+                    where: { templateName, isDeleted: false }
                   });
                   if (existingTemplate) {
                     templateId = existingTemplate.id;
                   } else {
                     const createdTemplate = await tx.templates.create({
                       data: {
-                        templateName: templateName2,
+                        templateName,
                         isEnabled: true,
                         isDefault: false
                       }
                     });
                     templateId = createdTemplate.id;
                   }
-                  resolvedTemplateIdsByName.set(templateName2, templateId);
-                  templateNameMap.set(templateName2, templateId);
+                  resolvedTemplateIdsByName.set(templateName, templateId);
+                  templateNameMap.set(templateName, templateId);
                 }
                 if (templateId !== null) {
                   templateIdMap.set(templateSourceId, templateId);
@@ -8995,10 +8995,10 @@ var importRepositoryCases = async (prisma2, datasetRows, projectIdMap, repositor
               await tx.steps.createMany({ data: stepEntries });
             }
           }
-          const projectName = await getProjectName2(tx, projectId);
-          const templateName = await getTemplateName2(tx, resolvedTemplateId);
+          const _projectName = await getProjectName2(tx, projectId);
+          const _templateName = await getTemplateName2(tx, resolvedTemplateId);
           const workflowName = await getWorkflowName2(tx, resolvedWorkflowId);
-          const folderName = await getFolderName2(tx, resolvedFolderId);
+          const _folderName = await getFolderName2(tx, resolvedFolderId);
           const creatorName = await getUserName2(tx, creatorId);
           const versionCaseName = toStringValue2(record.name) ?? repositoryCase.name;
           const caseVersion = await createTestCaseVersionInTransaction(
@@ -9381,7 +9381,7 @@ var importTestRunCases = async (prisma2, datasetRows, testRunIdMap, caseIdMap, c
       const runTestSourceId = toNumberValue(record.id);
       const runSourceId = toNumberValue(record.run_id);
       const caseSourceId = toNumberValue(record.case_id);
-      const caseName = toStringValue2(record.name) ?? `Imported Case ${caseSourceId ?? 0}`;
+      const _caseName = toStringValue2(record.name) ?? `Imported Case ${caseSourceId ?? 0}`;
       if (runTestSourceId === null || runSourceId === null || caseSourceId === null) {
         decrementEntityTotal(context, "testRunCases");
         continue;
@@ -10305,7 +10305,7 @@ async function processImportMode(importJob, jobId, prisma2, tenantId) {
     currentEntity = entity;
     try {
       const now = Date.now();
-      const timeSinceLastUpdate = now - context.lastProgressUpdate;
+      const _timeSinceLastUpdate = now - context.lastProgressUpdate;
       const metrics = calculateProgressMetrics(context, plannedTotalCount);
       const data = {
         currentEntity: entity,

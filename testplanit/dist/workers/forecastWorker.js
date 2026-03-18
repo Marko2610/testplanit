@@ -691,13 +691,13 @@ var NotificationService = class {
   /**
    * Mark notifications as read
    */
-  static async markNotificationsAsRead(notificationIds, userId) {
+  static async markNotificationsAsRead(notificationIds, _userId) {
     return notificationIds;
   }
   /**
    * Get unread notification count for a user
    */
-  static async getUnreadCount(userId) {
+  static async getUnreadCount(_userId) {
     return 0;
   }
   /**
