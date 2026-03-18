@@ -90,7 +90,7 @@ over stored configuration.
     .description("Show current configuration")
     .action(() => {
       const storedConfig = config.getStoredConfig();
-      const effectiveConfig = config.getConfig();
+      const _effectiveConfig = config.getConfig();
 
       console.log();
       console.log("Configuration file:", config.getConfigPath());

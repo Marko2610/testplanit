@@ -164,7 +164,7 @@ export const SlashCommand = Extension.create<Record<string, never>, SlashCommand
                 }
 
                 // Account for when the editor is bound inside a container that doesn't go all the way to the edge of the screen
-                const editorXOffset = editorNode.getBoundingClientRect().x
+                const _editorXOffset = editorNode.getBoundingClientRect().x
                 return new DOMRect(rect.x, yPos, rect.width, rect.height)
               }
 
