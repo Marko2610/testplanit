@@ -35,7 +35,7 @@ overrides:
   lodash-es: '>=4.17.23'
   undici: '>=7.24.0'
   diff: '>=8.0.3'
-  fast-xml-parser: '>=5.3.6'
+  fast-xml-parser: '>=5.5.6'
   esbuild: '>=0.25.0'
   webpack: '>=5.104.1'
   markdown-it: '>=14.1.1'
@@ -1339,8 +1339,8 @@ packages:
   '@atlaskit/adf-schema@48.0.0':
     resolution: {integrity: sha512-zzPhx1zsiAL2zSR9APrw6CMNxAGMerjjNgc0AeqQWZjSuh4U18THv77o4buS9QPdUn2S8BztBNiEbB7bP9wNRw==}
 
-  '@atlaskit/adf-schema@52.2.6':
-    resolution: {integrity: sha512-JH38BCMrm1ovjaMhTFa/5lPLdeyeU8DVX8XxnynrsSNoTVTM+oqcsnWRNUVKrMPXBm+ri/P/O6WaT9jmp6Ha2g==}
+  '@atlaskit/adf-schema@52.3.0':
+    resolution: {integrity: sha512-yKJcByVb8xM88b/Qwibp/HWRt3jkxvL8jMzGWYzx8NomyZOuWxUJ8aXeN/UeqzcjNZtREXcyGBmhkeXcArSaBg==}
 
   '@atlaskit/adf-utils@19.27.10':
     resolution: {integrity: sha512-Dl7vVbIjzoGswFcbRzwr7llWNoQvooFmvcv5wsxCLOEQEPb5iRlCcWYC0O6x+rkss51lhM2v+WpzgXl4eYCNfQ==}
@@ -2163,8 +2163,8 @@ packages:
       '@atlaskit/media-core': ^34.4.0
       '@atlaskit/media-state': ^1.0.0
 
-  '@atlaskit/media-client@36.0.1':
-    resolution: {integrity: sha512-UrOrF00Uau3ifOAslLv0v948e7aozGgGucUVxj2CTPoqXocU9gYN8Melxhkx8wpPr6HTbBtzrPcAUn1OEY26rw==}
+  '@atlaskit/media-client@36.0.2':
+    resolution: {integrity: sha512-bcLEjEKR8CmhEjXdj8XzRS6alKn9xZ9yzbSqdVC8fYAW81F0kFLNDa+JRy+NbmovvyndQc0UF78Xt8oXE8f/9w==}
     peerDependencies:
       '@atlaskit/media-core': ^37.0.0
       '@atlaskit/media-state': ^2.0.0
@@ -2740,8 +2740,8 @@ packages:
     peerDependencies:
       react: ^18.2.0
 
-  '@atlaskit/tmp-editor-statsig@38.0.0':
-    resolution: {integrity: sha512-KO2LCescIdjyXQMQPdqVMSCJVTPzV9T0dLmHe3V2lz4jqqC8BJPjRQumSlOmAA+zeYzok9c3kxg39yl7Fcw4Eg==}
+  '@atlaskit/tmp-editor-statsig@38.1.1':
+    resolution: {integrity: sha512-vZ2bb77ffOpRlz7Yx3jgVjYlVic3tzM3owpTQ6b9LrmCuMWwd4kV7F/Pt786ATbPskEfKxXYOZVYXfmFcM+pEQ==}
     peerDependencies:
       react: ^18.2.0
 
@@ -2852,8 +2852,8 @@ packages:
       react-dom: ^16.8.0 || ^17.0.0 || ^18.2.0
       react-intl-next: npm:react-intl@^5.18.1
 
-  '@atlaskit/user-picker@11.24.0':
-    resolution: {integrity: sha512-8Qg1AyMxmyAAgxolSCgC6xGRW5Mtx9tIaWdXU+kSbCn2/drzFaiV55J6N02fYp8MBOPxsDS1JD3OcrqYiUCfHg==}
+  '@atlaskit/user-picker@11.25.0':
+    resolution: {integrity: sha512-b9CF/NRrd/+WwjHXtTns5NayswD+JnueV5BYGwQC+8xNg/JkkLhFdcWgcNgvq84EY7icXHZDm0+nymehYmW0/A==}
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -18326,7 +18326,7 @@ snapshots:
 
   '@atlaskit/adf-schema@47.7.1(react@19.2.4)':
     dependencies:
-      '@atlaskit/editor-prosemirror': 7.0.0
+      '@atlaskit/editor-prosemirror': 7.3.0
       '@atlaskit/feature-gate-js-client': 4.26.5(react@19.2.4)
       '@babel/runtime': 7.29.2
       css-color-names: 0.0.4
@@ -18346,11 +18346,11 @@ snapshots:
     transitivePeerDependencies:
       - react
 
-  '@atlaskit/adf-schema@52.2.6(react@18.3.1)':
+  '@atlaskit/adf-schema@52.3.0(react@18.3.1)':
     dependencies:
       '@atlaskit/adf-schema-generator': 2.1.2
       '@atlaskit/editor-prosemirror': 7.3.0
-      '@atlaskit/tmp-editor-statsig': 38.0.0(react@18.3.1)
+      '@atlaskit/tmp-editor-statsig': 38.1.1(react@18.3.1)
       '@babel/runtime': 7.29.2
       css-color-names: 0.0.4
       linkify-it: 3.0.3
@@ -18358,11 +18358,11 @@ snapshots:
     transitivePeerDependencies:
       - react
 
-  '@atlaskit/adf-schema@52.2.6(react@19.2.4)':
+  '@atlaskit/adf-schema@52.3.0(react@19.2.4)':
     dependencies:
       '@atlaskit/adf-schema-generator': 2.1.2
       '@atlaskit/editor-prosemirror': 7.3.0
-      '@atlaskit/tmp-editor-statsig': 38.0.0(react@19.2.4)
+      '@atlaskit/tmp-editor-statsig': 38.1.1(react@19.2.4)
       '@babel/runtime': 7.29.2
       css-color-names: 0.0.4
       linkify-it: 3.0.3
@@ -18372,16 +18372,16 @@ snapshots:
 
   '@atlaskit/adf-utils@19.27.10(react@19.2.4)':
     dependencies:
-      '@atlaskit/adf-schema': 52.2.6(react@19.2.4)
+      '@atlaskit/adf-schema': 52.3.0(react@19.2.4)
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
-      '@atlaskit/tmp-editor-statsig': 38.0.0(react@19.2.4)
+      '@atlaskit/tmp-editor-statsig': 38.1.1(react@19.2.4)
       '@babel/runtime': 7.29.2
     transitivePeerDependencies:
       - react
 
   '@atlaskit/adf-utils@19.27.7(react@18.3.1)':
     dependencies:
-      '@atlaskit/adf-schema': 52.2.6(react@18.3.1)
+      '@atlaskit/adf-schema': 52.3.0(react@18.3.1)
       '@atlaskit/platform-feature-flags': 1.1.3(react@18.3.1)
       '@atlaskit/tmp-editor-statsig': 35.5.0(react@18.3.1)
       '@babel/runtime': 7.29.2
@@ -19465,7 +19465,7 @@ snapshots:
 
   '@atlaskit/editor-jira-transformer@15.0.1(@atlaskit/editor-common@99.19.0(@atlaskit/media-core@34.5.0(react@19.2.4))(@babel/core@7.29.0)(@types/node@25.5.0)(@types/react@19.2.14)(eslint@9.39.4(jiti@2.6.1))(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react-intl@5.25.1(react@19.2.4)(typescript@5.9.3))(react@19.2.4)(scheduler@0.27.0)(typescript@5.9.3)(url-search-params@0.10.2))(react@19.2.4)':
     dependencies:
-      '@atlaskit/adf-schema': 52.2.6(react@19.2.4)
+      '@atlaskit/adf-schema': 52.3.0(react@19.2.4)
       '@atlaskit/editor-common': 99.19.0(@atlaskit/media-core@34.5.0(react@19.2.4))(@babel/core@7.29.0)(@types/node@25.5.0)(@types/react@19.2.14)(eslint@9.39.4(jiti@2.6.1))(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react-intl@5.25.1(react@19.2.4)(typescript@5.9.3))(react@19.2.4)(scheduler@0.27.0)(typescript@5.9.3)(url-search-params@0.10.2)
       '@atlaskit/editor-prosemirror': 7.3.0
       '@babel/runtime': 7.29.2
@@ -19474,7 +19474,7 @@ snapshots:
 
   '@atlaskit/editor-json-transformer@8.31.6(react@19.2.4)':
     dependencies:
-      '@atlaskit/adf-schema': 52.2.6(react@19.2.4)
+      '@atlaskit/adf-schema': 52.3.0(react@19.2.4)
       '@atlaskit/adf-utils': 19.27.10(react@19.2.4)
       '@atlaskit/editor-prosemirror': 7.3.0
       '@babel/runtime': 7.29.2
@@ -19524,7 +19524,7 @@ snapshots:
   '@atlaskit/editor-shared-styles@3.10.30(@types/react@19.2.14)(react@19.2.4)':
     dependencies:
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
-      '@atlaskit/tmp-editor-statsig': 38.0.0(react@19.2.4)
+      '@atlaskit/tmp-editor-statsig': 38.1.1(react@19.2.4)
       '@atlaskit/tokens': 11.1.1(react@19.2.4)
       '@babel/runtime': 7.29.2
       '@emotion/react': 11.14.0(@types/react@19.2.14)(react@19.2.4)
@@ -19537,7 +19537,7 @@ snapshots:
     dependencies:
       '@atlaskit/editor-prosemirror': 7.3.0
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
-      '@atlaskit/tmp-editor-statsig': 38.0.0(react@19.2.4)
+      '@atlaskit/tmp-editor-statsig': 38.1.1(react@19.2.4)
       '@babel/runtime': 7.29.2
     transitivePeerDependencies:
       - react
@@ -19591,14 +19591,14 @@ snapshots:
       '@atlaskit/css': 0.19.2(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/heading': 5.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/icon': 32.1.0(@types/react@19.2.14)(react@19.2.4)
-      '@atlaskit/media-client': 36.0.1(@atlaskit/media-core@34.5.0(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@atlaskit/media-client': 36.0.2(@atlaskit/media-core@34.5.0(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/media-client-react': 5.0.0(@atlaskit/analytics-next@11.1.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@atlaskit/media-core@34.5.0(react@19.2.4))(@types/react@19.2.14)(eslint@9.39.4(jiti@2.6.1))(immer@11.1.4)(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
       '@atlaskit/primitives': 18.0.2(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/spinner': 19.0.11(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/textfield': 8.2.3(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/theme': 22.0.1(react@19.2.4)
-      '@atlaskit/tmp-editor-statsig': 38.0.0(react@19.2.4)
+      '@atlaskit/tmp-editor-statsig': 38.1.1(react@19.2.4)
       '@atlaskit/tokens': 11.1.1(react@19.2.4)
       '@atlaskit/tooltip': 20.14.7(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/ufo': 0.4.2(react@19.2.4)
@@ -21089,7 +21089,7 @@ snapshots:
   '@atlaskit/media-client-react@5.0.0(@atlaskit/analytics-next@11.1.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@atlaskit/media-core@34.5.0(react@19.2.4))(@types/react@19.2.14)(eslint@9.39.4(jiti@2.6.1))(immer@11.1.4)(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@atlaskit/analytics-next': 11.1.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@atlaskit/media-client': 36.0.1(@atlaskit/media-core@34.5.0(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@atlaskit/media-client': 36.0.2(@atlaskit/media-core@34.5.0(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
       '@atlaskit/platform-feature-flags-react': 0.4.4(eslint@9.39.4(jiti@2.6.1))(prop-types@15.8.1)(react@19.2.4)
       '@babel/runtime': 7.29.2
@@ -21130,7 +21130,7 @@ snapshots:
       - react-dom
       - supports-color
 
-  '@atlaskit/media-client@36.0.1(@atlaskit/media-core@34.5.0(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@atlaskit/media-client@36.0.2(@atlaskit/media-core@34.5.0(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@atlaskit/atlassian-context': 0.6.1(react@19.2.4)
       '@atlaskit/chunkinator': 7.0.0(react@19.2.4)
@@ -22084,11 +22084,11 @@ snapshots:
       '@atlaskit/analytics-next': 11.1.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/app-provider': 2.3.0(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/css': 0.10.7(@types/react@19.2.14)(react@19.2.4)
-      '@atlaskit/ds-lib': 4.0.0(@types/react@19.2.14)(react@19.2.4)
-      '@atlaskit/interaction-context': 3.0.0(react@19.2.4)
+      '@atlaskit/ds-lib': 4.2.0(@types/react@19.2.14)(react@19.2.4)
+      '@atlaskit/interaction-context': 3.1.0(react@19.2.4)
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
       '@atlaskit/tokens': 4.9.1(@types/react@19.2.14)(react@19.2.4)
-      '@atlaskit/visually-hidden': 3.0.2(react@19.2.4)
+      '@atlaskit/visually-hidden': 3.0.4(react@19.2.4)
       '@babel/runtime': 7.29.2
       '@compiled/react': 0.18.6(react@19.2.4)
       '@emotion/react': 11.14.0(@types/react@19.2.14)(react@19.2.4)
@@ -22107,10 +22107,10 @@ snapshots:
       '@atlaskit/app-provider': 2.3.0(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/css': 0.10.7(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/ds-lib': 4.2.0(@types/react@19.2.14)(react@19.2.4)
-      '@atlaskit/interaction-context': 3.0.0(react@19.2.4)
+      '@atlaskit/interaction-context': 3.1.0(react@19.2.4)
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
       '@atlaskit/tokens': 4.9.1(@types/react@19.2.14)(react@19.2.4)
-      '@atlaskit/visually-hidden': 3.0.2(react@19.2.4)
+      '@atlaskit/visually-hidden': 3.0.4(react@19.2.4)
       '@babel/runtime': 7.29.2
       '@compiled/react': 0.18.6(react@19.2.4)
       '@emotion/react': 11.14.0(@types/react@19.2.14)(react@19.2.4)
@@ -22909,7 +22909,7 @@ snapshots:
       '@atlaskit/analytics-next': 11.1.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
       '@atlaskit/ufo': 0.4.2(react@19.2.4)
-      '@atlaskit/user-picker': 11.24.0(@types/react@19.2.14)(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react-intl@5.25.1(react@19.2.4)(typescript@5.9.3))(react@19.2.4)(scheduler@0.27.0)(typescript@5.9.3)
+      '@atlaskit/user-picker': 11.25.0(@types/react@19.2.14)(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react-intl@5.25.1(react@19.2.4)(typescript@5.9.3))(react@19.2.4)(scheduler@0.27.0)(typescript@5.9.3)
       '@babel/runtime': 7.29.2
       lodash: 4.17.23
       memoize-one: 6.0.0
@@ -22939,7 +22939,7 @@ snapshots:
 
   '@atlaskit/spinner@18.0.3(@types/react@19.2.14)(react@19.2.4)':
     dependencies:
-      '@atlaskit/interaction-context': 3.0.0(react@19.2.4)
+      '@atlaskit/interaction-context': 3.1.0(react@19.2.4)
       '@atlaskit/theme': 18.0.3(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/tokens': 4.9.1(@types/react@19.2.14)(react@19.2.4)
       '@babel/runtime': 7.29.2
@@ -23250,7 +23250,7 @@ snapshots:
   '@atlaskit/theme@18.0.1(@types/react@19.2.14)(react@19.2.4)':
     dependencies:
       '@atlaskit/codemod-utils': 4.2.5
-      '@atlaskit/ds-lib': 4.0.0(@types/react@19.2.14)(react@19.2.4)
+      '@atlaskit/ds-lib': 4.2.0(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/tokens': 4.9.1(@types/react@19.2.14)(react@19.2.4)
       '@babel/runtime': 7.29.2
       react: 19.2.4
@@ -23354,14 +23354,14 @@ snapshots:
       '@babel/runtime': 7.29.2
       react: 18.3.1
 
-  '@atlaskit/tmp-editor-statsig@38.0.0(react@18.3.1)':
+  '@atlaskit/tmp-editor-statsig@38.1.1(react@18.3.1)':
     dependencies:
       '@atlaskit/feature-gate-js-client': 5.5.9(react@18.3.1)
       '@atlaskit/react-ufo': 5.4.8(react@18.3.1)
       '@babel/runtime': 7.29.2
       react: 18.3.1
 
-  '@atlaskit/tmp-editor-statsig@38.0.0(react@19.2.4)':
+  '@atlaskit/tmp-editor-statsig@38.1.1(react@19.2.4)':
     dependencies:
       '@atlaskit/feature-gate-js-client': 5.5.9(react@19.2.4)
       '@atlaskit/react-ufo': 5.4.8(react@19.2.4)
@@ -23481,7 +23481,7 @@ snapshots:
 
   '@atlaskit/tokens@4.5.2(@types/react@19.2.14)(react@19.2.4)':
     dependencies:
-      '@atlaskit/ds-lib': 4.0.0(@types/react@19.2.14)(react@19.2.4)
+      '@atlaskit/ds-lib': 4.2.0(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/platform-feature-flags': 1.1.3(react@19.2.4)
       '@babel/runtime': 7.29.2
       '@babel/traverse': 7.29.0
@@ -23567,7 +23567,7 @@ snapshots:
   '@atlaskit/tooltip@20.0.4(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@atlaskit/analytics-next': 11.1.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@atlaskit/ds-lib': 4.0.0(@types/react@19.2.14)(react@19.2.4)
+      '@atlaskit/ds-lib': 4.2.0(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/layering': 2.2.1(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/motion': 5.4.1(@types/react@19.2.14)(react@19.2.4)
       '@atlaskit/popper': 7.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -23732,7 +23732,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@atlaskit/user-picker@11.24.0(@types/react@19.2.14)(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react-intl@5.25.1(react@19.2.4)(typescript@5.9.3))(react@19.2.4)(scheduler@0.27.0)(typescript@5.9.3)':
+  '@atlaskit/user-picker@11.25.0(@types/react@19.2.14)(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react-intl@5.25.1(react@19.2.4)(typescript@5.9.3))(react@19.2.4)(scheduler@0.27.0)(typescript@5.9.3)':
     dependencies:
       '@atlaskit/afm-i18n-platform-elements-user-picker': 2.7.0
       '@atlaskit/analytics-next': 11.1.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -39298,9 +39298,9 @@ snapshots:
 
   prosemirror-commands@1.6.2:
     dependencies:
-      prosemirror-model: 1.24.1
-      prosemirror-state: 1.4.3
-      prosemirror-transform: 1.10.2
+      prosemirror-model: 1.25.4
+      prosemirror-state: 1.4.4
+      prosemirror-transform: 1.11.0
 
   prosemirror-commands@1.7.1:
     dependencies:
@@ -39310,9 +39310,9 @@ snapshots:
 
   prosemirror-dropcursor@1.8.1:
     dependencies:
-      prosemirror-state: 1.4.3
-      prosemirror-transform: 1.10.2
-      prosemirror-view: 1.37.1
+      prosemirror-state: 1.4.4
+      prosemirror-transform: 1.11.0
+      prosemirror-view: 1.41.6
 
   prosemirror-dropcursor@1.8.2:
     dependencies:
@@ -39329,9 +39329,9 @@ snapshots:
 
   prosemirror-history@1.4.1:
     dependencies:
-      prosemirror-state: 1.4.3
-      prosemirror-transform: 1.10.2
-      prosemirror-view: 1.37.1
+      prosemirror-state: 1.4.4
+      prosemirror-transform: 1.11.0
+      prosemirror-view: 1.41.6
       rope-sequence: 1.3.4
 
   prosemirror-history@1.5.0:
@@ -39348,7 +39348,7 @@ snapshots:
 
   prosemirror-keymap@1.2.2:
     dependencies:
-      prosemirror-state: 1.4.3
+      prosemirror-state: 1.4.4
       w3c-keyname: 2.2.8
 
   prosemirror-keymap@1.2.3:
@@ -39360,7 +39360,7 @@ snapshots:
     dependencies:
       '@types/markdown-it': 14.1.2
       markdown-it: 14.1.1
-      prosemirror-model: 1.24.1
+      prosemirror-model: 1.25.4
 
   prosemirror-markdown@1.13.2:
     dependencies:
@@ -39401,9 +39401,9 @@ snapshots:
 
   prosemirror-state@1.4.3:
     dependencies:
-      prosemirror-model: 1.24.1
-      prosemirror-transform: 1.10.2
-      prosemirror-view: 1.37.1
+      prosemirror-model: 1.25.4
+      prosemirror-transform: 1.11.0
+      prosemirror-view: 1.41.6
 
   prosemirror-state@1.4.4:
     dependencies:
@@ -39429,7 +39429,7 @@ snapshots:
 
   prosemirror-transform@1.10.2:
     dependencies:
-      prosemirror-model: 1.24.1
+      prosemirror-model: 1.25.4
 
   prosemirror-transform@1.10.5:
     dependencies:
@@ -39451,9 +39451,9 @@ snapshots:
 
   prosemirror-view@1.37.1:
     dependencies:
-      prosemirror-model: 1.24.1
-      prosemirror-state: 1.4.3
-      prosemirror-transform: 1.10.2
+      prosemirror-model: 1.25.4
+      prosemirror-state: 1.4.4
+      prosemirror-transform: 1.11.0
 
   prosemirror-view@1.41.5:
     dependencies:
