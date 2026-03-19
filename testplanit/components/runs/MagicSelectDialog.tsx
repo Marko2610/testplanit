@@ -425,7 +425,7 @@ export function MagicSelectDialog({
                       allAvailableCases={state.originalSuggestedCaseIds}
                       trigger={
                         <Button variant="outline" size="sm">
-                          <Badge className="border border-primary-background">
+                          <Badge className="border border-primary-foreground">
                             {state.suggestedCaseIds.length}
                           </Badge>
                           {t("viewSuggested")}

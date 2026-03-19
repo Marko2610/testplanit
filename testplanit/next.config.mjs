@@ -99,7 +99,7 @@ const nextConfig = {
     },
   },
   transpilePackages: ['lucide-react'],
-  serverExternalPackages: ["@zenstackhq/runtime", "@zenstackhq/server", "test-results-parser"],
+  serverExternalPackages: ["@zenstackhq/runtime", "@zenstackhq/server", "test-results-parser", "jspdf", "fflate"],
   outputFileTracingRoot: path.join(path.dirname(fileURLToPath(import.meta.url)), "../"),
   experimental: {
     // Limit number of workers to reduce memory usage during build

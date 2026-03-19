@@ -1,6 +1,5 @@
 import { CaseFields, Projects } from "@prisma/client";
 import { format } from "date-fns";
-import jsPDF from "jspdf";
 import Papa from "papaparse";
 import { useCallback, useState } from "react";
 import { ExportOptions } from "../app/[locale]/projects/repository/[projectId]/ExportModal";
@@ -785,6 +784,7 @@ export function useExportData<
           }
 
           // Document format - detailed sections per test case
+          const { default: jsPDF } = await import("jspdf");
           const doc = new jsPDF({
             orientation: "portrait",
             unit: "mm",

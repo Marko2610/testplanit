@@ -66,7 +66,6 @@ export function MultiAsyncCombobox<T>({
   const [search, setSearch] = useState("");
   const [options, setOptions] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
-  const [touched, _setTouched] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [width, setWidth] = useState<number>(200);
   const [page, setPage] = useState(0);
@@ -115,33 +114,6 @@ export function MultiAsyncCombobox<T>({
       ignore = true;
     };
   }, [search, page, pageSize, open, fetchOptions]);
-
-  // Fetch initial options when opened
-  useEffect(() => {
-    if (open && !touched) {
-      setLoading(true);
-      fetchOptions("", page, pageSize)
-        .then((result) => {
-          if (Array.isArray(result)) {
-            setOptions(result);
-            setTotal(null);
-          } else if (
-            result &&
-            typeof result === "object" &&
-            "results" in result &&
-            "total" in result
-          ) {
-            setOptions(result.results);
-            setTotal(result.total);
-          } else {
-            setOptions([]);
-            setTotal(null);
-          }
-        })
-        .finally(() => setLoading(false));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
 
   // Reset page when search changes
   useEffect(() => {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans } from "next/font/google";
+import Script from "next/script";
 import "~/styles/globals.css";
 
 export const metadata: Metadata = {
@@ -65,8 +66,9 @@ export default function RootLayout({
     <html lang="en" className={`${notoSans.variable}`}>
       <head>
         <meta name="storage-mode" content={storageMode} />
-        {/* Set global storage mode before any scripts run */}
-        <script
+        <Script
+          id="storage-mode"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `window.__STORAGE_MODE__ = "${storageMode}";`,
           }}
