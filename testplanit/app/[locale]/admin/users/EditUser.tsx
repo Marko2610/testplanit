@@ -5,13 +5,21 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import {
-  useCreateManyGroupAssignment, useCreateManyProjectAssignment, useDeleteManyGroupAssignment, useDeleteManyProjectAssignment, useFindManyGroups, useFindManyProjects, useFindManyRoles
+  useCreateManyGroupAssignment,
+  useCreateManyProjectAssignment,
+  useDeleteManyGroupAssignment,
+  useDeleteManyProjectAssignment,
+  useFindManyGroups,
+  useFindManyProjects,
+  useFindManyRoles,
 } from "~/lib/hooks";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod/v4";
 
+import { Avatar } from "@/components/Avatar";
+import UploadAvatar from "@/components/UploadAvatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
@@ -20,12 +28,14 @@ import { getCustomStyles } from "~/styles/multiSelectStyles";
 
 import {
   Select,
-  SelectContent, SelectGroup, SelectItem,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 
-import { SquarePen } from "lucide-react";
+import { CircleSlash2, SquarePen, Trash2 } from "lucide-react";
 
 import {
   Form,
@@ -33,7 +43,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 
 import {
@@ -43,9 +53,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { HelpPopover } from "@/components/ui/help-popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 
 interface ExtendedUser extends User {
@@ -61,9 +76,15 @@ export function EditUserModal({ user }: EditUserModalProps) {
   const t = useTranslations("admin.users.edit");
   const tGlobal = useTranslations();
   const tCommon = useTranslations("common");
+  const tUserAvatar = useTranslations("users.avatar");
+  const tUserEdit = useTranslations("users.profile.edit");
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [removeAvatar, setRemoveAvatar] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
+  const [showDeleteAvatarConfirm, setShowDeleteAvatarConfirm] = useState(false);
 
   // Define a Zod schema specifically for form validation
   const EditUserFormValidationSchema = z.object({
@@ -174,6 +195,10 @@ export function EditUserModal({ user }: EditUserModalProps) {
   useEffect(() => {
     if (open) {
       form.reset(defaultFormValues);
+      setAvatarUrl(null);
+      setRemoveAvatar(false);
+      setShowUpload(false);
+      setShowDeleteAvatarConfirm(false);
     }
   }, [open, defaultFormValues, form]);
 
@@ -191,7 +216,7 @@ export function EditUserModal({ user }: EditUserModalProps) {
     setIsSubmitting(true);
     try {
       // Construct payload matching UserUpdateInput for the API
-      const apiPayload: UserUpdateApiPayload = {
+      const apiPayload: UserUpdateApiPayload & { image?: string | null } = {
         name: data.name,
         email: data.email,
         isActive: data.isActive,
@@ -199,6 +224,13 @@ export function EditUserModal({ user }: EditUserModalProps) {
         access: data.access,
         roleId: data.roleId,
       };
+
+      // Include avatar changes
+      if (removeAvatar) {
+        apiPayload.image = null;
+      } else if (avatarUrl) {
+        apiPayload.image = avatarUrl;
+      }
 
       // Update user core data
       // Use dedicated update API endpoint instead of ZenStack
@@ -308,6 +340,95 @@ export function EditUserModal({ user }: EditUserModalProps) {
                 {t("title")}
               </DialogDescription>
             </DialogHeader>
+
+            {/* Avatar management */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {tUserAvatar("changeProfilePicture")}
+              </label>
+              {showUpload ? (
+                <div className="space-y-2">
+                  <UploadAvatar
+                    onUpload={(url) => {
+                      setAvatarUrl(url);
+                      setRemoveAvatar(false);
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowUpload(false);
+                      setAvatarUrl(null);
+                    }}
+                  >
+                    {tCommon("cancel")}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Avatar
+                    image={removeAvatar ? null : (avatarUrl ?? user.image)}
+                    alt={user.name}
+                    width={48}
+                    height={48}
+                    showTooltip={false}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowUpload(true)}
+                    >
+                      {tUserAvatar("changeProfilePicture")}
+                    </Button>
+                    {(user.image || avatarUrl) && !removeAvatar && (
+                      <Popover
+                        open={showDeleteAvatarConfirm}
+                        onOpenChange={setShowDeleteAvatarConfirm}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button type="button" variant="destructive" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                            {tUserEdit("deleteAvatar")}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="max-w-md" side="bottom">
+                          {tUserEdit("deleteAvatarConfirm")}
+                          <div className="flex items-start justify-between gap-4 mt-2">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => setShowDeleteAvatarConfirm(false)}
+                            >
+                              <CircleSlash2 className="h-4 w-4" />
+                              {tCommon("cancel")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                setRemoveAvatar(true);
+                                setAvatarUrl(null);
+                                setShowDeleteAvatarConfirm(false);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              {tUserEdit("deleteAvatar")}
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <FormField
               control={form.control}
               name="name"
@@ -604,7 +725,11 @@ export function EditUserModal({ user }: EditUserModalProps) {
               <Button variant="outline" type="button" onClick={handleCancel}>
                 {tCommon("cancel")}
               </Button>
-              <Button type="submit" disabled={isSubmitting} data-testid="edit-user-submit-button">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                data-testid="edit-user-submit-button"
+              >
                 {isSubmitting
                   ? tCommon("actions.submitting")
                   : tCommon("actions.submit")}
