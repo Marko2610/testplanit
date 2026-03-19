@@ -11,12 +11,17 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  AlertCircle, CheckCircle2, Info, RefreshCw, Settings2, Sparkles
+  AlertCircle,
+  CheckCircle2,
+  Info,
+  RefreshCw,
+  Settings2,
+  Sparkles,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
@@ -194,7 +199,11 @@ export function MagicSelectDialog({
               directlySelected: data.metadata.directlySelected || 0,
               linkedCasesAdded: data.metadata.linkedCasesAdded || 0,
               model: data.metadata.model || "",
-              tokens: data.metadata.tokens || { prompt: 0, completion: 0, total: 0 },
+              tokens: data.metadata.tokens || {
+                prompt: 0,
+                completion: 0,
+                total: 0,
+              },
             }
           : null,
       }));
@@ -208,12 +217,7 @@ export function MagicSelectDialog({
             : "An unexpected error occurred",
       }));
     }
-  }, [
-    projectId,
-    testRunMetadata,
-    clarification,
-    currentSelection,
-  ]);
+  }, [projectId, testRunMetadata, clarification, currentSelection]);
 
   // Auto-fetch count when dialog opens
   useEffect(() => {
@@ -421,7 +425,7 @@ export function MagicSelectDialog({
                       allAvailableCases={state.originalSuggestedCaseIds}
                       trigger={
                         <Button variant="outline" size="sm">
-                          <Badge variant="outline" className="mr-2">
+                          <Badge className="border border-primary-background">
                             {state.suggestedCaseIds.length}
                           </Badge>
                           {t("viewSuggested")}

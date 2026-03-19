@@ -32,12 +32,17 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
@@ -45,22 +50,53 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Attachments, CaseFields, Color,
-  FieldIcon, Issue, Projects, RepositoryCases, RepositoryCaseSource, RepositoryFolders, Status, Steps, Tags, User, Workflows
+  Attachments,
+  CaseFields,
+  Color,
+  FieldIcon,
+  Issue,
+  Projects,
+  RepositoryCases,
+  RepositoryCaseSource,
+  RepositoryFolders,
+  Status,
+  Steps,
+  Tags,
+  User,
+  Workflows,
 } from "@prisma/client";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import {
-  ArrowRight, Bot, Check, ExternalLink, Folder, GripVertical, LinkIcon, ListChecks, MoreVertical, PlayCircle, Plus, PlusSquare, ScrollText, Trash2, UserCog
+  Activity,
+  ArrowRight,
+  Bot,
+  Check,
+  ExternalLink,
+  Folder,
+  GripVertical,
+  LinkIcon,
+  ListChecks,
+  MoreVertical,
+  PlayCircle,
+  Plus,
+  PlusSquare,
+  ScrollText,
+  Trash2,
+  UserCog,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { searchProjectMembers } from "~/app/actions/searchProjectMembers";
 import { notifyTestCaseAssignment } from "~/app/actions/test-run-notifications";
 import { ForecastDisplay } from "~/components/ForecastDisplay";
 import LoadingSpinner from "~/components/LoadingSpinner";
-import { useFindManyRepositoryFolders, useFindManyStatus, useUpdateTestRunCases } from "~/lib/hooks";
+import {
+  useFindManyRepositoryFolders,
+  useFindManyStatus,
+  useUpdateTestRunCases,
+} from "~/lib/hooks";
 import { Link } from "~/lib/navigation";
 import { IconName } from "~/types/globals";
 import { isAutomatedCaseSource } from "~/utils/testResultTypes";
@@ -866,58 +902,75 @@ const ActionsCell = React.memo(function ActionsCell({
   onQuickScript?: (caseId: number) => void;
 }) {
   const t = useTranslations();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   return (
-    <div className="whitespace-nowrap flex justify-center gap-1 w-full">
-      {!isRunMode && !isSelectionMode && quickScriptEnabled && canAddEdit && onQuickScript && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                className="px-2 py-1 h-auto"
+    <div className="flex justify-center w-full">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            data-testid={`actions-menu-${row.original.id}`}
+          >
+            <MoreVertical className="h-4 w-4" />
+            <span className="sr-only">{t("common.actions.actionsLabel")}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {!isRunMode &&
+            !isSelectionMode &&
+            quickScriptEnabled &&
+            canAddEdit &&
+            onQuickScript && (
+              <DropdownMenuItem
                 onClick={() => onQuickScript(row.original.id)}
                 data-testid={`quickscript-case-${row.original.id}`}
               >
-                <ScrollText className="h-5 w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{t("repository.cases.quickScript")}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-      {!isRunMode && !isSelectionMode && canAddEditRun && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="px-2 py-1 h-auto" disabled={isSoftDeletedInRun}>
-                    <PlusSquare className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                {!isSoftDeletedInRun && (
-                  <DropdownMenuContent align="end">
-                    <AddToTestRunDropdown
-                      caseId={row.original.id}
-                      projectId={row.original.projectId}
-                    />
-                  </DropdownMenuContent>
-                )}
-              </DropdownMenu>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{t("common.actions.addToTestRun")}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-      {canDelete && (
+                <ScrollText className="mr-2 h-4 w-4" />
+                <span>{t("repository.cases.quickScript")}</span>
+              </DropdownMenuItem>
+            )}
+          {!isRunMode &&
+            !isSelectionMode &&
+            canAddEditRun &&
+            !isSoftDeletedInRun && (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <PlusSquare className="mr-2 h-4 w-4" />
+                  <span>{t("common.actions.addToTestRun")}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <AddToTestRunDropdown
+                    caseId={row.original.id}
+                    projectId={row.original.projectId}
+                  />
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            )}
+          {canDelete && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.preventDefault();
+                setShowDeleteModal(true);
+              }}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              <span>{t("common.actions.delete")}</span>
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {canDelete && showDeleteModal && (
         <DeleteCaseModal
           key={`delete-${row.original.id}`}
           testcase={row.original}
           showLabel={false}
+          externalOpen={showDeleteModal}
+          onExternalOpenChange={setShowDeleteModal}
         />
       )}
     </div>
@@ -1172,7 +1225,15 @@ const SelectAllCheckbox = React.memo(function SelectAllCheckbox({
 });
 
 export const getColumns = (
-  userPreferences: { user: { preferences: { dateFormat?: string; timezone?: string; timeFormat?: string } } },
+  userPreferences: {
+    user: {
+      preferences: {
+        dateFormat?: string;
+        timezone?: string;
+        timeFormat?: string;
+      };
+    };
+  },
   uniqueCaseFieldList: CaseFields[],
   handleSelect: (attachments: Attachments[], index: number) => void,
   columnTranslations: {
@@ -2095,15 +2156,22 @@ export const getColumns = (
       },
     });
   } else {
-    if ((canDelete || canAddEditRun || (quickScriptEnabled && canAddEdit)) && !isSelectionMode) {
+    if (
+      (canDelete || canAddEditRun || (quickScriptEnabled && canAddEdit)) &&
+      !isSelectionMode
+    ) {
       orderedColumns.push({
         id: "actions",
-        header: columnTranslations.actions,
-        enableResizing: true,
+        header: () => (
+          <div className="-ml-1 flex justify-center" style={{ width: 55 }}>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </div>
+        ),
+        enableResizing: false,
         enableSorting: false,
         enableHiding: false,
         meta: { isPinned: "right" },
-        size: 110,
+        size: 55,
         cell: ({ row }) => (
           <ActionsCell
             row={row}

@@ -32,15 +32,24 @@ interface DeleteCaseProps {
   testcase: DeleteModalTestCase; // Use the new specific type
   showLabel?: boolean;
   onDeleteSuccess?: () => void;
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
 }
 
 export function DeleteCaseModal({
   testcase,
   showLabel,
   onDeleteSuccess,
+  externalOpen,
+  onExternalOpenChange,
 }: DeleteCaseProps) {
   const t = useTranslations();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled
+    ? (val: boolean) => onExternalOpenChange?.(val)
+    : setInternalOpen;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showActiveRunWarning, setShowActiveRunWarning] = useState(false);
   const [activeRunCount, setActiveRunCount] = useState(0);
@@ -105,15 +114,17 @@ export function DeleteCaseModal({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <Button
-        variant="destructive"
-        className="px-2 py-1 h-auto w-full"
-        type="button"
-        onClick={handleOpen}
-      >
-        <Trash2 className="h-5 w-5" />
-        {showLabel && <div>{t("common.actions.delete")}</div>}
-      </Button>
+      {!isControlled && (
+        <Button
+          variant="destructive"
+          className="px-2 py-1 h-auto w-full"
+          type="button"
+          onClick={handleOpen}
+        >
+          <Trash2 className="h-5 w-5" />
+          {showLabel && <div>{t("common.actions.delete")}</div>}
+        </Button>
+      )}
       <AlertDialogContent className="sm:max-w-[425px] lg:max-w-[600px] border-destructive">
         <div className="space-y-4">
           <AlertDialogHeader>
