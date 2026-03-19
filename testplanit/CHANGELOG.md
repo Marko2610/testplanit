@@ -1,3 +1,9 @@
+## [0.16.28](https://github.com/TestPlanIt/testplanit/compare/v0.16.27...v0.16.28) (2026-03-19)
+
+### Enhancements
+
+* **users:** Enhance EditUserModal with avatar management features ([f69d715](https://github.com/TestPlanIt/testplanit/commit/f69d715495a93b635f507b76e986391e598dc11c))
+
 ## [0.16.27](https://github.com/TestPlanIt/testplanit/compare/v0.16.26...v0.16.27) (2026-03-19)
 
 ### Bug Fixes
