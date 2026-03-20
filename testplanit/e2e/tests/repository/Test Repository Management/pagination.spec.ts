@@ -17,7 +17,7 @@ test.describe("Pagination", () => {
     api: import("../../../fixtures/api.fixture").ApiHelper
   ): Promise<number> {
     // Create a project for this test - tests should be self-contained
-    return await api.createProject(`E2E Test Project ${Date.now()}`);
+    return await api.createProject(`E2E Pagination ${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   }
 
   test("Navigate to Next Page", async ({ api, page }) => {
