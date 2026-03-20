@@ -1,6 +1,7 @@
 import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import { docs, blog, pages } from './src/og-image/renderers.js';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -66,6 +67,17 @@ const config: Config = {
         ],
       },
     ],
+    [
+      '@acid-info/docusaurus-og',
+      {
+        path: './preview-images',
+        imageRenderers: {
+          'docusaurus-plugin-content-docs': docs,
+          'docusaurus-plugin-content-blog': blog,
+          'docusaurus-plugin-content-pages': pages,
+        },
+      },
+    ],
   ],
 
   presets: [
@@ -102,8 +114,8 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Social card for Open Graph / Twitter previews (1200x630px recommended)
-    image: 'img/social-card.png',
+    // OG images are dynamically generated per-page by @acid-info/docusaurus-og
+    image: 'img/social-card.png', // fallback for pages without a generated image
     navbar: {
       title: 'TestPlanIt Docs',
       logo: {
