@@ -13,6 +13,85 @@ import { expect, test } from "../../../fixtures";
  * - Clearing search restores full case list
  * - Select All uses search result IDs (not entire folder)
  */
+
+/**
+ * Helper to click a folder node in the ProjectRepository tree inside the dialog.
+ * Step 2 of AddTestRunModal shows a folder tree; cases only load when a folder is selected.
+ */
+async function clickFolderInDialog(
+  page: import("@playwright/test").Page,
+  folderName: string
+) {
+  // Wait for the folder tree to load
+  await page
+    .locator('[data-testid^="folder-node-"]')
+    .first()
+    .waitFor({ state: "attached", timeout: 10000 });
+
+  // Small delay for React to stabilize rendering
+  await page.waitForTimeout(500);
+
+  // Locate and click the specific folder node
+  const folderNode = page
+    .locator('[data-testid^="folder-node-"]')
+    .filter({ hasText: folderName })
+    .first();
+
+  await folderNode.waitFor({ state: "attached", timeout: 5000 });
+  // Use force:true since the dialog overlay can intercept clicks
+  await folderNode.click({ force: true });
+
+  // Wait for the Cases table to reload with the folder's data
+  await page.waitForTimeout(1500);
+}
+
+/**
+ * Helper to open the AddTestRunModal and navigate to step 2 (test case selection).
+ * Waits for the state select to be populated before clicking Next, which avoids
+ * a race condition where stateId=0 causes silent validation failure.
+ */
+async function openModalAndGoToStep2(
+  page: import("@playwright/test").Page,
+  runName: string
+) {
+  const newRunButton = page.getByTestId("new-run-button");
+  await expect(newRunButton).toBeVisible({ timeout: 15000 });
+  await newRunButton.click();
+
+  const dialog = page.locator('[role="dialog"]').last();
+  await expect(dialog).toBeVisible({ timeout: 10000 });
+
+  // Fill the run name
+  const nameInput = dialog.getByTestId("run-name-input");
+  await nameInput.fill(runName);
+
+  // Wait for the state select to be populated (workflows must load first)
+  // The state select is inside a SelectTrigger with a SelectValue.
+  // When stateId is valid, the SelectValue renders the workflow name (not the placeholder).
+  // We wait for any SelectTrigger in the dialog to NOT contain the placeholder text.
+  const stateSelect = dialog.locator('label:has-text("State")').locator('..').locator('[role="combobox"]');
+  await expect(stateSelect).toBeVisible({ timeout: 10000 });
+  // Wait until the state select has a value (not empty/placeholder)
+  await expect(async () => {
+    const text = await stateSelect.textContent();
+    expect(text?.trim().length).toBeGreaterThan(0);
+    // Make sure it's not just the placeholder
+    expect(text).not.toMatch(/select.*state/i);
+  }).toPass({ timeout: 10000 });
+
+  // Click Next to go to step 2 (test case selection)
+  // Use evaluate click to bypass overflow-y-auto intercepting pointer events
+  const nextButton = dialog.getByTestId("run-next-button");
+  await nextButton.evaluate((el: HTMLElement) => el.click());
+
+  // Wait for step 2 dialog content to appear (ProjectRepository in selection mode)
+  // The dialog content changes completely, so re-query the dialog
+  const step2Dialog = page.locator('[role="dialog"]').last();
+  await expect(step2Dialog).toBeVisible({ timeout: 10000 });
+
+  return step2Dialog;
+}
+
 test.describe("Elasticsearch Search in Selection Mode", () => {
   test("should show ES search input when in selection mode (AddTestRunModal step 2)", async ({
     api,
@@ -32,20 +111,7 @@ test.describe("Elasticsearch Search in Selection Mode", () => {
     await page.goto(`/en-US/projects/runs/${projectId}`);
     await page.waitForLoadState("load");
 
-    const newRunButton = page.getByTestId("new-run-button");
-    await expect(newRunButton).toBeVisible({ timeout: 15000 });
-    await newRunButton.click();
-
-    // Fill step 1 (basic info)
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
-
-    const nameInput = page.getByTestId("run-name-input");
-    await nameInput.fill(`ES Search Run ${Date.now()}`);
-
-    // Click Next to go to step 2 (test case selection)
-    const nextButton = page.getByTestId("run-next-button");
-    await nextButton.click();
+    const dialog = await openModalAndGoToStep2(page, `ES Search Run ${Date.now()}`);
 
     // In step 2, the ProjectRepository is rendered in selection mode
     // The ES search input should be visible
@@ -62,7 +128,8 @@ test.describe("Elasticsearch Search in Selection Mode", () => {
     const projectId = await api.createProject(
       `E2E ES Filter ${Date.now()}`
     );
-    const folderId = await api.createFolder(projectId, "ES Filter Folder");
+    const folderName = `ES Filter Folder ${Date.now()}`;
+    const folderId = await api.createFolder(projectId, folderName);
     const ts = Date.now();
     const matchingCase = `UniqueLoginTest ${ts}`;
     const nonMatchingCase = `PaymentFlow ${ts}`;
@@ -76,22 +143,16 @@ test.describe("Elasticsearch Search in Selection Mode", () => {
     await page.goto(`/en-US/projects/runs/${projectId}`);
     await page.waitForLoadState("load");
 
-    const newRunButton = page.getByTestId("new-run-button");
-    await expect(newRunButton).toBeVisible({ timeout: 15000 });
-    await newRunButton.click();
-
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
-
-    // Fill step 1
-    await page.getByTestId("run-name-input").fill(`Filter Run ${Date.now()}`);
-    await page.getByTestId("run-next-button").click();
+    const dialog = await openModalAndGoToStep2(page, `Filter Run ${Date.now()}`);
 
     // Wait for step 2 to load
     const esSearchInput = dialog.locator(
       'input[placeholder*="Search in this project"]'
     );
     await expect(esSearchInput).toBeVisible({ timeout: 10000 });
+
+    // Click the folder to load its cases into the table
+    await clickFolderInDialog(page, folderName);
 
     // Wait for cases to initially load in the table
     await expect(dialog.locator(`text="${matchingCase}"`)).toBeVisible({
@@ -122,7 +183,8 @@ test.describe("Elasticsearch Search in Selection Mode", () => {
     const projectId = await api.createProject(
       `E2E ES Clear ${Date.now()}`
     );
-    const folderId = await api.createFolder(projectId, "ES Clear Folder");
+    const folderName = `ES Clear Folder ${Date.now()}`;
+    const folderId = await api.createFolder(projectId, folderName);
     const ts = Date.now();
     const case1 = `ClearTestAlpha ${ts}`;
     const case2 = `ClearTestBeta ${ts}`;
@@ -134,20 +196,15 @@ test.describe("Elasticsearch Search in Selection Mode", () => {
     await page.goto(`/en-US/projects/runs/${projectId}`);
     await page.waitForLoadState("load");
 
-    const newRunButton = page.getByTestId("new-run-button");
-    await expect(newRunButton).toBeVisible({ timeout: 15000 });
-    await newRunButton.click();
-
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
-
-    await page.getByTestId("run-name-input").fill(`Clear Run ${Date.now()}`);
-    await page.getByTestId("run-next-button").click();
+    const dialog = await openModalAndGoToStep2(page, `Clear Run ${Date.now()}`);
 
     const esSearchInput = dialog.locator(
       'input[placeholder*="Search in this project"]'
     );
     await expect(esSearchInput).toBeVisible({ timeout: 10000 });
+
+    // Click the folder to load its cases into the table
+    await clickFolderInDialog(page, folderName);
 
     // Wait for both cases to be visible
     await expect(dialog.locator(`text="${case1}"`)).toBeVisible({
@@ -197,7 +254,8 @@ test.describe("Elasticsearch Search in Selection Mode", () => {
     const projectId = await api.createProject(
       `E2E ES Select ${Date.now()}`
     );
-    const folderId = await api.createFolder(projectId, "ES Select Folder");
+    const folderName = `ES Select Folder ${Date.now()}`;
+    const folderId = await api.createFolder(projectId, folderName);
     const ts = Date.now();
     const searchableCase = `SelectableLogin ${ts}`;
     const otherCase = `OtherPayment ${ts}`;
@@ -209,20 +267,15 @@ test.describe("Elasticsearch Search in Selection Mode", () => {
     await page.goto(`/en-US/projects/runs/${projectId}`);
     await page.waitForLoadState("load");
 
-    const newRunButton = page.getByTestId("new-run-button");
-    await expect(newRunButton).toBeVisible({ timeout: 15000 });
-    await newRunButton.click();
-
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
-
-    await page.getByTestId("run-name-input").fill(`Select Run ${Date.now()}`);
-    await page.getByTestId("run-next-button").click();
+    const dialog = await openModalAndGoToStep2(page, `Select Run ${Date.now()}`);
 
     const esSearchInput = dialog.locator(
       'input[placeholder*="Search in this project"]'
     );
     await expect(esSearchInput).toBeVisible({ timeout: 10000 });
+
+    // Click the folder to load its cases into the table
+    await clickFolderInDialog(page, folderName);
 
     // Wait for cases to load
     await expect(dialog.locator(`text="${searchableCase}"`)).toBeVisible({

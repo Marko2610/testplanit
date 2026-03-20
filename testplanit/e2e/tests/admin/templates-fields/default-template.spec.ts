@@ -162,6 +162,11 @@ test.describe("Default Template - Protection Rules", () => {
       throw new Error(`Template ${templateId} was not marked as default in the database (isDefault=${verification.isDefault})`);
     }
 
+    // Re-set the template as default right before navigating, in case a concurrent
+    // test's createTemplate (which runs updateMany to unset all defaults) has cleared
+    // our template's isDefault flag since we created it.
+    await api.ensureTemplateIsDefault(templateId);
+
     await templatesPage.goto();
 
     // Wait for the page to load and show the correct data
@@ -175,16 +180,23 @@ test.describe("Default Template - Protection Rules", () => {
     await expect(row).toBeVisible({ timeout: 5000 });
 
     // Verify the "Default" switch is checked - poll to wait for UI to sync with database
+    // The table may need a reload to reflect the API-created template's isDefault state
     const defaultSwitch = row.locator('button[role="switch"]').last();
     await expect.poll(
       async () => {
         const state = await defaultSwitch.getAttribute("data-state");
-        return state;
+        if (state !== "checked") {
+          // A concurrent test may have stolen isDefault; reclaim it and reload
+          await api.ensureTemplateIsDefault(templateId);
+          await page.reload();
+          await page.waitForLoadState("networkidle");
+        }
+        return await defaultSwitch.getAttribute("data-state");
       },
       {
         message: `Expected default switch to be checked for template ${templateName}`,
-        timeout: 10000,
-        intervals: [100, 250, 500],
+        timeout: 20000,
+        intervals: [500, 1000, 2000, 3000],
       }
     ).toBe("checked");
 

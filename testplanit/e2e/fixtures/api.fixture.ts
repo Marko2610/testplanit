@@ -20,6 +20,8 @@ export class ApiHelper {
   private createdFieldOptionIds: number[] = [];
   private createdShareLinkIds: string[] = [];
   private createdConfigurationIds: number[] = [];
+  private createdLlmIntegrationIds: number[] = [];
+  private createdProjectLlmIntegrationIds: string[] = [];
   private cachedTemplateIds: Map<number, number> = new Map(); // projectId -> templateId
   private cachedStateIds: Map<number, number> = new Map(); // projectId -> stateId
   private cachedRepositoryIds: Map<number, number> = new Map(); // projectId -> repositoryId
@@ -388,6 +390,30 @@ export class ApiHelper {
     }
 
     return caseId;
+  }
+
+  /**
+   * Create multiple test cases in parallel batches for faster setup.
+   * Uses concurrent requests (batch size of 5) to speed up data creation.
+   * @returns Array of created case IDs
+   */
+  async createTestCasesBatch(
+    projectId: number,
+    folderId: number,
+    names: string[],
+    batchSize: number = 5
+  ): Promise<number[]> {
+    const caseIds: number[] = [];
+
+    for (let i = 0; i < names.length; i += batchSize) {
+      const batch = names.slice(i, i + batchSize);
+      const batchResults = await Promise.all(
+        batch.map((name) => this.createTestCase(projectId, folderId, name))
+      );
+      caseIds.push(...batchResults);
+    }
+
+    return caseIds;
   }
 
   /**
@@ -1332,7 +1358,7 @@ export class ApiHelper {
     }
 
     if (options?.configId) {
-      data.config = { connect: { id: options.configId } };
+      data.configuration = { connect: { id: options.configId } };
     }
 
     if (options?.configurationGroupId) {
@@ -1920,18 +1946,11 @@ export class ApiHelper {
     resultFieldIds?: number[];
     projectIds?: number[];
   }): Promise<number> {
-    // If setting as default, unset other defaults first
-    if (options.isDefault) {
-      await this.request.patch(
-        `${this.baseURL}/api/model/templates/updateMany`,
-        {
-          data: {
-            where: { isDefault: true },
-            data: { isDefault: false },
-          },
-        }
-      );
-    }
+    // Note: We intentionally do NOT clear other templates' isDefault flag here.
+    // The application's server-side logic handles the cascade (unsetting previous
+    // defaults when a new default is set). Clearing all defaults via updateMany
+    // causes race conditions in parallel tests — other tests' createProject calls
+    // may fail because they can't find any default template.
 
     const response = await this.request.post(
       `${this.baseURL}/api/model/templates/create`,
@@ -2104,6 +2123,24 @@ export class ApiHelper {
         },
       })
       .catch(() => {});
+  }
+
+  /**
+   * Ensure a template is marked as default. Only sets the given template as
+   * default without clearing others — the app's server-side logic handles
+   * the cascade. This avoids race conditions where clearing all defaults
+   * breaks parallel tests that depend on a default template existing.
+   */
+  async ensureTemplateIsDefault(templateId: number): Promise<void> {
+    await this.request.patch(
+      `${this.baseURL}/api/model/templates/update`,
+      {
+        data: {
+          where: { id: templateId },
+          data: { isDefault: true, isEnabled: true },
+        },
+      }
+    );
   }
 
   /**
@@ -2913,6 +2950,85 @@ export class ApiHelper {
   }
 
   /**
+   * Create an LLM integration record (ADMIN only).
+   * Uses fake credentials — tests mock the actual LLM API routes.
+   */
+  async createLlmIntegration(name: string): Promise<number> {
+    const response = await this.request.post(
+      `${this.baseURL}/api/model/llmIntegration/create`,
+      {
+        data: {
+          data: {
+            name,
+            provider: "OPENAI",
+            status: "ACTIVE",
+            credentials: { apiKey: "sk-fake-e2e-test-key" },
+            settings: {},
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to create LLM integration: ${error}`);
+    }
+
+    const result = await response.json();
+    const id = result.data.id;
+    this.createdLlmIntegrationIds.push(id);
+    return id;
+  }
+
+  /**
+   * Link an LLM integration to a project via ProjectLlmIntegration.
+   */
+  async linkLlmToProject(projectId: number, llmIntegrationId: number): Promise<string> {
+    const response = await this.request.post(
+      `${this.baseURL}/api/model/projectLlmIntegration/create`,
+      {
+        data: {
+          data: {
+            projectId,
+            llmIntegrationId,
+            isActive: true,
+          },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to link LLM to project: ${error}`);
+    }
+
+    const result = await response.json();
+    const id = result.data.id;
+    this.createdProjectLlmIntegrationIds.push(id);
+    return id;
+  }
+
+  /**
+   * Enable QuickScript on a project.
+   */
+  async enableQuickScript(projectId: number): Promise<void> {
+    const response = await this.request.patch(
+      `${this.baseURL}/api/model/projects/update`,
+      {
+        data: {
+          where: { id: projectId },
+          data: { quickScriptEnabled: true },
+        },
+      }
+    );
+
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to enable QuickScript: ${error}`);
+    }
+  }
+
+  /**
    * Clean up all test data created during tests
    */
   async cleanup(): Promise<void> {
@@ -2951,6 +3067,26 @@ export class ApiHelper {
       await this.deleteIssue(issueId);
     }
     this.createdIssueIds = [];
+
+    // Delete project LLM integrations (they reference projects and LLM integrations)
+    for (const pliId of this.createdProjectLlmIntegrationIds) {
+      this.request
+        .delete(`${this.baseURL}/api/model/projectLlmIntegration/delete`, {
+          data: { where: { id: pliId } },
+        })
+        .catch(() => {});
+    }
+    this.createdProjectLlmIntegrationIds = [];
+
+    // Delete LLM integrations
+    for (const llmId of this.createdLlmIntegrationIds) {
+      this.request
+        .delete(`${this.baseURL}/api/model/llmIntegration/delete`, {
+          data: { where: { id: llmId } },
+        })
+        .catch(() => {});
+    }
+    this.createdLlmIntegrationIds = [];
 
     // Delete share links (they reference projects)
     for (const shareLinkId of this.createdShareLinkIds) {

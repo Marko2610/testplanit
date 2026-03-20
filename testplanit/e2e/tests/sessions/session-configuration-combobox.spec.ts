@@ -33,15 +33,17 @@ test.describe("Session Configuration Combobox", () => {
     await newSessionButton.click();
 
     // Wait for dialog
-    const dialog = page.locator('[role="dialog"]');
+    const dialog = page.locator('[role="dialog"]').first();
     await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Find the Configuration field's combobox trigger
     // The ConfigurationSelect renders an AsyncCombobox with role="combobox"
     // It's in the right column of the form, after Template and State selects
+    // Use label-based scoping to target the correct combobox (not Template or State)
     const configCombobox = dialog
-      .locator('button[role="combobox"]')
-      .first();
+      .locator('label:has-text("Configuration")')
+      .locator('..')
+      .locator('button[role="combobox"]');
     await expect(configCombobox).toBeVisible({ timeout: 5000 });
 
     // Click to open the combobox popover
@@ -72,13 +74,14 @@ test.describe("Session Configuration Combobox", () => {
     await expect(newSessionButton).toBeVisible({ timeout: 15000 });
     await newSessionButton.click();
 
-    const dialog = page.locator('[role="dialog"]');
+    const dialog = page.locator('[role="dialog"]').first();
     await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Open config combobox
     const configCombobox = dialog
-      .locator('button[role="combobox"]')
-      .first();
+      .locator('label:has-text("Configuration")')
+      .locator('..')
+      .locator('button[role="combobox"]');
     await configCombobox.click();
 
     // Select the configuration
@@ -108,13 +111,14 @@ test.describe("Session Configuration Combobox", () => {
     await expect(newSessionButton).toBeVisible({ timeout: 15000 });
     await newSessionButton.click();
 
-    const dialog = page.locator('[role="dialog"]');
+    const dialog = page.locator('[role="dialog"]').first();
     await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Open config combobox
     const configCombobox = dialog
-      .locator('button[role="combobox"]')
-      .first();
+      .locator('label:has-text("Configuration")')
+      .locator('..')
+      .locator('button[role="combobox"]');
     await configCombobox.click();
 
     // First select a configuration
@@ -156,13 +160,15 @@ test.describe("Session Configuration Combobox", () => {
     await expect(newSessionButton).toBeVisible({ timeout: 15000 });
     await newSessionButton.click();
 
-    const dialog = page.locator('[role="dialog"]');
+    const dialog = page.locator('[role="dialog"]').first();
     await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Open config combobox
     const configCombobox = dialog
-      .locator('button[role="combobox"]')
-      .first();
+      .locator('label:has-text("Configuration")')
+      .locator('..')
+      .locator('button[role="combobox"]');
+    await expect(configCombobox).toBeVisible({ timeout: 5000 });
     await configCombobox.click();
 
     // Wait for both to load
@@ -170,10 +176,9 @@ test.describe("Session Configuration Combobox", () => {
       page.locator(`[role="option"]:has-text("${configMatch}")`)
     ).toBeVisible({ timeout: 5000 });
 
-    // Type in the search input
-    const searchInput = page
-      .locator('[cmdk-input], input[placeholder]')
-      .first();
+    // Type in the search input inside the combobox command palette
+    const searchInput = page.locator('[cmdk-input]');
+    await expect(searchInput).toBeVisible({ timeout: 5000 });
     await searchInput.fill("Findable");
 
     // Wait for search to apply
@@ -207,13 +212,15 @@ test.describe("Session Configuration Combobox", () => {
     await expect(newSessionButton).toBeVisible({ timeout: 15000 });
     await newSessionButton.click();
 
-    const dialog = page.locator('[role="dialog"]');
+    const dialog = page.locator('[role="dialog"]').first();
     await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Open config combobox
     const configCombobox = dialog
-      .locator('button[role="combobox"]')
-      .first();
+      .locator('label:has-text("Configuration")')
+      .locator('..')
+      .locator('button[role="combobox"]');
+    await expect(configCombobox).toBeVisible({ timeout: 5000 });
     await configCombobox.click();
 
     // Wait for options
@@ -221,20 +228,22 @@ test.describe("Session Configuration Combobox", () => {
       page.locator(`[role="option"]:has-text("${configName}")`)
     ).toBeVisible({ timeout: 5000 });
 
-    // Verify pagination footer is visible
+    // Verify pagination footer is visible inside the combobox popover
+    // The Previous/Next buttons and page indicator are rendered inside the popover content
+    // which is portaled to the body. Since the combobox is the only open popover,
+    // these buttons are unique on the page.
     const prevButton = page.getByRole("button", { name: "Previous" });
     const nextButton = page.getByRole("button", { name: "Next" });
-    await expect(prevButton).toBeVisible();
-    await expect(nextButton).toBeVisible();
+    await expect(prevButton).toBeVisible({ timeout: 5000 });
+    await expect(nextButton).toBeVisible({ timeout: 5000 });
 
     // Previous should be disabled on first page
     await expect(prevButton).toBeDisabled();
 
     // Verify page indicator text is shown (e.g., "Showing 1-20 of N")
-    const paginationText = page.locator(
-      ".text-xs.text-muted-foreground"
-    );
-    await expect(paginationText).toBeVisible();
+    // The text is inside a span with specific classes, next to the pagination buttons
+    const paginationText = page.locator('text=/Showing \\d+/');
+    await expect(paginationText).toBeVisible({ timeout: 5000 });
   });
 
   test("should create session with selected configuration", async ({
@@ -254,7 +263,7 @@ test.describe("Session Configuration Combobox", () => {
     await expect(newSessionButton).toBeVisible({ timeout: 15000 });
     await newSessionButton.click();
 
-    const dialog = page.locator('[role="dialog"]');
+    const dialog = page.locator('[role="dialog"]').first();
     await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Fill required fields
@@ -263,8 +272,9 @@ test.describe("Session Configuration Combobox", () => {
 
     // Select a configuration
     const configCombobox = dialog
-      .locator('button[role="combobox"]')
-      .first();
+      .locator('label:has-text("Configuration")')
+      .locator('..')
+      .locator('button[role="combobox"]');
     await configCombobox.click();
 
     await page
