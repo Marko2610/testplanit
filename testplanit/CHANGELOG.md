@@ -1,3 +1,9 @@
+## [0.17.0](https://github.com/TestPlanIt/testplanit/compare/v0.16.28...v0.17.0) (2026-03-22)
+
+### Features
+
+* Release v0.17.0 — adds two major features: Copy/Move Test Cases Between Projects and Per-Prompt LLM Configuration, along with worker audit logging, comprehensive test coverage improvements, and bug fixes ([#147](https://github.com/TestPlanIt/testplanit/issues/147)) ([4116cb7](https://github.com/TestPlanIt/testplanit/commit/4116cb78afd507261b1f20120519ac576c05f0f9)), closes [#143](https://github.com/TestPlanIt/testplanit/issues/143) [#143](https://github.com/TestPlanIt/testplanit/issues/143) [#144](https://github.com/TestPlanIt/testplanit/issues/144)
+
 ## [0.16.28](https://github.com/TestPlanIt/testplanit/compare/v0.16.27...v0.16.28) (2026-03-19)
 
 ### Enhancements
