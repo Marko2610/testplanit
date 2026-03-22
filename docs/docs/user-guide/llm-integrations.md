@@ -216,7 +216,7 @@ Use project default integration
 
 This resolution chain applies independently per AI feature. Different features in the same project can resolve to different LLM integrations depending on what is configured at each level.
 
-Per-prompt LLM assignments are configured in the admin prompt editor. See [Prompt Configurations — Per-Prompt LLM Assignment](./prompt-configurations#per-prompt-llm-assignment) for details.
+Per-prompt LLM assignments are configured in the admin prompt editor. See [Prompt Configurations — Per-Prompt LLM Assignment](../prompt-configurations#per-prompt-llm-assignment) for details.
 
 ## Security Considerations
 
