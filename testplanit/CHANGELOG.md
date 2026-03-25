@@ -1,3 +1,9 @@
+## [0.18.0](https://github.com/TestPlanIt/testplanit/compare/v0.17.1...v0.18.0) (2026-03-25)
+
+### Features
+
+* Find/Resolve duplicate test cases and test steps ([#152](https://github.com/TestPlanIt/testplanit/issues/152)) ([5fb99ac](https://github.com/TestPlanIt/testplanit/commit/5fb99ac552ea44a8af31cb1d9f33f2ce887b93c7)), closes [#3](https://github.com/TestPlanIt/testplanit/issues/3) [#ID](https://github.com/TestPlanIt/testplanit/issues/ID)
+
 ## [0.17.1](https://github.com/TestPlanIt/testplanit/compare/v0.17.0...v0.17.1) (2026-03-24)
 
 ### Bug Fixes
