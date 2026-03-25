@@ -1005,6 +1005,18 @@ const metadata: ModelMeta = {
                     name: "quickScriptEnabled",
                     type: "Boolean",
                     attributes: [{ "name": "@default", "args": [{ "name": "value", "value": false }] }],
+                }, duplicateScanResults: {
+                    name: "duplicateScanResults",
+                    type: "DuplicateScanResult",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'project',
+                }, stepSequenceMatches: {
+                    name: "stepSequenceMatches",
+                    type: "StepSequenceMatch",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'project',
                 },
             }, uniqueConstraints: {
                 id: {
@@ -2904,6 +2916,206 @@ const metadata: ModelMeta = {
                 },
             },
         },
+        duplicateScanResult: {
+            name: 'DuplicateScanResult', fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    isId: true,
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                    isAutoIncrement: true,
+                }, projectId: {
+                    name: "projectId",
+                    type: "Int",
+                    isForeignKey: true,
+                    relationField: 'project',
+                }, project: {
+                    name: "project",
+                    type: "Projects",
+                    isDataModel: true,
+                    backLink: 'duplicateScanResults',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "projectId" },
+                }, caseAId: {
+                    name: "caseAId",
+                    type: "Int",
+                    isForeignKey: true,
+                    relationField: 'caseA',
+                }, caseA: {
+                    name: "caseA",
+                    type: "RepositoryCases",
+                    isDataModel: true,
+                    backLink: 'duplicateScanResultsA',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "caseAId" },
+                }, caseBId: {
+                    name: "caseBId",
+                    type: "Int",
+                    isForeignKey: true,
+                    relationField: 'caseB',
+                }, caseB: {
+                    name: "caseB",
+                    type: "RepositoryCases",
+                    isDataModel: true,
+                    backLink: 'duplicateScanResultsB',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "caseBId" },
+                }, score: {
+                    name: "score",
+                    type: "Float",
+                }, matchedFields: {
+                    name: "matchedFields",
+                    type: "String",
+                    isArray: true,
+                }, detectionMethod: {
+                    name: "detectionMethod",
+                    type: "String",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": "fuzzy" }] }],
+                }, status: {
+                    name: "status",
+                    type: "DuplicateScanResultStatus",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, scanJobId: {
+                    name: "scanJobId",
+                    type: "String",
+                    isOptional: true,
+                }, isDeleted: {
+                    name: "isDeleted",
+                    type: "Boolean",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": false }] }],
+                }, createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                },
+            }, uniqueConstraints: {
+                id: {
+                    name: "id",
+                    fields: ["id"]
+                }, caseAId_caseBId_scanJobId: {
+                    name: "caseAId_caseBId_scanJobId",
+                    fields: ["caseAId", "caseBId", "scanJobId"]
+                },
+            },
+        },
+        stepSequenceMatch: {
+            name: 'StepSequenceMatch', fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    isId: true,
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                    isAutoIncrement: true,
+                }, projectId: {
+                    name: "projectId",
+                    type: "Int",
+                    isForeignKey: true,
+                    relationField: 'project',
+                }, project: {
+                    name: "project",
+                    type: "Projects",
+                    isDataModel: true,
+                    backLink: 'stepSequenceMatches',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "projectId" },
+                }, fingerprint: {
+                    name: "fingerprint",
+                    type: "String",
+                }, stepCount: {
+                    name: "stepCount",
+                    type: "Int",
+                }, status: {
+                    name: "status",
+                    type: "StepSequenceMatchStatus",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, scanJobId: {
+                    name: "scanJobId",
+                    type: "String",
+                    isOptional: true,
+                }, isDeleted: {
+                    name: "isDeleted",
+                    type: "Boolean",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": false }] }],
+                }, createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                }, members: {
+                    name: "members",
+                    type: "StepSequenceMatchCase",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'match',
+                },
+            }, uniqueConstraints: {
+                id: {
+                    name: "id",
+                    fields: ["id"]
+                }, projectId_fingerprint_scanJobId: {
+                    name: "projectId_fingerprint_scanJobId",
+                    fields: ["projectId", "fingerprint", "scanJobId"]
+                },
+            },
+        },
+        stepSequenceMatchCase: {
+            name: 'StepSequenceMatchCase', fields: {
+                id: {
+                    name: "id",
+                    type: "Int",
+                    isId: true,
+                    attributes: [{ "name": "@default", "args": [{ "name": "value" }] }],
+                    isAutoIncrement: true,
+                }, matchId: {
+                    name: "matchId",
+                    type: "Int",
+                    isForeignKey: true,
+                    relationField: 'match',
+                }, match: {
+                    name: "match",
+                    type: "StepSequenceMatch",
+                    isDataModel: true,
+                    backLink: 'members',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "matchId" },
+                }, caseId: {
+                    name: "caseId",
+                    type: "Int",
+                    isForeignKey: true,
+                    relationField: 'case',
+                }, case: {
+                    name: "case",
+                    type: "RepositoryCases",
+                    isDataModel: true,
+                    backLink: 'stepSequenceMatchCases',
+                    isRelationOwner: true,
+                    onDeleteAction: 'Cascade',
+                    foreignKeyMapping: { "id": "caseId" },
+                }, startStepId: {
+                    name: "startStepId",
+                    type: "Int",
+                }, endStepId: {
+                    name: "endStepId",
+                    type: "Int",
+                }, isDeleted: {
+                    name: "isDeleted",
+                    type: "Boolean",
+                    attributes: [{ "name": "@default", "args": [{ "name": "value", "value": false }] }],
+                },
+            }, uniqueConstraints: {
+                id: {
+                    name: "id",
+                    fields: ["id"]
+                }, matchId_caseId: {
+                    name: "matchId_caseId",
+                    fields: ["matchId", "caseId"]
+                },
+            },
+        },
         repositoryCases: {
             name: 'RepositoryCases', fields: {
                 id: {
@@ -3120,6 +3332,24 @@ const metadata: ModelMeta = {
                     isDataModel: true,
                     isArray: true,
                     backLink: 'caseB',
+                }, duplicateScanResultsA: {
+                    name: "duplicateScanResultsA",
+                    type: "DuplicateScanResult",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'caseA',
+                }, duplicateScanResultsB: {
+                    name: "duplicateScanResultsB",
+                    type: "DuplicateScanResult",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'caseB',
+                }, stepSequenceMatchCases: {
+                    name: "stepSequenceMatchCases",
+                    type: "StepSequenceMatchCase",
+                    isDataModel: true,
+                    isArray: true,
+                    backLink: 'case',
                 }, comments: {
                     name: "comments",
                     type: "Comment",
@@ -7785,7 +8015,7 @@ const metadata: ModelMeta = {
         user: ['Account', 'UserPreferences', 'ApiToken', 'GroupAssignment', 'UserIntegrationAuth', 'UserProjectPermission', 'Notification', 'ShareLink', 'CommentMention'],
         groups: ['GroupAssignment', 'GroupProjectPermission'],
         roles: ['RolePermission'],
-        projects: ['ProjectAssignment', 'ProjectStatusAssignment', 'ProjectWorkflowAssignment', 'Milestones', 'MilestoneTypesAssignment', 'TemplateProjectAssignment', 'CaseExportTemplateProjectAssignment', 'Repositories', 'RepositoryFolders', 'RepositoryCases', 'RepositoryCaseVersions', 'Sessions', 'SessionVersions', 'TestRuns', 'Issue', 'ProjectCodeRepositoryConfig', 'ProjectLlmIntegration', 'UserProjectPermission', 'GroupProjectPermission', 'SharedStepGroup', 'ShareLink', 'ProjectIntegration', 'LlmFeatureConfig', 'LlmResponseCache', 'Comment'],
+        projects: ['ProjectAssignment', 'ProjectStatusAssignment', 'ProjectWorkflowAssignment', 'Milestones', 'MilestoneTypesAssignment', 'TemplateProjectAssignment', 'CaseExportTemplateProjectAssignment', 'Repositories', 'RepositoryFolders', 'DuplicateScanResult', 'StepSequenceMatch', 'RepositoryCases', 'RepositoryCaseVersions', 'Sessions', 'SessionVersions', 'TestRuns', 'Issue', 'ProjectCodeRepositoryConfig', 'ProjectLlmIntegration', 'UserProjectPermission', 'GroupProjectPermission', 'SharedStepGroup', 'ShareLink', 'ProjectIntegration', 'LlmFeatureConfig', 'LlmResponseCache', 'Comment'],
         milestones: ['Comment'],
         caseFields: ['TemplateCaseAssignment', 'CaseFieldAssignment', 'CaseFieldValues', 'SessionFieldValues'],
         resultFields: ['TemplateResultAssignment', 'ResultFieldAssignment', 'ResultFieldValues'],
@@ -7798,7 +8028,8 @@ const metadata: ModelMeta = {
         configurations: ['ConfigurationConfigVariant'],
         repositories: ['RepositoryFolders', 'RepositoryCases'],
         repositoryFolders: ['RepositoryCases'],
-        repositoryCases: ['RepositoryCaseLink', 'RepositoryCaseVersions', 'CaseFieldValues', 'Attachments', 'Steps', 'TestRunCases', 'JUnitTestResult', 'JUnitProperty', 'JUnitAttachment', 'JUnitTestStep', 'Comment'],
+        stepSequenceMatch: ['StepSequenceMatchCase'],
+        repositoryCases: ['RepositoryCaseLink', 'DuplicateScanResult', 'StepSequenceMatchCase', 'RepositoryCaseVersions', 'CaseFieldValues', 'Attachments', 'Steps', 'TestRunCases', 'JUnitTestResult', 'JUnitProperty', 'JUnitAttachment', 'JUnitTestStep', 'Comment'],
         steps: ['TestRunStepResults'],
         sessions: ['Attachments', 'SessionResults', 'SessionVersions', 'SessionFieldValues', 'Comment'],
         sessionResults: ['ResultFieldValues', 'Attachments'],

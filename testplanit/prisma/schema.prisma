@@ -108,6 +108,19 @@ enum LinkType {
   DEPENDS_ON
 }
 
+enum DuplicateScanResultStatus {
+  PENDING
+  MERGED
+  LINKED
+  DISMISSED
+}
+
+enum StepSequenceMatchStatus {
+  PENDING
+  CONVERTED
+  DISMISSED
+}
+
 enum TestRunType {
   REGULAR
   JUNIT
@@ -484,6 +497,8 @@ model Projects {
   defaultCaseExportTemplateId Int?
   defaultCaseExportTemplate   CaseExportTemplate?                   @relation("ProjectDefaultExportTemplate", fields: [defaultCaseExportTemplateId], references: [id], onDelete: SetNull)
   quickScriptEnabled          Boolean                               @default(false)
+  duplicateScanResults        DuplicateScanResult[]
+  stepSequenceMatches         StepSequenceMatch[]
 
   @@index([isDeleted, isCompleted])
   @@index([createdBy])
@@ -921,6 +936,58 @@ model RepositoryCaseLink {
   @@unique([caseAId, caseBId, type])
 }
 
+model DuplicateScanResult {
+  id              Int                       @id() @default(autoincrement())
+  projectId       Int
+  project         Projects                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  caseAId         Int
+  caseA           RepositoryCases           @relation("DuplicateCaseA", fields: [caseAId], references: [id], onDelete: Cascade)
+  caseBId         Int
+  caseB           RepositoryCases           @relation("DuplicateCaseB", fields: [caseBId], references: [id], onDelete: Cascade)
+  score           Float
+  matchedFields   String[]
+  detectionMethod String                    @default("fuzzy")
+  status          DuplicateScanResultStatus @default(PENDING)
+  scanJobId       String?
+  isDeleted       Boolean                   @default(false)
+  createdAt       DateTime                  @default(now()) @db.Timestamptz(6)
+
+  @@unique([caseAId, caseBId, scanJobId])
+  @@index([projectId, status, isDeleted])
+  @@index([scanJobId])
+}
+
+model StepSequenceMatch {
+  id          Int                     @id() @default(autoincrement())
+  projectId   Int
+  project     Projects                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fingerprint String
+  stepCount   Int
+  status      StepSequenceMatchStatus @default(PENDING)
+  scanJobId   String?
+  isDeleted   Boolean                 @default(false)
+  createdAt   DateTime                @default(now()) @db.Timestamptz(6)
+  members     StepSequenceMatchCase[]
+
+  @@unique([projectId, fingerprint, scanJobId])
+  @@index([projectId, status, isDeleted])
+  @@index([scanJobId])
+}
+
+model StepSequenceMatchCase {
+  id          Int               @id() @default(autoincrement())
+  matchId     Int
+  match       StepSequenceMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  caseId      Int
+  case        RepositoryCases   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  startStepId Int
+  endStepId   Int
+  isDeleted   Boolean           @default(false)
+
+  @@unique([matchId, caseId])
+  @@index([caseId])
+}
+
 model RepositoryCases {
   id                     Int                      @id() @default(autoincrement())
   projectId              Int
@@ -961,6 +1028,9 @@ model RepositoryCases {
   junitTestSteps         JUnitTestStep[]          @relation("JUnitTestStepCase")
   linksFrom              RepositoryCaseLink[]     @relation("CaseALinks")
   linksTo                RepositoryCaseLink[]     @relation("CaseBLinks")
+  duplicateScanResultsA  DuplicateScanResult[]    @relation("DuplicateCaseA")
+  duplicateScanResultsB  DuplicateScanResult[]    @relation("DuplicateCaseB")
+  stepSequenceMatchCases StepSequenceMatchCase[]
   comments               Comment[]
 
   @@unique([projectId, name, className, source])

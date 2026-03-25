@@ -116,7 +116,6 @@
       "junit": {
         "details": "Détails des résultats des tests automatisés",
         "import": {
-          "trigger": "Résultats des tests d'importation",
           "title": "Résultats des tests d'importation",
           "description": "Importez les fichiers de résultats de test dans une nouvelle exécution. Formats pris en charge : JUnit, TestNG, xUnit, NUnit, MSTest, Mocha et Cucumber.",
           "testRun": {
@@ -146,7 +145,6 @@
           },
           "error": {
             "title": "Erreur d'importation",
-            "missingFields": "Veuillez remplir tous les champs obligatoires et télécharger les fichiers de résultats de test.",
             "importFailed": "Échec de l'importation des résultats des tests. Veuillez réessayer."
           },
           "success": {
@@ -158,33 +156,14 @@
       },
       "testResults": {
         "import": {
-          "title": "Résultats des tests d'importation",
-          "description": "Importez les fichiers de résultats de test dans une nouvelle exécution. Formats pris en charge : JUnit, TestNG, xUnit, NUnit, MSTest, Mocha et Cucumber.",
           "format": {
             "label": "Format du résultat",
             "placeholder": "Sélectionnez le format"
-          },
-          "file": {
-            "label": "Fichiers de résultats de test"
-          },
-          "progress": {
-            "parsing": "Analyse des résultats {format} ...",
-            "parseWarnings": "Analyse effectuée avec {count, plural, one {# avertissement} other {# avertissements}}",
-            "errorParsing": "Erreur d'analyse des fichiers : {error}"
-          },
-          "error": {
-            "missingFields": "Veuillez remplir tous les champs obligatoires et télécharger les fichiers de résultats de test.",
-            "importFailed": "Impossible d'importer les résultats des tests. Veuillez vérifier le format du fichier et réessayer."
-          },
-          "success": {
-            "description": "Les résultats des tests ont été importés avec succès."
-          },
-          "fileRequired": "Veuillez télécharger au moins un fichier de résultats de test."
+          }
         }
       },
       "confirmRestoreTitle": "Confirmer la restauration",
       "confirmPurgeTitle": "Confirmer la purge",
-      "view": "Voir",
       "remove": "Retirer"
     },
     "permissions": {
@@ -663,19 +642,16 @@
       "goToPrevious": "Aller à la page précédente",
       "goToNext": "Passer à la page suivante",
       "all": "Tous les articles",
-      "entries": "{count, plural, =1 {article} other {articles}}",
+      "entries": "{count, plural, =1 {# article} other {# articles}}",
       "pageSize": "Format de page",
       "showing": "Affichage",
-      "total": "total {count, plural, =1 {article} other {articles}}",
+      "total": "total {count, plural, =1 {# article} other {# articles}}",
       "filtered": "filtré de",
       "pageOfPages": "Page {current} de {total}"
     },
     "upload": {
       "title": "Ajouter une nouvelle photo de profil",
       "description": "Glissez-déposez votre image ou cliquez sur le bouton ci-dessous pour sélectionner un fichier.",
-      "errors": {
-        "unknown": "Une erreur inconnue s'est produite."
-      },
       "attachments": {
         "title": "Télécharger des pièces jointes",
         "description": "Glissez-déposez vos fichiers ou cliquez sur le bouton ci-dessous pour sélectionner des fichiers.",
@@ -703,11 +679,6 @@
       "setColor": "Définir la couleur",
       "enterUrl": "Saisissez l'URL, y compris https://",
       "uploadFile": "Téléverser un fichier",
-      "paragraph": "Paragraphe",
-      "heading1": "Titre 1",
-      "heading2": "Titre 2",
-      "heading3": "Titre 3",
-      "codeBlock": "Bloc de code",
       "video": {
         "controls": "Commandes du lecteur vidéo"
       },
@@ -1164,10 +1135,8 @@
           "noOverride": "Aucune modification possible",
           "projectOverride": "Remplacement du projet",
           "promptConfig": "Invite de configuration",
-          "projectDefault": "Projet par défaut",
           "noLlmConfigured": "Aucun LLM configuré",
           "selectIntegration": "Sélectionnez l'intégration...",
-          "clearOverride": "Clair",
           "overrideSaved": "Remplacement de fonctionnalité enregistré",
           "overrideCleared": "Remplacement de fonctionnalité effacé",
           "overrideError": "Échec de l'enregistrement de la modification de fonctionnalité"
@@ -1193,7 +1162,6 @@
         "repository": {
           "title": "Dépôt de code",
           "description": "Sélectionnez le dépôt de code à utiliser pour le contexte de l'IA",
-          "label": "Dépôt de code",
           "placeholder": "Sélectionnez un dépôt de code...",
           "branchLabel": "Bifurquer",
           "branchPlaceholder": "Laissez vide pour utiliser la branche par défaut du dépôt"
@@ -1228,10 +1196,7 @@
           "listingFiles": "Liste des fichiers…",
           "cachingFiles": "Mise en cache des fichiers {count}…",
           "statusNeverFetched": "Jamais récupéré",
-          "statusSuccess": "Succès",
-          "statusError": "Erreur",
           "statusPending": "Rafraîchissant...",
-          "statusLabel": "Statut",
           "lastFetched": "Dernière récupération",
           "filesCached": "Fichiers en cache",
           "totalSize": "Taille totale"
@@ -1260,7 +1225,6 @@
           "defaultPlaceholder": "Aucun (utiliser la valeur par défaut globale)",
           "assigned": "Attribué",
           "save": "Enregistrer les devoirs du modèle",
-          "saving": "Économie...",
           "saved": "Modèles d'affectation enregistrés",
           "saveError": "Impossible d'enregistrer les affectations de modèle."
         },
@@ -1758,8 +1722,7 @@
     "folderActions": {
       "edit": "Modifier le dossier",
       "delete": "Supprimer le dossier",
-      "rename": "Renommer le dossier",
-      "copyMove": "Copier / Déplacer vers le projet"
+      "rename": "Renommer le dossier"
     },
     "cases": {
       "filter": "Boîtiers de filtre...",
@@ -2046,9 +2009,6 @@
       "copySuccess": "Copié dans le presse-papiers",
       "fallbackBadge": "Généré à partir d'un modèle (IA indisponible)",
       "retryButton": "Réessayer la génération d'IA",
-      "downloadButton": "Télécharger",
-      "copyButton": "Copier dans le presse-papiers",
-      "backButton": "Dos",
       "aiGenerated": "Généré par l'IA",
       "templateGenerated": "Modèle généré",
       "truncatedWarning": "Le résultat a été tronqué : le modèle a atteint sa limite de jetons. Essayez de réduire la taille du lot ou d’augmenter le nombre maximal de jetons de sortie dans votre configuration d’invite.",
@@ -2056,6 +2016,73 @@
       "noCodeContextHint": "Aucun dépôt de code n'est configuré. L'IA utilisera des modèles de framework standard.",
       "generatingParallelProgress": "Génération de {done} de fichiers {total}...",
       "cancelledGeneration": "Annulé"
+    },
+    "duplicates": {
+      "findDuplicates": "Trouver les doublons",
+      "viewResults": "Afficher {count, plural, one {# Résultat} other {# Résultats}}",
+      "retryScan": "Réessayer l'analyse",
+      "analyzing": "{analyzed}/{total}",
+      "aiAnalyzing": "Améliorer les résultats grâce à l'IA...",
+      "scanComplete": "Analyse des doublons terminée — {count, plural, =0 {aucun doublon trouvé} one {# doublon potentiel trouvé} other {# doublons potentiels trouvés}}",
+      "scanFailed": "L'analyse en double a échoué",
+      "scanFailedDescription": "Une erreur inattendue s'est produite.",
+      "pageTitle": "Candidats en double",
+      "pageDescription": "Examiner les cas de test potentiellement dupliqués trouvés lors de la dernière analyse.",
+      "rescan": "Analyser à nouveau",
+      "cancelScan": "Annuler l'analyse",
+      "loading": "Chargement des candidats en double...",
+      "noDuplicatesFound": "Aucun doublon trouvé",
+      "noDuplicatesDescription": "Dernière analyse terminée sans aucune paire correspondante.",
+      "loadMore": "Charger plus",
+      "filterPlaceholder": "Filtrer les doublons...",
+      "columnConfidence": "Confiance",
+      "columnCaseA": "Cas A",
+      "columnCaseB": "Cas B",
+      "columnMatchedFields": "Champs appariés",
+      "columnScore": "Score",
+      "compareButton": "Comparer",
+      "viewCaseDetails": "Voir les détails de l'affaire",
+      "selectAll": "Tout sélectionner",
+      "selectRow": "Sélectionner la ligne",
+      "selected": "{count, plural, one {# sélectionné} other {# sélectionné}}",
+      "bulkDismiss": "Non dupliqué ({count})",
+      "bulkLink": "Lien associé ({count})",
+      "bulkDismissSuccess": "{count, plural, one {# paire rejetée} other {# paires rejetées}}",
+      "bulkLinkSuccess": "{count, plural, one {# paire liée} other {# paires liées}}",
+      "bulkError": "Certaines opérations ont échoué. Veuillez réessayer.",
+      "tableHint": "Cliquez sur une ligne ou sur le bouton Comparer pour examiner et résoudre les doublons.",
+      "comparisonTitle": "{caseA} vs {caseB}",
+      "comparisonDescription": "Comparez ces doublons potentiels et choisissez comment les résoudre.",
+      "selectPrimary": "Cliquez sur un dossier pour le sélectionner comme dossier principal à fusionner.",
+      "selectedAsPrimary": "Sélectionné comme principal",
+      "mergeButton": "Conserver le primaire",
+      "linkButton": "Lien associé",
+      "dismissButton": "Ce n'est pas un doublon",
+      "merging": "Fusion...",
+      "linking": "Enchaînement...",
+      "dismissing": "Rejeter...",
+      "mergeSuccess": "Les dossiers ont été fusionnés avec succès. {runsTransferred, plural, =0 {Aucun test transféré} one {# test transféré} other {# tests transférés}}.",
+      "linkSuccess": "Dossiers liés.",
+      "dismissSuccess": "Paire rejetée. Elle n'apparaîtra pas dans les prochains scans.",
+      "resolveError": "Impossible de résoudre la paire en double. Veuillez réessayer.",
+      "loadingDetails": "Chargement des détails de l'affaire...",
+      "caseDetailsError": "Impossible de charger les détails du dossier.",
+      "sourceLabel": "Source",
+      "fieldValuesLabel": "Valeurs du champ",
+      "lastRunLabel": "Dernière course",
+      "noFieldValues": "Aucune valeur de champ",
+      "noLastRun": "Ne jamais courir",
+      "stepExpectedResult": "{step} → {result}",
+      "runStatusDate": "{status} — {date}",
+      "noFolder": "Aucun dossier",
+      "duplicateWarning": "Des doublons possibles ont été trouvés.",
+      "duplicateWarningDescription": "{count, plural, one {# cas existant} other {# cas existants}} peut couvrir des fonctionnalités similaires",
+      "duplicateWarningReview": "Revoir",
+      "importWarning": "Duplicata possible",
+      "importWarningTooltip": "Ce nom de cas est similaire à {count, plural, one {# cas existant} other {# cas existants}}: {names}",
+      "importIntraWarning": "Duplicata dans l'importation",
+      "importIntraWarningTooltip": "Les lignes {rows} de cette importation ont un nom identique ou très similaire.",
+      "checkingDuplicates": "Vérification des doublons..."
     },
     "generateTestCases": {
       "buttonText": "Générer des cas de test",
@@ -2141,7 +2168,6 @@
       "errors": {
         "generateFailed": "Impossible de générer les cas de test. Veuillez réessayer.",
         "importFailed": "L'importation des cas de test a échoué. Veuillez réessayer.",
-        "noTestCasesSelected": "Veuillez sélectionner au moins un cas de test à importer.",
         "noTestCasesGenerated": "Aucun cas de test n'a été généré. Veuillez réessayer avec des entrées différentes.",
         "noAiModel": "Aucun modèle d'IA n'est configuré pour ce projet. Veuillez configurer un modèle d'IA dans les paramètres du projet.",
         "noIssueSelected": "Veuillez sélectionner un problème à partir duquel générer des cas de test.",
@@ -2411,7 +2437,6 @@
       "issues": "Problèmes",
       "appConfig": "Configuration de l'application",
       "notifications": "Notifications",
-      "systemHeader": "Système",
       "imports": "Importation de données",
       "integrations": "Intégrations de problèmes",
       "llm": "Modèles d'IA",
@@ -2557,7 +2582,6 @@
         "previousImportsNoFilename": "Fichier inconnu",
         "jobHistoryLoadFailed": "Nous n'avons pas pu charger les tâches précédemment importées.",
         "jobLoadFailed": "Nous n'avons pas pu charger cette tâche d'importation.",
-        "uploadProgressUploading": "Chargement en cours...",
         "uploadProgressAnalyzing": "Téléchargement terminé. Analyse du fichier…",
         "uploadProgressComplete": "Téléchargement terminé",
         "etaLabel": "ETA : {time}",
@@ -2657,7 +2681,6 @@
           "templateFieldDuplicateTargetWarning": "La cible sélectionnée est déjà associée à un autre champ Testmo. Veuillez choisir une autre cible.",
           "templateFieldTargetAlreadyUsed": "Déjà cartographié",
           "templateFieldMappedSummary": "Associé à {name} ({type})",
-          "templateFieldIssueBadge": "Nécessite une attention particulière",
           "templateFieldIssueMissingTarget": "Sélectionnez un champ cible.",
           "templateFieldIssueMissingDetails": "Veuillez indiquer le nom d'affichage, le nom du système et le type de champ avant de continuer.",
           "noTemplatesAvailable": "Aucun modèle disponible.",
@@ -3170,7 +3193,6 @@
         "category": "Catégorie",
         "framework": "Cadre",
         "fileExtension": "Extension de fichier",
-        "language": "Langue",
         "headerBody": "Modèle d'en-tête",
         "templateBody": "Corps du modèle",
         "footerBody": "Modèle de pied de page",
@@ -3223,8 +3245,6 @@
       "variableInserter": {
         "placeholder": "Insérer une variable...",
         "groups": {
-          "caseFields": "Champs de cas",
-          "steps": "Mesures",
           "customFields": "Champs personnalisés"
         },
         "stepsBlock": "Bloc d'escaliers"
@@ -3266,7 +3286,6 @@
         "revoked": "Révoqué",
         "expired": "Expiré"
       },
-      "lastUsedNever": "Jamais",
       "noExpiry": "Aucune date d'expiration",
       "revokeToken": "Révoquer le jeton",
       "revokeConfirmTitle": "Révoquer le jeton API",
@@ -3302,11 +3321,6 @@
     },
     "workflows": {
       "description": "Gérer les flux de travail des cas de test",
-      "types": {
-        "NOT_STARTED": "Non démarré",
-        "IN_PROGRESS": "En cours",
-        "DONE": "Fait"
-      },
       "add": {
         "button": "Ajouter un flux de travail",
         "title": "Ajouter un nouveau flux de travail",
@@ -3953,7 +3967,6 @@
         "spendOfBudget": "{currentSpend} de {budgetLimit}",
         "overBudget": "Dépassement du budget",
         "budgetPercentage": "{percentage}% du budget utilisé",
-        "resetSpend": "Réinitialiser",
         "spendReset": "Les dépenses du mois en cours ont été réinitialisées."
       }
     },
@@ -3991,7 +4004,6 @@
         "warning": "Cette action est irréversible. Tous les projets utilisant cette configuration reviendront à la configuration d'invite de commande par défaut."
       },
       "llmColumn": "LLM",
-      "projectDefaultLabel": "Projet par défaut",
       "mixedLlms": "{count} LLM",
       "cannotDeleteDefault": "Impossible de supprimer la configuration d'invite par défaut. Veuillez d'abord en définir une autre comme invite par défaut.",
       "defaultChanged": "La configuration d'invite par défaut a été mise à jour avec succès.",
@@ -4300,8 +4312,6 @@
       "completed": "(Complet)",
       "targetFolder": "Dossier cible",
       "newFolderPlaceholder": "Nom du nouveau dossier...",
-      "createFolder": "Créer",
-      "next": "Suivant",
       "operation": "Opération",
       "operationCopy": "Copie",
       "operationCopyDesc": "Crée une copie du ou des cas sélectionnés dans le projet cible. Les originaux restent inchangés.",
@@ -4323,18 +4333,14 @@
       "sharedStepGroupReuseDesc": "Les cas feront référence au groupe d'étapes partagé existant.",
       "sharedStepGroupCreateNew": "Créer un nouveau",
       "sharedStepGroupCreateNewDesc": "Un nouveau groupe de partage de pas sera créé.",
-      "back": "Dos",
       "go": "Aller",
       "processing": "Traitement...",
       "progressText": "{processed} de {total} cas traités",
-      "cancel": "Annuler",
-      "complete": "Complet",
       "successCount": "{count} cas {operation}d avec succès",
       "skipped": "Ignoré : {count}",
       "droppedLinks": "Liens inter-projets supprimés : {count}",
       "errorCount": "{count} cas ont échoué",
       "viewInTargetProject": "Voir dans le projet cible",
-      "close": "Fermer",
       "failed": "Échoué",
       "folderMode": "Dossier \"{folderName}\" — {caseCount, plural, one {# cas} other {# cas}}"
     }
@@ -5331,7 +5337,6 @@
         "passRate": "Taux de réussite",
         "passed": "Passé",
         "failed": "Échoué",
-        "untested": "Non testé",
         "lastStatus": "Dernier statut",
         "lastExecuted": "Dernière exécution",
         "notTested": "Non testé",
@@ -5508,20 +5513,17 @@
       "expiration": {
         "label": "Expiration",
         "noExpiration": "Aucune date d'expiration",
-        "expiresAtMidnight": "Le lien expirera à la fin de la journée sélectionnée (heure locale).",
-        "clear": "Clair"
+        "expiresAtMidnight": "Le lien expirera à la fin de la journée sélectionnée (heure locale)."
       },
       "notifyOnView": {
         "label": "Prévenez-moi quand quelqu'un consultera ce lien",
         "description": "Vous recevrez une notification lorsque le lien de partage sera consulté, conformément à vos préférences de notification."
       },
       "title": {
-        "label": "Titre",
         "placeholder": "par exemple, rapport d'exécution des tests",
         "leaveEmptyToUse": "Laisser vide pour utilisation :"
       },
       "description": {
-        "label": "Description",
         "placeholder": "Ajoutez une description à ce rapport partagé..."
       },
       "actions": {
@@ -5554,22 +5556,13 @@
       },
       "shareList": {
         "columns": {
-          "title": "Titre",
-          "project": "Projet",
           "mode": "Mode",
           "views": "Vues",
-          "notifications": "Notifications",
-          "created": "Créé",
-          "expires": "Expire",
-          "status": "Statut"
+          "expires": "Expire"
         },
         "status": {
-          "active": "Actif",
           "revoked": "Révoqué",
           "expired": "Expiré"
-        },
-        "expires": {
-          "never": "Jamais"
         },
         "notifications": {
           "enabled": "Sur",
@@ -5582,26 +5575,19 @@
         "defaultTitle": "{entityType} partager",
         "noProject": "Projet transversal",
         "actions": {
-          "label": "Actes",
           "copyLink": "Copier le lien",
-          "copied": "Copié !",
-          "edit": "Modifier",
-          "revoke": "Révoquer",
-          "delete": "Supprimer"
+          "revoke": "Révoquer"
         },
         "revokeDialog": {
           "title": "Révoquer le lien de partage ?",
           "description": "Cette action révoquera immédiatement le lien de partage. Toute personne tentant d'y accéder verra un message d'erreur. Cette action est irréversible.",
-          "cancel": "Annuler",
           "confirm": "Révoquer le lien",
           "revoking": "Révocation..."
         },
         "deleteDialog": {
           "title": "Supprimer le lien de partage ?",
           "description": "Cette action supprimera définitivement le lien de partage. S'il est actuellement actif, il expirera immédiatement et deviendra inaccessible. Cette action est irréversible.",
-          "cancel": "Annuler",
-          "confirm": "Supprimer le lien",
-          "deleting": "Suppression en cours..."
+          "confirm": "Supprimer le lien"
         },
         "toast": {
           "linkCopied": "Lien copié !",
@@ -5629,15 +5615,11 @@
         "description": "Votre lien de partage est prêt à être utilisé. Copiez-le et partagez-le avec d'autres personnes.",
         "shareLink": "Partager le lien",
         "copy": "Copie",
-        "copied": "Copié !",
         "openInNewTab": "Ouvrir dans un nouvel onglet",
         "metadata": {
           "mode": "Mode",
           "expires": "Expire",
-          "notifications": "Notifications",
-          "views": "Vues",
-          "enabled": "Activé",
-          "disabled": "Désactivé"
+          "views": "Vues"
         },
         "warnings": {
           "publicLink": "Lien public :",
@@ -5645,19 +5627,14 @@
           "expiresSoon": "Ce lien expirera à la fin de"
         },
         "actions": {
-          "createAnother": "Créer un autre",
-          "done": "Fait"
+          "createAnother": "Créer un autre"
         }
       },
       "editDialog": {
         "title": "Modifier le lien de partage",
         "description": "Mettez à jour les paramètres de ce lien de partage.",
         "passwordExists": "Ce lien de partage est déjà protégé par un mot de passe. Laissez le champ du mot de passe vide pour conserver le mot de passe existant.",
-        "passwordPlaceholder": "Laisser vide pour conserver le mot de passe existant",
-        "confirmPassword": "Confirmez le mot de passe",
-        "cancel": "Annuler",
-        "saving": "Économie...",
-        "save": "Enregistrer les modifications"
+        "passwordPlaceholder": "Laisser vide pour conserver le mot de passe existant"
       }
     },
     "passwordDialog": {
@@ -5734,7 +5711,6 @@
       },
       "page1": {
         "title": "Téléchargement du fichier et configuration",
-        "uploadFile": "Téléverser un fichier",
         "selectedFile": "Fichier sélectionné",
         "delimiter": "Délimiteur de champ",
         "delimiters": {
@@ -5764,7 +5740,6 @@
     "manualEntry": {
       "buttonLabel": "Ajouter manuellement",
       "description": "Créer un nouveau groupe d'étapes partagé avec saisie manuelle",
-      "groupNameLabel": "Nom du groupe",
       "groupNamePlaceholder": "Saisissez un nom pour ce groupe de pas partagé",
       "success": "Étapes partagées créées avec succès",
       "errors": {
@@ -5772,7 +5747,53 @@
         "stepsRequired": "Au moins une étape est nécessaire",
         "saveFailed": "Impossible d'enregistrer les étapes partagées"
       }
-    }
+    },
+    "stepDuplicates": {
+      "pageTitle": "Duplicata de séquence d'étapes",
+      "pageDescription": "Examinez les séquences d'étapes correspondantes dans les différents cas de test. Convertissez les correspondances en groupes d'étapes partagées ou éliminez les faux positifs.",
+      "noResultsFound": "Aucune séquence d'étapes en double n'a été trouvée.",
+      "noResultsDescription": "Effectuez une analyse pour détecter les séquences d'étapes répétées dans vos cas de test.",
+      "filterPlaceholder": "Filtrer par nom de dossier...",
+      "selected": "{count, plural, one {# sélectionné} other {# sélectionné}}",
+      "bulkDismiss": "Ignorer ({count})",
+      "bulkDismissSuccess": "{count, plural, one {# match rejeté} other {# matchs rejetés}}",
+      "bulkError": "Certaines opérations ont échoué. Veuillez réessayer.",
+      "tableHint": "Cliquez sur une ligne pour prévisualiser les étapes correspondantes. Sélectionnez les lignes à l'aide de cases à cocher pour effectuer des actions groupées.",
+      "columns": {
+        "matchedSteps": "Étapes assorties",
+        "casesCount": "Cas",
+        "review": "Revoir"
+      },
+      "scanning": "Balayage...",
+      "scanComplete": "{count, plural, one {# correspondance trouvée} other {# correspondances trouvées}}",
+      "scanFailed": "L'analyse a échoué",
+      "scanFailedDescription": "Une erreur s'est produite lors de l'analyse. Veuillez réessayer.",
+      "cancelScan": "Annuler l'analyse",
+      "findStepDuplicates": "Trouver les doublons d'étapes",
+      "rescan": "Balayage",
+      "viewResults": "Afficher les résultats ({count})",
+      "retryScan": "Réessayer l'analyse",
+      "dialog": {
+        "title": "Convertir en étapes partagées",
+        "previewTitle": "Séquence d'étapes correspondante",
+        "casesTitle": "Cas de test concernés",
+        "casesDescription": "Décochez les cas que vous souhaitez exclure de la conversion.",
+        "nameLabel": "Nom du groupe de pas partagé",
+        "namePlaceholder": "Saisissez un nom pour le groupe d'étapes partagé...",
+        "converting": "Conversion en cours...",
+        "dismissMatch": "Rejeter le match",
+        "dismissing": "Rejeter...",
+        "convertSuccess": "Groupe de partage de pas créé avec succès !",
+        "convertError": "La conversion a échoué. Veuillez réessayer.",
+        "dismissSuccess": "Match annulé.",
+        "dismissError": "Impossible de fermer. Veuillez réessayer.",
+        "viewSharedStep": "Afficher le groupe d'étapes partagé",
+        "skippedWarning": "{count, plural, one {# cas ignoré} other {# cas ignorés}} (obsolète ou déjà converti).",
+        "noCasesSelected": "Sélectionnez au moins un cas à convertir.",
+        "selectAll": "Tout sélectionner"
+      }
+    },
+    "findStepDuplicates": "Trouver les doublons"
   },
   "search": {
     "title": "Recherche",
@@ -5943,7 +5964,6 @@
     "sheetTitle": "Partagez vos commentaires",
     "sheetDescription": "Aidez-nous à améliorer TestPlanIt en partageant votre expérience.",
     "bannerMessage": "Comment se déroule votre procès ? Nous aimerions connaître votre avis.",
-    "takeSurvey": "Partager vos commentaires",
     "menuItem": "Partager vos commentaires"
   },
   "autoTag": {
@@ -6007,7 +6027,6 @@
     },
     "entityDetail": {
       "customFields": "Champs personnalisés",
-      "documentation": "Documentation",
       "noDetails": "Aucun détail supplémentaire disponible.",
       "openInNewTab": "Ouvrir dans un nouvel onglet"
     }

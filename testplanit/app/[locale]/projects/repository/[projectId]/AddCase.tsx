@@ -41,10 +41,11 @@ import { ApplicationArea, Prisma } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Asterisk, ChevronLeft, ChevronRight, CirclePlus } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import parseDuration from "parse-duration";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { emptyEditorContent, MAX_DURATION } from "~/app/constants";
@@ -263,6 +264,7 @@ interface FormValues {
 
 export function AddCaseModal({ folderId }: AddCaseModalProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const { data: session } = useSession();
   const { projectId } = useParams();
   const numericProjectId = Number(projectId);
@@ -717,6 +719,44 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
     return null;
   }
 
+  const checkForDuplicates = async (caseName: string, caseId: number, tagNames: string[]) => {
+    try {
+      const res = await fetch("/api/duplicate-scan/check-new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: Number(projectId), caseId, name: caseName, tags: tagNames }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.cases && data.cases.length > 0) {
+        const caseLinks = data.cases.map((c: { id: number; name: string }) =>
+          React.createElement("a", {
+            key: c.id,
+            href: `/${locale}/projects/repository/${projectId}/${c.id}`,
+            target: "_blank",
+            rel: "noopener noreferrer",
+            style: { textDecoration: "underline", display: "block", marginTop: 4 },
+          }, c.name),
+        );
+        toast.warning(t("repository.duplicates.duplicateWarning"), {
+          description: React.createElement("div", null,
+            t("repository.duplicates.duplicateWarningDescription", { count: data.cases.length }),
+            ...caseLinks,
+            React.createElement("a", {
+              href: `/${locale}/projects/repository/${projectId}/duplicates`,
+              target: "_blank",
+              rel: "noopener noreferrer",
+              style: { textDecoration: "underline", fontWeight: 500, display: "block", marginTop: 8 },
+            }, t("repository.duplicates.duplicateWarningReview")),
+          ),
+          duration: 15000,
+        });
+      }
+    } catch {
+      // Silently ignore — duplicate check is advisory only
+    }
+  };
+
   async function onSubmit(data: FormValues) {
     setIsSubmitting(true);
 
@@ -1074,6 +1114,9 @@ export function AddCaseModal({ folderId }: AddCaseModalProps) {
         setSelectedTags([]);
         setLinkedIssueIds([]);
         setSelectedFiles([]);
+
+        // Fire-and-forget duplicate check — never blocks the save
+        checkForDuplicates(convertedData.name, newCase.id, tagNamesForVersion).catch(() => {});
       }
     } catch (err: any) {
       form.setError("root", {

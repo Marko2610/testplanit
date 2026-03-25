@@ -801,7 +801,6 @@ export function TestmoImportPanel() {
     [analysis, selectedDataset]
   );
 
-
   const canStartImport = useMemo(() => {
     if (!currentJob || currentJob.status !== "READY") {
       return false;
@@ -1176,7 +1175,7 @@ export function TestmoImportPanel() {
   const uploadProgressLabel = useMemo(() => {
     switch (uploadProgress.state) {
       case "uploading":
-        return t("testmo.uploadProgressUploading");
+        return tCommon("status.uploading");
       case "analyzing":
         return t("testmo.uploadProgressAnalyzing");
       case "complete":
@@ -1184,7 +1183,7 @@ export function TestmoImportPanel() {
       default:
         return "";
     }
-  }, [uploadProgress, t]);
+  }, [uploadProgress, t, tCommon]);
 
   const translatedError = useMemo(() => {
     if (!errorKey) {

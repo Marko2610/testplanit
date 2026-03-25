@@ -221,6 +221,26 @@ export const upgradeNotifications: Record<string, UpgradeNotification> = {
       </ul>
     `,
   },
+  "0.18.0": {
+    title: "New Feature: Duplicate Detection",
+    message: `
+      <p>Find and resolve <strong>duplicate test cases</strong> and <strong>repeated step sequences</strong> across your repository.</p>
+      <h4>Duplicate Test Cases</h4>
+      <ul>
+        <li>Click <strong>Find Duplicates</strong> in the Repository toolbar to scan your project</li>
+        <li>Review candidate pairs side-by-side with confidence scores (High / Medium / Low)</li>
+        <li>Resolve each pair by <strong>merging</strong>, <strong>linking as related</strong>, or <strong>dismissing</strong></li>
+        <li>Get a soft warning when saving a new test case that resembles an existing one</li>
+      </ul>
+      <h4>Duplicate Steps</h4>
+      <ul>
+        <li>Navigate to <strong>Shared Steps</strong> and click <strong>Find Duplicates</strong> to scan for repeated step sequences</li>
+        <li>Preview and edit steps before converting, then create a Shared Step Group in one click</li>
+        <li>Dismiss false positives individually or in bulk</li>
+      </ul>
+      <p>Projects with an LLM integration can enable <strong>semantic analysis</strong> for test case detection. See the <a href="https://docs.testplanit.com/blog/duplicate-detection" target="_blank">blog post</a> for details.</p>
+    `,
+  },
 };
 
 /**

@@ -3029,6 +3029,87 @@ export class ApiHelper {
   }
 
   /**
+   * Create a DuplicateScanResult record directly in the database.
+   * Used by E2E tests to set up deterministic duplicate pairs without
+   * relying on Elasticsearch indexing and scan timing.
+   */
+  async createDuplicateScanResult(
+    projectId: number,
+    caseAId: number,
+    caseBId: number,
+    score: number = 0.9,
+    matchedFields: string[] = ["name"],
+  ): Promise<number> {
+    const response = await this.request.post(
+      `${this.baseURL}/api/model/duplicateScanResult/create`,
+      {
+        data: {
+          data: {
+            project: { connect: { id: projectId } },
+            caseA: { connect: { id: caseAId } },
+            caseB: { connect: { id: caseBId } },
+            score,
+            matchedFields,
+            detectionMethod: "e2e-test",
+            scanJobId: `e2e-${Date.now()}`,
+          },
+        },
+      },
+    );
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to create DuplicateScanResult: ${error}`);
+    }
+    const data = await response.json();
+    return data.id;
+  }
+
+  /**
+   * Create a StepSequenceMatch record with member cases directly in the database.
+   * Used by E2E tests to set up deterministic step-duplicate results without
+   * relying on the BullMQ scan worker.
+   */
+  async createStepSequenceMatch(
+    projectId: number,
+    members: Array<{
+      caseId: number;
+      startStepId: number;
+      endStepId: number;
+    }>,
+    stepCount: number = 3,
+  ): Promise<number> {
+    const fingerprint = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const response = await this.request.post(
+      `${this.baseURL}/api/model/stepSequenceMatch/create`,
+      {
+        data: {
+          data: {
+            project: { connect: { id: projectId } },
+            fingerprint,
+            stepCount,
+            scanJobId: `e2e-${Date.now()}`,
+            status: "PENDING",
+            isDeleted: false,
+            members: {
+              create: members.map((m) => ({
+                case: { connect: { id: m.caseId } },
+                startStepId: m.startStepId,
+                endStepId: m.endStepId,
+              })),
+            },
+          },
+        },
+      },
+    );
+    if (!response.ok()) {
+      const error = await response.text();
+      throw new Error(`Failed to create StepSequenceMatch: ${error}`);
+    }
+    const data = await response.json();
+    return data.id;
+  }
+
+  /**
    * Clean up all test data created during tests
    */
   async cleanup(): Promise<void> {
