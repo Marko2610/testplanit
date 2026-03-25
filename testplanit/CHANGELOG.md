@@ -1,3 +1,9 @@
+## [0.18.3](https://github.com/TestPlanIt/testplanit/compare/v0.18.2...v0.18.3) (2026-03-25)
+
+### Bug Fixes
+
+* enhance Prisma client usage in shared steps resolution ([7e8cc1e](https://github.com/TestPlanIt/testplanit/commit/7e8cc1e414f9a1cf28e17748e97df50711dd445e))
+
 ## [0.18.2](https://github.com/TestPlanIt/testplanit/compare/v0.18.1...v0.18.2) (2026-03-25)
 
 ### Bug Fixes
