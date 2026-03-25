@@ -1,3 +1,9 @@
+## [0.18.2](https://github.com/TestPlanIt/testplanit/compare/v0.18.1...v0.18.2) (2026-03-25)
+
+### Bug Fixes
+
+* **workers:** add new step sequence scan worker ([4ffdc5e](https://github.com/TestPlanIt/testplanit/commit/4ffdc5e257517a3f79c2b221f48d8822deec0cab))
+
 ## [0.18.1](https://github.com/TestPlanIt/testplanit/compare/v0.18.0...v0.18.1) (2026-03-25)
 
 ### Enhancements
