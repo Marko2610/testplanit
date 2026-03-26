@@ -261,6 +261,92 @@ describe("AuditLog Service", () => {
     });
   });
 
+  describe("captureAuditEvent tenantId handling", () => {
+    it("should use explicit tenantId from event when provided", async () => {
+      const event: AuditEvent = {
+        action: "CREATE",
+        entityType: "Issue",
+        entityId: "456",
+        tenantId: "tenant-from-worker",
+      };
+
+      mockQueue.add.mockResolvedValue({ id: "job-1" });
+
+      await captureAuditEvent(event);
+
+      expect(mockQueue.add).toHaveBeenCalledWith(
+        "audit-event",
+        expect.objectContaining({
+          tenantId: "tenant-from-worker",
+        }),
+        expect.any(Object)
+      );
+    });
+
+    it("should fall back to getCurrentTenantId when no explicit tenantId", async () => {
+      const multiTenant = await import("../multiTenantPrisma");
+      vi.mocked(multiTenant.getCurrentTenantId).mockReturnValue("tenant-from-env");
+
+      const event: AuditEvent = {
+        action: "CREATE",
+        entityType: "Issue",
+        entityId: "456",
+      };
+
+      mockQueue.add.mockResolvedValue({ id: "job-1" });
+
+      await captureAuditEvent(event);
+
+      const jobData = mockQueue.add.mock.calls[0][1];
+      expect(jobData.tenantId).toBe("tenant-from-env");
+
+      // Restore default
+      vi.mocked(multiTenant.getCurrentTenantId).mockReturnValue(undefined);
+    });
+
+    it("should prefer explicit tenantId over getCurrentTenantId", async () => {
+      const multiTenant = await import("../multiTenantPrisma");
+      vi.mocked(multiTenant.getCurrentTenantId).mockReturnValue("tenant-from-env");
+
+      const event: AuditEvent = {
+        action: "UPDATE",
+        entityType: "Issue",
+        entityId: "789",
+        tenantId: "tenant-explicit",
+      };
+
+      mockQueue.add.mockResolvedValue({ id: "job-1" });
+
+      await captureAuditEvent(event);
+
+      const jobData = mockQueue.add.mock.calls[0][1];
+      expect(jobData.tenantId).toBe("tenant-explicit");
+
+      // Restore default
+      vi.mocked(multiTenant.getCurrentTenantId).mockReturnValue(undefined);
+    });
+
+    it("should result in undefined tenantId when neither provided", async () => {
+      const event: AuditEvent = {
+        action: "CREATE",
+        entityType: "Issue",
+        entityId: "456",
+      };
+
+      mockQueue.add.mockResolvedValue({ id: "job-1" });
+
+      await captureAuditEvent(event);
+
+      expect(mockQueue.add).toHaveBeenCalledWith(
+        "audit-event",
+        expect.objectContaining({
+          tenantId: undefined,
+        }),
+        expect.any(Object)
+      );
+    });
+  });
+
   describe("auditCreate", () => {
     it("should capture CREATE event with entity details", async () => {
       const entity = {

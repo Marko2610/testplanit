@@ -4132,9 +4132,8 @@ async function captureAuditEvent(event) {
     context,
     queuedAt: (/* @__PURE__ */ new Date()).toISOString(),
     // Include tenantId for multi-tenant support
-    // Always include when available - web app sets INSTANCE_TENANT_ID,
-    // shared worker uses MULTI_TENANT_MODE to validate it
-    tenantId: getCurrentTenantId()
+    // Use explicitly passed tenantId (from workers) or fall back to env var
+    tenantId: event.tenantId ?? getCurrentTenantId()
   };
   try {
     await queue.add("audit-event", jobData, {
@@ -4175,6 +4174,7 @@ var processor = async (job) => {
           entityName: `Issue Sync`,
           userId: jobData.userId,
           projectId: jobData.projectId ? Number(jobData.projectId) : void 0,
+          tenantId: jobData.tenantId,
           metadata: {
             source: "sync-worker",
             integrationId: jobData.integrationId,
@@ -4217,6 +4217,7 @@ var processor = async (job) => {
           entityName: `Issue Sync`,
           userId: jobData.userId,
           projectId: jobData.projectId ? Number(jobData.projectId) : void 0,
+          tenantId: jobData.tenantId,
           metadata: {
             source: "sync-worker:project",
             integrationId: jobData.integrationId,
@@ -4257,6 +4258,7 @@ var processor = async (job) => {
           entityType: "Issue",
           entityId: String(jobData.issueId),
           userId: jobData.userId,
+          tenantId: jobData.tenantId,
           metadata: {
             source: "sync-worker:refresh",
             integrationId: jobData.integrationId,

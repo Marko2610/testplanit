@@ -49,6 +49,7 @@ const processor = async (job: Job) => {
           entityName: `Issue Sync`,
           userId: jobData.userId,
           projectId: jobData.projectId ? Number(jobData.projectId) : undefined,
+          tenantId: jobData.tenantId,
           metadata: {
             source: "sync-worker",
             integrationId: jobData.integrationId,
@@ -95,6 +96,7 @@ const processor = async (job: Job) => {
           entityName: `Issue Sync`,
           userId: jobData.userId,
           projectId: jobData.projectId ? Number(jobData.projectId) : undefined,
+          tenantId: jobData.tenantId,
           metadata: {
             source: "sync-worker:project",
             integrationId: jobData.integrationId,
@@ -141,6 +143,7 @@ const processor = async (job: Job) => {
           entityType: "Issue",
           entityId: String(jobData.issueId),
           userId: jobData.userId,
+          tenantId: jobData.tenantId,
           metadata: {
             source: "sync-worker:refresh",
             integrationId: jobData.integrationId,

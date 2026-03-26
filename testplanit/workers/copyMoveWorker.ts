@@ -733,6 +733,7 @@ const processor = async (job: Job<CopyMoveJobData>): Promise<CopyMoveJobResult> 
       entityId: String(targetId),
       projectId: job.data.targetProjectId,
       userId: job.data.userId,
+      tenantId: job.data.tenantId,
       metadata: {
         source: `copy-move:${job.data.operation}`,
         sourceProjectId: job.data.sourceProjectId,
@@ -750,6 +751,7 @@ const processor = async (job: Job<CopyMoveJobData>): Promise<CopyMoveJobResult> 
         entityId: String(sourceId),
         projectId: job.data.sourceProjectId,
         userId: job.data.userId,
+        tenantId: job.data.tenantId,
         metadata: {
           source: "copy-move:move",
           targetProjectId: job.data.targetProjectId,

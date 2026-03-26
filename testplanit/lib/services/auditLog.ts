@@ -26,6 +26,8 @@ export interface AuditEvent {
   userName?: string;
   /** Additional metadata */
   metadata?: Record<string, unknown>;
+  /** Optional tenantId override (for workers where env var isn't available) */
+  tenantId?: string;
 }
 
 /**
@@ -214,9 +216,8 @@ export async function captureAuditEvent(event: AuditEvent): Promise<void> {
     context,
     queuedAt: new Date().toISOString(),
     // Include tenantId for multi-tenant support
-    // Always include when available - web app sets INSTANCE_TENANT_ID,
-    // shared worker uses MULTI_TENANT_MODE to validate it
-    tenantId: getCurrentTenantId(),
+    // Use explicitly passed tenantId (from workers) or fall back to env var
+    tenantId: event.tenantId ?? getCurrentTenantId(),
   };
 
   try {

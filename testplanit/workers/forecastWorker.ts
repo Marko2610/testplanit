@@ -198,6 +198,7 @@ const processor = async (job: Job) => {
               entityId: String(milestone.id),
               entityName: milestone.name,
               projectId: milestone.projectId,
+              tenantId: job.data.tenantId,
               metadata: {
                 source: "forecast-worker:auto-complete",
                 jobId: job.id,

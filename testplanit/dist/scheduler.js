@@ -1179,9 +1179,8 @@ async function captureAuditEvent(event) {
     context,
     queuedAt: (/* @__PURE__ */ new Date()).toISOString(),
     // Include tenantId for multi-tenant support
-    // Always include when available - web app sets INSTANCE_TENANT_ID,
-    // shared worker uses MULTI_TENANT_MODE to validate it
-    tenantId: getCurrentTenantId()
+    // Use explicitly passed tenantId (from workers) or fall back to env var
+    tenantId: event.tenantId ?? getCurrentTenantId()
   };
   try {
     await queue.add("audit-event", jobData, {
@@ -2014,6 +2013,7 @@ var processor2 = async (job) => {
               entityId: String(milestone.id),
               entityName: milestone.name,
               projectId: milestone.projectId,
+              tenantId: job.data.tenantId,
               metadata: {
                 source: "forecast-worker:auto-complete",
                 jobId: job.id
