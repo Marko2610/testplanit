@@ -1,3 +1,9 @@
+## [0.18.9](https://github.com/TestPlanIt/testplanit/compare/v0.18.8...v0.18.9) (2026-03-27)
+
+### Bug Fixes
+
+* Fixed Docker custom ports and updated docs ([#158](https://github.com/TestPlanIt/testplanit/issues/158)) ([8f355e0](https://github.com/TestPlanIt/testplanit/commit/8f355e03ddcb6e73c338873468ef1582a307dc6a))
+
 ## [0.18.8](https://github.com/TestPlanIt/testplanit/compare/v0.18.7...v0.18.8) (2026-03-27)
 
 ### Bug Fixes
