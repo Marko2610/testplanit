@@ -296,7 +296,7 @@ Add specific guidance when needed:
 
 ## API Reference
 
-Magic Select uses a submit/poll pattern backed by a background worker. See [Background Processes](../background-processes) for worker setup.
+Magic Select uses a submit/poll pattern backed by a background worker. See [Background Processes](/docs/background-processes) for worker setup.
 
 ### Count Only (synchronous)
 
