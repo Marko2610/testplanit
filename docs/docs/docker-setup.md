@@ -110,6 +110,34 @@ The Docker Compose setup starts these containerized services:
 
     **Important:** The `.env.production` file contains many other variables (database, Valkey, Elasticsearch, MinIO connections) that are already configured correctly for Docker. Only modify the variables shown above unless you're using external services.
 
+    ### Optional: Change External Docker Ports
+
+    You can override host-exposed ports with `DOCKER_*_PORT` variables (for example `DOCKER_POSTGRES_PORT=5732`).
+
+    Compose files use fallback syntax such as `${DOCKER_POSTGRES_PORT:-5432}:5432`, which means:
+
+    - use `DOCKER_POSTGRES_PORT` when set
+    - otherwise fall back to `5432`
+
+    Important behavior:
+
+    - `env_file:` in `docker-compose*.yml` sets runtime variables inside containers
+    - it does **not** control Compose interpolation for published ports
+
+    If you changed port values in `.env.development` or `.env.production`, run Compose with `--env-file`:
+
+    ```bash
+    # Development
+    docker compose --env-file .env.development -f docker-compose.dev.yml up -d --build
+
+    # Production
+    docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+    ```
+
+    Alternatively, place the `DOCKER_*_PORT` values in a local `.env` file (auto-loaded by Compose).
+
+    Note: this only changes external host bindings. Internal service ports stay the same (for example PostgreSQL remains `postgres:5432` inside the Docker network).
+
 4. **Choose Your Services:**
 
     TestPlanIt uses Docker Compose profiles to make services optional:
@@ -180,16 +208,22 @@ The Docker Compose setup starts these containerized services:
     **First startup takes 2-5 minutes** as images are built and services initialize.
 
 6. **Access TestPlanIt:**
-    - **Development**: [http://localhost:3000](http://localhost:3000)
-    - **Production**: [http://localhost:30000](http://localhost:30000)
+    - **Development** (`dev`): [http://localhost:3000](http://localhost:3000)
+      - Override with `DOCKER_DEV_APP_PORT`
+    - **Production** (`prod`): [http://localhost:30000](http://localhost:30000)
+      - Override with `DOCKER_PROD_APP_PORT`
     - **Default login**: `admin@example.com` / `admin` (change in production!)
     - **Demo Project**: A pre-populated Demo Project is created during initial setup with sample test cases, test runs, sessions, milestones, and issues. Use the **Help menu > Start Demo Project Tour** for a guided walkthrough.
 
 7. **Access Additional Services (if enabled):**
     - **MinIO Console** (`with-minio`): [http://localhost:9001](http://localhost:9001)
+      - Override with `DOCKER_MINIO_CONSOLE_PORT`
     - **Elasticsearch** (`with-elasticsearch`): [http://localhost:9200](http://localhost:9200)
+      - Override with `DOCKER_ELASTICSEARCH_HTTP_PORT`
     - **PostgreSQL** (`with-postgres`): `localhost:5432` (user: `user` / password: `password`)
+      - Override with `DOCKER_POSTGRES_PORT`
     - **Valkey** (`with-valkey`): `localhost:6379`
+      - Override with `DOCKER_VALKEY_PORT`
 
 ## Environment Management
 
