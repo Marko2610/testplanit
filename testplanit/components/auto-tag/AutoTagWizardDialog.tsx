@@ -181,6 +181,10 @@ interface AutoTagReviewRow {
   errorMessage?: string;
 }
 
+function getEntityKey(entityType: EntityType, entityId: number): string {
+  return `${entityType}:${entityId}`;
+}
+
 interface AutoTagWizardDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -220,6 +224,7 @@ export function AutoTagWizardDialog({
   const [includeRuns, setIncludeRuns] = useState(true);
   const [includeSessions, setIncludeSessions] = useState(true);
   const [untaggedOnly, setUntaggedOnly] = useState(false);
+  const [allowNewTags, setAllowNewTags] = useState(true);
 
   // Reset toggles when dialog opens
   useEffect(() => {
@@ -228,6 +233,7 @@ export function AutoTagWizardDialog({
       setIncludeRuns(true);
       setIncludeSessions(true);
       setUntaggedOnly(false);
+      setAllowNewTags(true);
     }
   }, [open]);
 
@@ -330,17 +336,23 @@ export function AutoTagWizardDialog({
     const promises: Promise<void>[] = [];
     if (includeCases && effectiveCaseIds.length > 0) {
       promises.push(
-        autoTagCases.submit(effectiveCaseIds, "repositoryCase", projectIdNum)
+        autoTagCases.submit(effectiveCaseIds, "repositoryCase", projectIdNum, {
+          allowNewTags,
+        })
       );
     }
     if (includeSessions && effectiveSessionIds.length > 0) {
       promises.push(
-        autoTagSessions.submit(effectiveSessionIds, "session", projectIdNum)
+        autoTagSessions.submit(effectiveSessionIds, "session", projectIdNum, {
+          allowNewTags,
+        })
       );
     }
     if (includeRuns && effectiveRunIds.length > 0) {
       promises.push(
-        autoTagRuns.submit(effectiveRunIds, "testRun", projectIdNum)
+        autoTagRuns.submit(effectiveRunIds, "testRun", projectIdNum, {
+          allowNewTags,
+        })
       );
     }
     await Promise.all(promises);
@@ -352,6 +364,7 @@ export function AutoTagWizardDialog({
     includeCases,
     includeRuns,
     includeSessions,
+    allowNewTags,
     autoTagCases,
     autoTagSessions,
     autoTagRuns,
@@ -396,10 +409,13 @@ export function AutoTagWizardDialog({
   >({});
 
   const mergedSelections = useMemo(() => {
-    const merged = new Map<number, Set<string>>();
+    const merged = new Map<string, Set<string>>();
     for (const job of allJobs) {
-      for (const [k, v] of job.selections) {
-        merged.set(k, v);
+      if (!job.suggestions) continue;
+      for (const entity of job.suggestions) {
+        const selection = job.selections.get(entity.entityId);
+        if (!selection) continue;
+        merged.set(getEntityKey(entity.entityType, entity.entityId), selection);
       }
     }
     return merged;
@@ -437,24 +453,35 @@ export function AutoTagWizardDialog({
 
   // Find which job owns a given entity for toggle/edit/apply
   const findJobForEntity = useCallback(
-    (entityId: number) => {
+    (entityType: EntityType, entityId: number) => {
       return allJobs.find((j) =>
-        j.suggestions?.some((s) => s.entityId === entityId)
+        j.suggestions?.some(
+          (s) => s.entityId === entityId && s.entityType === entityType,
+        )
       );
     },
     [allJobs]
   );
 
   const handleToggle = useCallback(
-    (entityId: number, tagName: string) => {
-      findJobForEntity(entityId)?.toggleTag(entityId, tagName);
+    (entityType: EntityType, entityId: number, tagName: string) => {
+      findJobForEntity(entityType, entityId)?.toggleTag(entityId, tagName);
     },
     [findJobForEntity]
   );
 
   const handleEdit = useCallback(
-    (entityId: number, oldName: string, newName: string) => {
-      findJobForEntity(entityId)?.editTag(entityId, oldName, newName);
+    (
+      entityType: EntityType,
+      entityId: number,
+      oldName: string,
+      newName: string,
+    ) => {
+      findJobForEntity(entityType, entityId)?.editTag(
+        entityId,
+        oldName,
+        newName,
+      );
     },
     [findJobForEntity]
   );
@@ -647,7 +674,9 @@ export function AutoTagWizardDialog({
         enableResizing: true,
         cell: ({ row }) => {
           const entity = row.original;
-          const entitySelections = mergedSelections.get(entity.entityId);
+          const entitySelections = mergedSelections.get(
+            getEntityKey(entity.entityType, entity.entityId),
+          );
           if (entity.failed || entity.errorMessage) {
             return (
               <span className="text-xs text-destructive">
@@ -677,9 +706,16 @@ export function AutoTagWizardDialog({
                   tagName={tag.tagName}
                   isExisting={tag.isExisting}
                   isAccepted={entitySelections?.has(tag.tagName) ?? false}
-                  onToggle={() => handleToggle(entity.entityId, tag.tagName)}
+                  onToggle={() =>
+                    handleToggle(entity.entityType, entity.entityId, tag.tagName)
+                  }
                   onEdit={(newName) =>
-                    handleEdit(entity.entityId, tag.tagName, newName)
+                    handleEdit(
+                      entity.entityType,
+                      entity.entityId,
+                      tag.tagName,
+                      newName,
+                    )
                   }
                 />
               ))}
@@ -708,8 +744,12 @@ export function AutoTagWizardDialog({
       const { assignCount, newCount } = mergedSummary;
       const entityCount = new Set(
         allSuggestions
-          .filter((e) => (mergedSelections.get(e.entityId)?.size ?? 0) > 0)
-          .map((e) => e.entityId)
+          .filter(
+            (e) =>
+              (mergedSelections.get(getEntityKey(e.entityType, e.entityId))
+                ?.size ?? 0) > 0,
+          )
+          .map((e) => getEntityKey(e.entityType, e.entityId))
       ).size;
       const tagCount = assignCount;
 
@@ -821,6 +861,14 @@ export function AutoTagWizardDialog({
                   onCheckedChange={setUntaggedOnly}
                 />
                 <span className="text-sm">{t("wizard.untaggedOnly")}</span>
+              </label>
+
+              <label className="flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors hover:bg-accent/50">
+                <Switch
+                  checked={allowNewTags}
+                  onCheckedChange={setAllowNewTags}
+                />
+                <span className="text-sm">{t("wizard.allowNewTags")}</span>
               </label>
             </div>
 

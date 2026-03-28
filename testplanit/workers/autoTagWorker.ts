@@ -21,6 +21,7 @@ export interface AutoTagJobData extends MultiTenantJobData {
   entityType: EntityType;
   projectId: number;
   userId: string;
+  allowNewTags?: boolean;
 }
 
 export interface AutoTagJobResult {
@@ -97,6 +98,7 @@ const processor = async (
     onBatchComplete: async (processed: number, total: number) => {
       await job.updateProgress({ analyzed: processed, total });
     },
+    allowNewTags: job.data.allowNewTags ?? true,
     isCancelled: async () => {
       const flag = await redis.get(cancelKey(job.id));
       if (flag) {

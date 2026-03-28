@@ -68,7 +68,13 @@ const mockSessionsJob = vi.hoisted(() => ({
     | "failed",
   progress: null as { analyzed: number; total: number; finalizing?: boolean } | null,
   error: null as string | null,
-  suggestions: null as null,
+  suggestions: null as Array<{
+    entityId: number;
+    entityType: "session";
+    entityName: string;
+    currentTags: string[];
+    tags: Array<{ tagName: string; isExisting: boolean }>;
+  }> | null,
   selections: new Map() as Map<number, Set<string>>,
   edits: new Map() as Map<string, string>,
   submit: mockSessionsSubmit,
@@ -92,7 +98,13 @@ const mockRunsJob = vi.hoisted(() => ({
     | "failed",
   progress: null as { analyzed: number; total: number; finalizing?: boolean } | null,
   error: null as string | null,
-  suggestions: null as null,
+  suggestions: null as Array<{
+    entityId: number;
+    entityType: "testRun";
+    entityName: string;
+    currentTags: string[];
+    tags: Array<{ tagName: string; isExisting: boolean }>;
+  }> | null,
   selections: new Map() as Map<number, Set<string>>,
   edits: new Map() as Map<string, string>,
   submit: mockRunsSubmit,
@@ -109,6 +121,8 @@ const mockRunsJob = vi.hoisted(() => ({
 const mockInvalidateModelQueries = vi.hoisted(() =>
   vi.fn().mockResolvedValue(undefined)
 );
+const mockToastSuccess = vi.hoisted(() => vi.fn());
+const mockToastError = vi.hoisted(() => vi.fn());
 
 // --- Mocks ---
 
@@ -154,8 +168,8 @@ vi.mock("~/lib/contexts/PaginationContext", () => ({
 
 vi.mock("sonner", () => ({
   toast: {
-    success: vi.fn(),
-    error: vi.fn(),
+    success: mockToastSuccess,
+    error: mockToastError,
   },
 }));
 
@@ -539,14 +553,14 @@ describe("AutoTagWizardDialog", () => {
 
       // Three checkboxes for entity types
       const checkboxes = screen.getAllByRole("checkbox");
-      // 3 entity checkboxes + 1 switch for untagged-only
+      // 3 entity checkboxes + 2 switches (untagged-only, allow-new-tags)
       expect(checkboxes.length).toBeGreaterThanOrEqual(3);
     });
 
     it("shows untagged-only switch in configure step", () => {
       renderWithQueryClient(<AutoTagWizardDialog {...defaultProps} />);
 
-      expect(screen.getAllByRole("switch")).toHaveLength(1);
+      expect(screen.getAllByRole("switch")).toHaveLength(2);
     });
 
     it("start button is enabled when entity IDs are provided", () => {
@@ -600,10 +614,34 @@ describe("AutoTagWizardDialog", () => {
       expect(mockCasesSubmit).toHaveBeenCalledWith(
         [1, 2, 3],
         "repositoryCase",
-        42
+        42,
+        { allowNewTags: true }
       );
-      expect(mockSessionsSubmit).toHaveBeenCalledWith([10, 11], "session", 42);
-      expect(mockRunsSubmit).toHaveBeenCalledWith([20, 21, 22], "testRun", 42);
+      expect(mockSessionsSubmit).toHaveBeenCalledWith([10, 11], "session", 42, {
+        allowNewTags: true,
+      });
+      expect(mockRunsSubmit).toHaveBeenCalledWith([20, 21, 22], "testRun", 42, {
+        allowNewTags: true,
+      });
+    });
+
+    it("passes allowNewTags=false to submit when new-tag creation is disabled", async () => {
+      renderWithQueryClient(<AutoTagWizardDialog {...defaultProps} />);
+
+      const switches = screen.getAllByRole("switch");
+      await userEvent.click(switches[1]!);
+
+      const startBtn = screen.getByRole("button", {
+        name: /wizard\.startAnalysis/i,
+      });
+      await userEvent.click(startBtn);
+
+      expect(mockCasesSubmit).toHaveBeenCalledWith(
+        [1, 2, 3],
+        "repositoryCase",
+        42,
+        { allowNewTags: false }
+      );
     });
   });
 
@@ -733,6 +771,45 @@ describe("AutoTagWizardDialog", () => {
       await userEvent.click(applyBtn);
 
       expect(mockCasesApply).toHaveBeenCalled();
+    });
+
+    it("counts selected entities per type when IDs overlap", async () => {
+      mockCasesJob.status = "completed";
+      mockCasesJob.suggestions = [
+        {
+          entityId: 1,
+          entityType: "repositoryCase" as const,
+          entityName: "Case #1",
+          currentTags: [],
+          tags: [{ tagName: "auth", isExisting: true }],
+        },
+      ];
+      mockCasesJob.selections = new Map([[1, new Set(["auth"])]]);
+      mockCasesJob.summary = { assignCount: 1, newCount: 0 };
+
+      mockSessionsJob.status = "completed";
+      mockSessionsJob.suggestions = [
+        {
+          entityId: 1,
+          entityType: "session" as const,
+          entityName: "Session #1",
+          currentTags: [],
+          tags: [{ tagName: "exploratory", isExisting: true }],
+        },
+      ];
+      mockSessionsJob.selections = new Map([[1, new Set(["exploratory"])]]);
+      mockSessionsJob.summary = { assignCount: 1, newCount: 0 };
+
+      renderWithQueryClient(<AutoTagWizardDialog {...defaultProps} />);
+
+      const applyBtn = screen.getByRole("button", {
+        name: /actions\.apply/i,
+      });
+      await userEvent.click(applyBtn);
+
+      expect(mockToastSuccess).toHaveBeenCalledWith(
+        "review.applySuccess(tagCount=2, entityCount=2)",
+      );
     });
 
     it("shows noSuggestions text in review step when suggestions list is empty", () => {

@@ -23,6 +23,7 @@ interface AnalyzeTagsParams {
   entityType: EntityType;
   projectId: number;
   userId: string;
+  allowNewTags?: boolean;
   onBatchComplete?: (processed: number, total: number) => Promise<void>;
   isCancelled?: () => Promise<boolean>;
 }
@@ -42,7 +43,13 @@ export class TagAnalysisService {
   ) {}
 
   async analyzeTags(params: AnalyzeTagsParams): Promise<TagAnalysisResult> {
-    const { entityIds, entityType, projectId, userId } = params;
+    const {
+      entityIds,
+      entityType,
+      projectId,
+      userId,
+      allowNewTags = true,
+    } = params;
 
     // 1. Resolve prompt via 3-tier chain (needed before resolveIntegration)
     const resolvedPrompt = await this.promptResolver.resolve(
@@ -163,7 +170,7 @@ export class TagAnalysisService {
         return;
       }
 
-      const userPrompt = this.buildUserPrompt(batch, existingTagNames);
+      const userPrompt = this.buildUserPrompt(batch, existingTagNames, allowNewTags);
 
       let response;
       try {
@@ -241,11 +248,18 @@ export class TagAnalysisService {
           entityContent.existingTagNames
         );
 
-        for (const match of matched) {
+        const filteredMatches = allowNewTags
+          ? matched
+          : matched.filter((m) => m.isExisting);
+
+        for (const match of filteredMatches) {
           allSuggestions.push({
             entityId: entitySugg.entityId,
             entityType,
-            tagName: match.tagName,
+            tagName:
+              match.isExisting && match.matchedExistingTag
+                ? match.matchedExistingTag
+                : match.tagName,
             isExisting: match.isExisting,
             matchedExistingTag: match.matchedExistingTag,
           });
@@ -368,9 +382,20 @@ export class TagAnalysisService {
    */
   private buildUserPrompt(
     entities: EntityContent[],
-    existingTagNames: string[]
+    existingTagNames: string[],
+    allowNewTags: boolean
   ): string {
     const parts: string[] = [];
+
+    parts.push("TAG ASSIGNMENT MODE:");
+    if (allowNewTags) {
+      parts.push("You may suggest either existing tags or new tags.");
+    } else {
+      parts.push(
+        "Suggest ONLY tags from the EXISTING PROJECT TAGS list. Do not invent new tags.",
+      );
+    }
+    parts.push("");
 
     parts.push("EXISTING PROJECT TAGS:");
     parts.push(
