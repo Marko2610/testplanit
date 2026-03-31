@@ -1,3 +1,9 @@
+## [0.19.1](https://github.com/TestPlanIt/testplanit/compare/v0.19.0...v0.19.1) (2026-03-31)
+
+### Bug Fixes
+
+* **integrations:** Add validation for external project and default issue type before saving settings ([#169](https://github.com/TestPlanIt/testplanit/issues/169)) ([66b9e6a](https://github.com/TestPlanIt/testplanit/commit/66b9e6a422c3141e1c4464f9e9dd84d83eb42c61))
+
 ## [0.19.0](https://github.com/TestPlanIt/testplanit/compare/v0.18.12...v0.19.0) (2026-03-28)
 
 ### Features
