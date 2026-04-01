@@ -1,3 +1,9 @@
+## [0.20.0](https://github.com/TestPlanIt/testplanit/compare/v0.19.1...v0.20.0) (2026-04-01)
+
+### Features
+
+* Multi-Configuration Sessions, Session Duplication, and PDF Export for Sessions & Test Runs ([#170](https://github.com/TestPlanIt/testplanit/issues/170)) ([61a17c4](https://github.com/TestPlanIt/testplanit/commit/61a17c459ec100a9afbe499ef6f2f8af78be0678))
+
 ## [0.19.1](https://github.com/TestPlanIt/testplanit/compare/v0.19.0...v0.19.1) (2026-03-31)
 
 ### Bug Fixes
