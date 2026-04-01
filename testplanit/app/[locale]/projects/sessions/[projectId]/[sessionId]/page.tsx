@@ -24,10 +24,13 @@ import { useProjectPermissions } from "~/hooks/useProjectPermissions";
 import {
   useCreateAttachments, useCreateSessionVersions, useFindFirstProjects, useFindFirstSessions,
   useFindManyMilestones,
+  useFindManySessionResults,
+  useFindManySessions,
   useFindManySessionVersions,
   useFindManyTemplates, useFindManyWorkflows, useUpdateAttachments, useUpdateSessions
 } from "~/lib/hooks";
 
+import { ConfigurationNameDisplay } from "@/components/ConfigurationNameDisplay";
 import { ConfigurationSelect } from "@/components/forms/ConfigurationSelect";
 import { AsyncCombobox } from "@/components/ui/async-combobox";
 import { AttachmentsCarousel } from "@/components/AttachmentsCarousel";
@@ -78,7 +81,7 @@ import { ApplicationArea } from "@prisma/client";
 import type { JSONContent } from "@tiptap/react";
 import {
   ArrowLeft, ChevronLeft,
-  ChevronRight, CircleCheckBig, CircleSlash2, Save,
+  ChevronRight, CircleCheckBig, CircleSlash2, Combine, FileDown, Save,
   SquarePen, Trash2
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -86,6 +89,7 @@ import parseDuration from "parse-duration";
 import type { Control, FieldErrors, Resolver } from "react-hook-form";
 import { ImperativePanelHandle } from "react-resizable-panels";
 import { emptyEditorContent, MAX_DURATION } from "~/app/constants";
+import { useExportSessionPdf } from "~/hooks/pdf/useExportSessionPdf";
 import SessionResultsSummary from "~/components/SessionResultsSummary";
 import { Link } from "~/lib/navigation";
 import { IconName } from "~/types/globals";
@@ -890,7 +894,22 @@ export default function SessionPage() {
     },
     include: {
       project: true,
-      template: true,
+      template: {
+        include: {
+          caseFields: {
+            include: {
+              caseField: {
+                include: {
+                  type: true,
+                  fieldOptions: {
+                    include: { fieldOption: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       configuration: true,
       milestone: {
         include: {
@@ -916,6 +935,11 @@ export default function SessionPage() {
         },
       },
       tags: true,
+      sessionFieldValues: {
+        include: {
+          field: { include: { type: true } },
+        },
+      },
       issues: {
         where: { isDeleted: false },
         select: {
@@ -944,11 +968,93 @@ export default function SessionPage() {
     },
   });
 
+  // Fetch sibling sessions for multi-config groups
+  type SiblingSession = {
+    id: number;
+    name: string;
+    configuration: { id: number; name: string } | null;
+  };
+
+  const { data: siblingSessions } = useFindManySessions(
+    {
+      where: {
+        configurationGroupId: sessionData?.configurationGroupId ?? undefined,
+        isDeleted: false,
+      },
+      select: {
+        id: true,
+        name: true,
+        configuration: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: "asc" },
+    },
+    { enabled: !!sessionData?.configurationGroupId }
+  );
+
+  const siblingList: SiblingSession[] = useMemo(
+    () => (siblingSessions as SiblingSession[]) || [],
+    [siblingSessions]
+  );
+  const isMultiConfigSession =
+    !!sessionData?.configurationGroupId && siblingList.length > 1;
+
+  const currentSibling = useMemo(
+    () => siblingList.find((s) => s.id === Number(sessionId)) || null,
+    [siblingList, sessionId]
+  );
+
+  const fetchSiblingConfigurations = useCallback(
+    async (query: string, page: number, pageSize: number) => {
+      let filtered = siblingList;
+      if (query) {
+        const lower = query.toLowerCase();
+        filtered = siblingList.filter(
+          (s) =>
+            s.name.toLowerCase().includes(lower) ||
+            s.configuration?.name?.toLowerCase().includes(lower)
+        );
+      }
+      const start = page * pageSize;
+      return { results: filtered.slice(start, start + pageSize), total: filtered.length };
+    },
+    [siblingList]
+  );
+
   // Fetch versions
   const { data: versions } =
     useFindManySessionVersions({
       where: { sessionId: Number(sessionId) },
       orderBy: { version: "desc" },
+    });
+
+  // Fetch session results for PDF export
+  const { data: sessionResultsForExport } = useFindManySessionResults({
+    where: { sessionId: Number(sessionId), isDeleted: false },
+    include: {
+      status: { include: { color: true } },
+      createdBy: { select: { name: true } },
+      attachments: { where: { isDeleted: false } },
+      issues: { select: { name: true, title: true, externalId: true, externalKey: true } },
+      resultFieldValues: {
+        include: {
+          field: { include: { type: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  // PDF export hook
+  const sessionExportData = sessionData
+    ? {
+        ...sessionData,
+        sessionResults: sessionResultsForExport || [],
+      }
+    : null;
+  const { isExporting: isExportingPdf, handleExport: handleExportPdf } =
+    useExportSessionPdf({
+      sessionData: sessionExportData,
+      locale: locale,
     });
 
 
@@ -1570,7 +1676,7 @@ export default function SessionPage() {
               </CardTitle>
               <div className="flex items-start gap-2">
                 {sessionData?.isCompleted ? (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-1">
                     <Badge
                       variant="secondary"
                       className="flex items-center text-md whitespace-nowrap text-sm gap-1 p-2 px-4"
@@ -1587,14 +1693,31 @@ export default function SessionPage() {
                         />
                       </div>
                     </Badge>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleExportPdf}
+                      disabled={isExportingPdf}
+                      className="group px-3 hover:px-3 transition-all duration-200 gap-0 hover:gap-2"
+                    >
+                      <FileDown className="h-4 w-4 shrink-0" />
+                      <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-200 group-hover:max-w-40">
+                        {isExportingPdf
+                          ? tCommon("actions.exportingPdf")
+                          : tCommon("actions.exportPdf")}
+                      </span>
+                    </Button>
                     {(canDeleteClosedSession || isSuperAdmin) && (
                       <Button
                         type="button"
                         variant="destructive"
                         onClick={() => setIsDeleteDialogOpen(true)}
+                        className="group px-3 hover:px-3 transition-all duration-200 gap-0 hover:gap-2"
                       >
-                        <Trash2 className="h-4 w-4" />
-                        {t("actions.delete")}
+                        <Trash2 className="h-4 w-4 shrink-0" />
+                        <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-200 group-hover:max-w-40">
+                          {t("actions.delete")}
+                        </span>
                       </Button>
                     )}
                   </div>
@@ -1612,26 +1735,46 @@ export default function SessionPage() {
                       />
                     )}
                     {!isEditMode ? (
-                      <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-1">
                         {showEditButtonPerm && !sessionData?.isCompleted && (
                           <Button
                             type="button"
                             variant="secondary"
                             onClick={handleEditClick}
+                            className="group px-3 hover:px-3 transition-all duration-200 gap-0 hover:gap-2"
                           >
-                            <SquarePen className="h-4 w-4" />
-                            {tCommon("actions.edit")}
+                            <SquarePen className="h-4 w-4 shrink-0" />
+                            <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-200 group-hover:max-w-40">
+                              {tCommon("actions.edit")}
+                            </span>
                           </Button>
                         )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleExportPdf}
+                          disabled={isExportingPdf}
+                          className="group px-3 hover:px-3 transition-all duration-200 gap-0 hover:gap-2"
+                        >
+                          <FileDown className="h-4 w-4 shrink-0" />
+                          <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-200 group-hover:max-w-40">
+                            {isExportingPdf
+                              ? tCommon("actions.exportingPdf")
+                              : tCommon("actions.exportPdf")}
+                          </span>
+                        </Button>
                         {showCompleteButtonPerm &&
                           !sessionData?.isCompleted && (
                             <Button
                               type="button"
                               variant="secondary"
                               onClick={() => setIsCompleteDialogOpen(true)}
+                              className="group px-3 hover:px-3 transition-all duration-200 gap-0 hover:gap-2"
                             >
-                              <CircleCheckBig className="h-4 w-4" />
-                              {tCommon("actions.complete")}
+                              <CircleCheckBig className="h-4 w-4 shrink-0" />
+                              <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-200 group-hover:max-w-40">
+                                {tCommon("actions.complete")}
+                              </span>
                             </Button>
                           )}
                       </div>
@@ -1808,6 +1951,39 @@ export default function SessionPage() {
                             JSON.stringify(emptyEditorContent)) && (
                           <Separator className="my-4" />
                         )}
+
+                      {/* Configuration selector for multi-config sessions */}
+                      {isMultiConfigSession && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-1 shrink-0 font-semibold">
+                            <Combine className="w-4 h-4" />
+                            <span>{tCommon("fields.configurations")}:</span>
+                          </div>
+                          <AsyncCombobox<SiblingSession>
+                            value={currentSibling}
+                            onValueChange={(selected) => {
+                              if (selected && selected.id !== Number(sessionId)) {
+                                router.push(
+                                  `/projects/sessions/${projectId}/${selected.id}`
+                                );
+                              }
+                            }}
+                            fetchOptions={fetchSiblingConfigurations}
+                            renderOption={(option) => (
+                              <div className="flex items-center gap-2">
+                                <ConfigurationNameDisplay
+                                  configuration={option.configuration}
+                                  name={option.configuration?.name || option.name}
+                                  truncate
+                                />
+                              </div>
+                            )}
+                            getOptionValue={(option) => option.id}
+                            placeholder={tCommon("placeholders.selectConfiguration")}
+                            className="flex-1"
+                          />
+                        </div>
+                      )}
 
                       <div className="flex items-end justify-end mb-2">
                         <SessionResultsSummary

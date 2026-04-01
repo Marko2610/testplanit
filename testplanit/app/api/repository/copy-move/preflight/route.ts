@@ -221,13 +221,15 @@ export async function POST(request: Request) {
       }),
     );
 
-    const collisionCases = await enhancedDb.repositoryCases.findMany({
+    // Use prisma directly for collision detection — access is already verified above
+    // and ZenStack's enhanced DB can have issues matching null fields in OR clauses
+    const collisionCases = await prisma.repositoryCases.findMany({
       where: {
         projectId: body.targetProjectId,
         isDeleted: false,
         OR: sourceNames.map((n) => ({
           name: n.name,
-          className: n.className === null ? { equals: null as any } : n.className,
+          ...(n.className === null ? {} : { className: n.className }),
           source: n.source,
         })),
       },

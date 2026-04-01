@@ -13,7 +13,7 @@ It's accessed by clicking on a session's name from the main [Sessions page](./se
 
 The page uses a resizable two-panel layout:
 
-1. **Left Panel**: Contains the session's description and mission, followed by the area for adding and viewing session results (notes, issues, questions).
+1. **Left Panel**: Contains the session's description and mission, the multi-configuration selector (when applicable), and the area for adding and viewing session results (notes, issues, questions).
 2. **Right Panel**: Displays metadata (Template, State, Configuration, Milestone, Assigned To, Estimate, Tags, Attachments, Creator) and controls.
 
 ## Header
@@ -27,8 +27,10 @@ The header area displays key information and actions:
     - **Version Selector**: If the session has multiple versions (i.e., has been edited), a dropdown appears allowing you to view [previous versions](./sessions-versions.md).
     - **Edit** (`SquarePen` icon): Switches the page to Edit mode (if user has permission).
     - **Complete** (`CircleCheckBig` icon): Opens a confirmation dialog to mark the session as finished. You select the final "Done" state and set the completion date. This action creates a new version and is irreversible (if user has permission).
+    - **Export PDF** (`FileDown` icon): Exports the session to a PDF document including all metadata, description, mission, tags, issues, custom field values, and session results with their statuses, details, and result-level custom fields. Embedded images from attachments are included.
   - **View Mode (Completed Session)**:
     - Displays a "Completed On [Date]" badge.
+    - **Export PDF** (`FileDown` icon): Exports the session to PDF (available on completed sessions as well).
     - **Delete** (`Trash2` icon): Opens a confirmation dialog to permanently delete the session and all its results/versions. This action is irreversible (Admin only).
   - **Edit Mode**:
     - **Save** (`Save` icon): Saves changes made in Edit mode. This creates a new version of the session.
@@ -39,6 +41,7 @@ The header area displays key information and actions:
 
 - **Description**: Displays the session's description using a rich-text viewer. In Edit mode, this becomes an editable TipTap editor.
 - **Mission**: Displays the session's mission/charter using a rich-text viewer. In Edit mode, this becomes an editable TipTap editor.
+- **Configuration Selector** (View Mode Only, Multi-Config Sessions): When a session is part of a [multi-configuration group](./sessions-add.md#multi-configuration-support), a configuration selector appears above the results. This single-select combobox shows the current session's configuration and lists all sibling sessions in the group. Selecting a different configuration navigates to that sibling session's detail page, matching the behavior of the [Test Run Details](./run-details.md) multi-configuration selector.
 - **Session Results** (View Mode Only):
   - **Summary**: Shows counts of different result types (Notes, Issues, Questions) recorded.
   - **Add Result Form**: A form to quickly add new results (Note, Issue, Question), including a text area and optional attachment upload.

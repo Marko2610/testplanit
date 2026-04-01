@@ -610,13 +610,24 @@ test.describe("Access Control - GLOBAL_ROLE Steps Permission (ACL-06)", () => {
   let memberUserId: string;
 
   test.beforeAll(async ({ browser, baseURL, api }) => {
-    // Create a regular USER-access member (gets default global role with canAddEdit: true)
+    // Create a regular USER-access member with the default "user" role
     memberEmail = `acl-steps-${Date.now()}@example.com`;
+
+    // Look up the default role (seeded as "user")
+    const rolesResponse = await api["request"].get(
+      `${baseURL}/api/model/roles/findFirst?q=${encodeURIComponent(
+        JSON.stringify({ where: { isDefault: true } })
+      )}`
+    );
+    const defaultRole = await rolesResponse.json();
+    const defaultRoleId = defaultRole?.data?.id;
+
     const memberResult = await api.createUser({
       name: "ACL Steps Member",
       email: memberEmail,
       password: "password123",
       access: "USER",
+      ...(defaultRoleId ? { roleId: defaultRoleId } : {}),
     });
     memberUserId = memberResult.data.id;
 
@@ -692,6 +703,10 @@ test.describe("Access Control - GLOBAL_ROLE Steps Permission (ACL-06)", () => {
     if (response.status() !== 201) {
       const errorBody = await response.json().catch(() => null);
       console.error("Step create failed:", response.status(), JSON.stringify(errorBody));
+      console.error("Step create caseId:", caseId, "memberUserId:", memberUserId);
+      // Log member's auth status
+      const whoami = await memberCtx.request.get(`${baseURL}/api/auth/session`);
+      console.error("Member session:", await whoami.text());
     }
     expect(response.status()).toBe(201);
     const result = await response.json();
